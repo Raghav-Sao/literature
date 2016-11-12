@@ -5,7 +5,7 @@ namespace AppBundle\Services\PubSub;
 /**
  *
  */
-interface Interface
+interface PubSubInterface
 {
 
     public function trigger(string $channel, string $event, string $data);

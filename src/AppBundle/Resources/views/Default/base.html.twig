@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>{% block title %}{% endblock %} | literature</title>
+        {% block stylesheets %}{% endblock %}
+        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+    </head>
+    <body>
+        {% block body %}{% endblock %}
+        {% block javascripts %}{% endblock %}
+
+        <!-- Pusher included in all views -->
+        <!-- <script src="https://js.pusher.com/3.2/pusher.min.js"></script> -->
+
+        <script>
+            // TODO: Enable this in dev env only
+            // Pusher.logToConsole = true;
+
+            // var pusher = new Pusher(
+            //     '0a4e78670f01ad56c33a',
+            //     {
+            //         encrypted: true
+            //     }
+            // );
+        </script>
+    </body>
+</html>

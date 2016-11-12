@@ -2,13 +2,13 @@
 
 namespace AppBundle\Services\PubSub;
 
-use \Pusher;
+use \Pusher as PusherClient;
 use AppBundle\Services\BaseService;
 
 /**
 *
 */
-class Pusher extends BaseService implements Interface
+class Pusher extends BaseService implements PubSubInterface
 {
 
     protected $pusher;
@@ -35,7 +35,7 @@ class Pusher extends BaseService implements Interface
             'encrypted' => true,
         ];
 
-        $this->pusher = new Pusher(
+        $this->pusher = new PusherClient(
             $appKey,
             $appSecret,
             $appId,

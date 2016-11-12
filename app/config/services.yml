@@ -28,7 +28,7 @@ services:
             - "%pusher.app_id%"
 
     app_bundle.knowledge:
-        class:        AppBundle\Services\knowledge
+        class:        AppBundle\Services\Knowledge
         arguments:
             - "@logger"
             - "@snc_redis.default"

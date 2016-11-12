@@ -2,6 +2,8 @@
 
 namespace AppBundle\Services;
 
+use AppBundle\Models;
+
 /**
  *
  */
@@ -13,24 +15,54 @@ class Game extends BaseService
     protected $knowledge;
 
     /**
-     * @param object                    $logger
-     * @param object                    $redis
-     * @param Services\PubSub\Interface $pubSub
-     * @param Services\Knowledge        $knowledge
+     * @param object                          $logger
+     * @param object                          $redis
+     * @param Services\PubSub\PubSubInterface $pubSub
+     * @param Services\Knowledge              $knowledge
      *
      * @return
      */
     public function __construct(
         $logger,
         $redis,
-        Services\PubSub\Interface $pubSub,
-        Services\Knowledge $knowledge)
+        PubSub\PubSubInterface $pubSub,
+        Knowledge $knowledge)
     {
-
         parent::__construct($logger);
 
         $this->redis     = $redis;
         $this->pubSub    = $pubSub;
         $this->knowledge = $knowledge;
+    }
+
+    /**
+     * @param string $gameId
+     *
+     * @return null|Models\Game
+     */
+    public function fetchById(
+        string $gameId)
+    {
+        $redisGameResults = $this->redis->hgetall($gameId);
+
+        if (empty($redisGameResults)) {
+
+            return null;
+        } else {
+
+            return new Models\Game($redisGameResults);
+        }
+    }
+
+    /**
+     * @param Models\Game $game
+     *
+     * @return null
+     */
+    public function delete(
+        Models\Game $game)
+    {
+        // TODO
+        // - Clean redis data for given gameId
     }
 }

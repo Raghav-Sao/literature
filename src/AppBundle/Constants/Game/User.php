@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Constants\User;
+namespace AppBundle\Constants\Game;
 
 /**
 *
