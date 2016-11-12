@@ -71,6 +71,6 @@ swiftmailer:
 snc_redis:
     clients:
         default:
-            type: predis
+            type:  predis
             alias: default
-            dsn: redis://localhost
+            dsn:   "%redis.dsn%"

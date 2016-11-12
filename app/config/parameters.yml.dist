@@ -19,6 +19,10 @@ parameters:
     secret:            ThisTokenIsNotSoSecretChangeIt
 
     # PubSub: Pusher credentials
-    pusher.app_key: xxxxxx
+    pusher.app_key:    xxxxxx
     pusher.app_secret: xxxxxx
-    pusher.app_id: 111111
+    pusher.app_id:     111111
+
+
+    # Redis
+    redis.dsn:         redis://localhost
