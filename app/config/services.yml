@@ -26,3 +26,33 @@ services:
             - "%pusher.app_key%"
             - "%pusher.app_secret%"
             - "%pusher.app_id%"
+
+    app_bundle.knowledge:
+        class:        AppBundle\Services\knowledge
+        arguments:
+            - "@logger"
+            - "@snc_redis.default"
+
+    app_bundle.game:
+        class:        AppBundle\Services\Game
+        arguments:
+            - "@logger"
+            - "@snc_redis.default"
+            - "@app_bundle.pubsub.pusher"
+            - "@app_bundle.knowledge"
+
+
+    # Event subscriber services
+    app.exception_subscriber:
+        class: AppBundle\EventSubscriber\ExceptionSubscriber
+        arguments:
+            - "@logger"
+        tags:
+            - { name: kernel.event_subscriber }
+
+    app.request_subscriber:
+        class: AppBundle\EventSubscriber\RequestSubscriber
+        arguments:
+            - "@logger"
+        tags:
+            - { name: kernel.event_subscriber }

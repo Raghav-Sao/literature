@@ -1,6 +1,15 @@
-app:
-    resource: "@AppBundle/Controller/"
-    type:     annotation
-core:
-    resource: "@CoreBundle/Controller/"
-    type:     annotation
+
+# AppBundle > DefaultController
+
+default_index:
+    path:     /
+    defaults:
+        _controller: AppBundle:Default:index
+
+
+# AppBundle > GameController
+
+game_index:
+    path:     /game
+    defaults:
+        _controller: AppBundle:Game:index
