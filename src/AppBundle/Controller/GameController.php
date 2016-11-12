@@ -5,24 +5,42 @@ namespace AppBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 
-
+/**
+ *
+ */
 class GameController extends Controller
 {
 
+    /**
+     *
+     * @return
+     */
     public function __construct()
     {
     }
 
+    /**
+     *
+     * @return Response
+     */
     public function indexAction()
     {
 
         return new Response('Welcome to game!');
     }
 
+    /**
+     *
+     * @return
+     */
     public function startAction()
     {
     }
 
+    /**
+     *
+     * @return
+     */
     public function joinAction()
     {
     }
@@ -87,7 +105,4 @@ class GameController extends Controller
     //         'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..').DIRECTORY_SEPARATOR,
     //     ]);
     // }
-
-    
 }
-

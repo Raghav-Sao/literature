@@ -3,13 +3,16 @@
 namespace AppBundle\Models;
 
 /**
-*
-*/
+ *
+ */
 class User
 {
 
-    function __construct(argument)
+    /**
+     *
+     * @return
+     */
+    public function __construct()
     {
-        # code...
     }
 }

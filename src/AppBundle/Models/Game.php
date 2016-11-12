@@ -3,13 +3,16 @@
 namespace AppBundle\Models;
 
 /**
-*
-*/
+ *
+ */
 class Game
 {
 
-    function __construct(argument)
+    /**
+     *
+     * @return
+     */
+    public function __construct()
     {
-        # code...
     }
 }

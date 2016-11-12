@@ -11,6 +11,15 @@ use AppBundle\Services\BaseService;
 class Pusher extends BaseService implements Interface
 {
 
+    /**
+     *
+     * @param object $logger
+     * @param string $appKey
+     * @param string $appSecret
+     * @param string $appId
+     *
+     * @return
+     */
     function __construct(
         $logger,
         string $appKey,
@@ -21,7 +30,7 @@ class Pusher extends BaseService implements Interface
         parent::__construct($logger);
 
         $options = [
-            'encrypted' => true
+            'encrypted' => true,
         ];
 
         $this->pusher = new Pusher(
@@ -32,6 +41,13 @@ class Pusher extends BaseService implements Interface
         );
     }
 
+    /**
+     * @param string $channel
+     * @param string $event
+     * @param string $data
+     *
+     * @return
+     */
     public function trigger(
         string $channel,
         string $event,

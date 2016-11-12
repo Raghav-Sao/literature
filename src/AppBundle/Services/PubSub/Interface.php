@@ -2,6 +2,9 @@
 
 namespace AppBundle\Services\PubSub;
 
+/**
+ *
+ */
 interface Interface
 {
 
