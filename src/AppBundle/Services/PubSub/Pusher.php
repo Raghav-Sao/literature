@@ -11,6 +11,8 @@ use AppBundle\Services\BaseService;
 class Pusher extends BaseService implements Interface
 {
 
+    protected $pusher;
+
     /**
      *
      * @param object $logger
@@ -20,7 +22,7 @@ class Pusher extends BaseService implements Interface
      *
      * @return
      */
-    function __construct(
+    public function __construct(
         $logger,
         string $appKey,
         string $appSecret,

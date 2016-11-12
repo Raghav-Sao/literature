@@ -3,12 +3,24 @@
 namespace AppBundle\Services;
 
 /**
-*
-*/
+ *
+ */
 class Game extends BaseService
 {
 
-    function __construct(
+    protected $redis;
+    protected $pubSub;
+    protected $knowledge;
+
+    /**
+     * @param object                    $logger
+     * @param object                    $redis
+     * @param Services\PubSub\Interface $pubSub
+     * @param Services\Knowledge        $knowledge
+     *
+     * @return
+     */
+    public function __construct(
         $logger,
         $redis,
         Services\PubSub\Interface $pubSub,

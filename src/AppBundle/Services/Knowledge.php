@@ -3,15 +3,23 @@
 namespace AppBundle\Services;
 
 /**
-*
-*/
+ *
+ */
 class Knowledge extends BaseService
 {
 
-    function __construct(
+    protected $redis;
+
+    /**
+     * @param object $logger
+     * @param object $redis
+     *
+     * @return
+     */
+    public function __construct(
         $logger,
-        $redis)
-    {
+        $redis
+    ) {
 
         parent::__construct($logger);
 
