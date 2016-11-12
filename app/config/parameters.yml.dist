@@ -17,3 +17,8 @@ parameters:
 
     # A secret key that's used to generate certain security-related tokens
     secret:            ThisTokenIsNotSoSecretChangeIt
+
+    # PubSub: Pusher credentials
+    pusher.app_key: xxxxxx
+    pusher.app_secret: xxxxxx
+    pusher.app_id: 111111

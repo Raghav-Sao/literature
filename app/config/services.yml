@@ -18,4 +18,11 @@ services:
     app_bundle.add_member:
         class:        AppBundle\Services\CardDistribution
         arguments:    ["@snc_redis.default"]
-    
+
+    app_bundle.pubsub.pusher:
+        class:        AppBundle\Services\PubSub\Pusher
+        arguments:
+            - "@logger"
+            - "%pusher.app_key%"
+            - "%pusher.app_secret%"
+            - "%pusher.app_id%"
