@@ -112,7 +112,7 @@ class User
     {
 
         return [
-            "id" => $this->id,
+            // "id" => $this->id,
             "cards" => $this->cards,
         ];
     }

@@ -76,7 +76,7 @@ class Utility
         string $card)
     {
 
-        return in_array($card, Card::$all, true);
+        return in_array($card, Card::$allInGame, true);
     }
 
     /**
@@ -117,5 +117,22 @@ class Utility
 
             return Card::HIGHER_RANGE;
         }
+    }
+
+    /**
+     * Returns set of 4 cards array, shuffled randomly
+     *
+     * @return array
+     */
+    public static function distributeCards()
+    {
+        $cards = Card::$allInGame;
+
+        // Shuffle all cards randombly few times
+        foreach (range(0, 10) as $key => $value) {
+            shuffle($cards);
+        }
+
+        return array_chunk($cards, 8);
     }
 }

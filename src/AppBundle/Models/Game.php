@@ -42,6 +42,15 @@ class Game
     }
 
     /**
+     * @return string
+     */
+    public function getId()
+    {
+
+        return $this->id;
+    }
+
+    /**
      *
      * @return boolean
      */

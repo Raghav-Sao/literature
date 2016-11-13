@@ -91,86 +91,40 @@ class Game extends BaseService
     }
 
     /**
-     * @param string $sessionId
-     * @param string $createdAt
      * @param string $userId
      *
      * @return null
      */
     public function initializeGame(
-        string $gameId,
-        string $createdAt,
         string $userId)
     {
-        list($cardU1, $cardU2, $cardU3, $cardU4) = $this->CardDistribution();
-        // var_dump($gameId);
-        $initializeGameResults = $this->redis->hMset(
+        $gameId = Utility::newGameId();
+        list($u1Cards, $u2Cards, $u3Cards, $u4Cards) = Utility::distributeCards();
+
+        $initializeGameResults = $this->redis->hmset(
             $gameId,
-            "created_at",   $createdAt, 
-            "total_user" ,  1,
-            "u1",           $userId,
-            "status",       "active",
-            "next_turn",    "u1",
-            "u1_card",      implode(" ", $cardU1),
-            "u2_card",      implode(" ", $cardU2),
-            "u3_card",      implode(" ", $cardU3),
-            "u4_card",      implode(" ", $cardU4)
-            );
+            Constants\Game\Game::CREATED_AT,   Utility::currentTimeStamp(), 
+            Constants\Game\User::USER_1,       $userId,
+            Constants\Game\Game::STATUS,       Constants\Game\Status::ACTIVE,
+            Constants\Game\Game::NEXT_TURN,    Constants\Game\User::USER_1,
+            Constants\Game\Game::U1_CARDS,     implode(",", $u1Cards),
+            Constants\Game\Game::U2_CARDS,     implode(",", $u2Cards),
+            Constants\Game\Game::U3_CARDS,     implode(",", $u3Cards),
+            Constants\Game\Game::U4_CARDS,     implode(",", $u4Cards)
+        );
         
-        $initializeUserReuslt = $this->redis->sAdd(
+        $initializeUserReuslt = $this->redis->sadd(
             $userId,
-            $cardU1
-            );
+            $u1Cards
+        );
 
-        // TODO: Make user
-
-        return array($this->fetchById($gameId), $this->fetchUserById($userId));
-
+        return [
+            $this->fetchById($gameId),
+            $this->fetchUserById($userId)
+        ];
     }
 
-    /**
-     * @param string $sessionId
-     * @param string $createdAt
-     * @param string $userId
-     *
-     * @return null
-     */
-    private function cardDistribution() {
-
-        $total_card = array();
-        $card_color = ['C', 'D', 'H', 'S'];
-        while(count($total_card) < 48) {
-            $color = (int)(rand(1,51)/13);
-            $card_no = (int)(rand(4,52)/4);
-            $card =   $card_color[$color] . $card_no;
-            if ( !in_array( $card, $total_card ) && $card_no != 7) {
-                array_push($total_card, $card);
-            }
-        }
-        $user1 = array();
-        $user2 = array();
-        $user3 = array();
-        $user4 = array();
-        for($i=0; $i<12; $i++) {
-            for($j=0; $j<=3; $j++) {
-                if($i%4==0){
-                    array_push($user1, $total_card[$i*4+$j]);
-                }
-                if($i%4==1){
-                    array_push($user2, $total_card[$i*4+$j]);
-                }
-                if($i%4==2){
-                    array_push($user3, $total_card[$i*4+$j]);
-                }
-                if($i%4==3){
-                    array_push($user4, $total_card[$i*4+$j]);
-                }
-            }
-        }
-        return array($user1, $user2, $user3, $user4);
-    }
-
-     /*
+    /*
      * @param Models\Game $game
      * @param string      $userId
      *
@@ -238,7 +192,10 @@ class Game extends BaseService
             );
             $game->setNextTurn($fromUserSN);
 
-            return (false, "The other user does not have that card.");
+            return [
+                false,
+                "The other user does not have that card."
+            ];
         }
 
         $this->redis->smove(
@@ -249,6 +206,9 @@ class Game extends BaseService
         $this->fromUser->removeCard($card);
         $this->toUser->addCard($card);
 
-        return (true, "Move successful.");
+        return [
+            true,
+            "Move successful."
+        ];
     }
 }
