@@ -27,7 +27,33 @@ class User
         $this->cards = $cards;
     }
 
+    /**
+     * @return string
+     */
+    public function getId()
+    {
 
+        return $this->id;
+    }
+
+    /**
+     *
+     * @param string $card
+     *
+     * @return boolean
+     */
+    public function hasAtLeastOneOfType(
+        string $card)
+    {
+        // TODO: Implment this
+
+        return true;
+    }
+
+    /**
+     *
+     * @return array
+     */
     public function toArray()
     {
 

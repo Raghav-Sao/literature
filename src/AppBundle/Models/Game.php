@@ -12,6 +12,7 @@ class Game
     private $id;
     private $createdAt;
     private $status;
+    private $nextTurn;
 
     // User serial numbers
     private $u1;
@@ -66,6 +67,49 @@ class Game
             ],
             true
         );
+    }
+
+    /**
+     *
+     * @param string $userSN
+     * @param string $userId
+     *
+     * @return boolean
+     */
+    public function isValidSNAgainstID($userSN, $userId)
+    {
+
+        return property_exists($this, $userSN) && $this->$userSN === $userId;
+    }
+
+    /**
+     *
+     * @param string $userSN
+     *
+     * @return null|string
+     */
+    public function getUserIdBySN($userSN)
+    {
+        if (property_exists($this, $userSN)) {
+
+            return $this->$userSN;
+        } else {
+            // TODO: Should throw error?
+
+            return null;
+        }
+    }
+
+    /**
+     * Gets user id with next turn
+     *
+     * @return string
+     */
+    public function getNextTurnUserId()
+    {
+        $nextTurnSN = $this->nextTurn;
+
+        return $this->$nextTurnSN;
     }
 
     /**

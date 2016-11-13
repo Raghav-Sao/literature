@@ -20,6 +20,6 @@ game_index_id:
         _controller: AppBundle:Game:indexId
 
 game_move_card:
-    path:     /game/{id}/move/card/{card}/from/{fromUserId}/to/{toUserId}
+    path:     /game/{id}/move/card/{card}/from/{fromUserSN}/to/{toUserSN}
     defaults:
         _controller: AppBundle:Game:moveCard
