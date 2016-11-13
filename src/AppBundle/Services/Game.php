@@ -118,4 +118,34 @@ class Game extends BaseService
             throw new BadRequestException("You do not belong to game with given id.");
         }
     }
+
+    /**
+     *
+     * @param Models\Game $game
+     * @param string      $card
+     * @param string      $fromUserSN
+     * @param string      $toUserSN
+     *
+     * @return
+     */
+    public function moveCard(
+        Models\Game $game,
+        string $card,
+        Models\User $fromUser,
+        Models\User $toUser)
+    {
+        if ($game->getNextTurnUserId() !== $toUser->getId()) {
+            throw new BadRequestException("It is not your turn to make a move.");
+        }
+
+        if ($toUser->hasAtLeastOneOfType($card) === false) {
+            throw new BadRequestException("You do not have at least one card of that type. Invalid move.");
+        }
+
+        // TODOs:
+        // Update data
+        // Check game status - Win/Loose etc
+        // Publish response data too
+        // Ensure $game & $user refreshed
+    }
 }

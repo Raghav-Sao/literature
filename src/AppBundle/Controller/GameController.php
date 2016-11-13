@@ -8,6 +8,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use AppBundle\Constants\Service;
 use AppBundle\Constants\SessionKey;
 
+use AppBundle\Exceptions\BadRequestException;
+
 /**
  *
  */
@@ -86,28 +88,52 @@ class GameController extends BaseController
     /**
      * @param string $id
      * @param string $card
-     * @param string $fromUserId
-     * @param string $toUserId
+     * @param string $fromUserSN
+     * @param string $toUserSN
      */
     public function moveCardAction(
         string $id,
         string $card,
-        string $fromUserId,
-        string $toUserId)
+        string $fromUserSN,
+        string $toUserSN)
     {
 
         // Using session data
         // $id       = $this->gameId
-        // $toUserId = $this->userId
+        // $toUserSN = $this->userId 's SN
 
         $this->init();
-        // $this->validateGame();
 
-        // His turn
-        // Validate move conditions; At least one card of a color
-        // Update data
-        // Check game status - Win/Loose etc
-        // Publish response data too
+        try {
+
+            $game = $this->gameService->fetchById($this->gameId);
+
+            $this->gameService->validateGame($game, $this->userId);
+
+            // Other validation
+            if ($game->isValidSNAgainstID($toUserSN, $this->userId) === false) {
+                throw new BadRequestException("`toUserSN` is not valid.");
+            }
+
+            $fromUser = $this->gameService->fetchUserById($game->getUserIdBySN($fromUserSN));
+            $toUser   = $this->gameService->fetchUserById($game->getUserIdBySN($toUserSN));
+
+            $gameService->moveCard(
+                $game,
+                $card,
+                $fromUser,
+                $toUser
+            );
+
+        } catch (\Exception $e) {
+
+            return $this->handleException($e);
+        }
+
+        return new JsonResponse([
+            "game" => $game->toArray(),
+            "user" => $toUser->toArray(),
+        ]);
     }
 
     // /**
