@@ -57,13 +57,14 @@ class Game
     {
 
         return in_array(
+            $userId,
             [
                 $this->u1,
                 $this->u2,
                 $this->u3,
                 $this->u4,
             ],
-            $userId
+            true
         );
     }
 

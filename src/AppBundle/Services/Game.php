@@ -4,6 +4,9 @@ namespace AppBundle\Services;
 
 use AppBundle\Models;
 
+use AppBundle\Exceptions\NotFoundException;
+use AppBundle\Exceptions\BadRequestException;
+
 /**
  *
  */
@@ -87,6 +90,8 @@ class Game extends BaseService
 
     /**
      * @param string $sessionId
+     * @param string $createdAt
+     * @param string $userId
      *
      * @return null
      */
@@ -95,23 +100,40 @@ class Game extends BaseService
         string $createdAt,
         string $userId)
     {
-        list($CardU1, $CardU2, $CardU3, $CardU4) = $this->CardDistribution();
-        var_dump($gameId);
-        $redisInitializeResults = $this->redis->hMset(
+        list($cardU1, $cardU2, $cardU3, $cardU4) = $this->CardDistribution();
+        // var_dump($gameId);
+        $initializeGameResults = $this->redis->hMset(
             $gameId,
             "created_at",   $createdAt, 
             "total_user" ,  1,
-            "u1",           $sessionId,
+            "u1",           $userId,
             "status",       "active",
             "next_turn",    "u1",
-            "u1_card",      implode(" ", $CardU1)
-        );
+            "u1_card",      implode(" ", $cardU1),
+            "u2_card",      implode(" ", $cardU2),
+            "u3_card",      implode(" ", $cardU3),
+            "u4_card",      implode(" ", $cardU4)
+            );
+        
+        $initializeUserReuslt = $this->redis->sAdd(
+            $userId,
+            $cardU1
+            );
 
+        // TODO: Make user
+
+        return array($this->fetchById($gameId), $this->fetchUserById($userId));
 
     }
 
-
-    private function CardDistribution() {
+    /**
+     * @param string $sessionId
+     * @param string $createdAt
+     * @param string $userId
+     *
+     * @return null
+     */
+    private function cardDistribution() {
 
         $total_card = array();
         $card_color = ['C', 'D', 'H', 'S'];
@@ -144,5 +166,33 @@ class Game extends BaseService
             }
         }
         return array($user1, $user2, $user3, $user4);
+    }
+
+     /*
+     * @param Models\Game $game
+     * @param string      $userId
+     *
+     * @return
+     */
+    public function validateGame(
+        Models\Game $game,
+        string $userId)
+    {
+        if (empty($game)) {
+
+            throw new NotFoundException("Game with given id not found.");
+        }
+
+        if ($game->isActive() === false) {
+
+            $this->delete($game);
+
+            throw new NotFoundException("Game with given id is no longer active.");
+        }
+
+        if ($game->hasUser($userId) === false) {
+
+            throw new BadRequestException("You do not belong to game with given id.");
+        }
     }
 }

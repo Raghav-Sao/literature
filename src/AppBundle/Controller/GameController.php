@@ -30,28 +30,26 @@ class GameController extends BaseController
     public function startAction()
     {
         $this->init();
-        $this->redirectIfUserActiveInAGame();
-        $session = $this->session;
-        $userId = $session->getId();
-        $gameId = Utility::newGameId();
-        $createdAt = Utility::currentTimeStamp();
-        $this->gameService->initializeGame($gameId, $createdAt, $userId);
-        return new response ("newGame");
-        // $session_id = $session->getId();
-        // $this->redis->hMset($game_id, 
-        //                                 "start_at",     "today", 
-        //                                 "game_id",      $game_id, 
-        //                                 "total_user" ,  1,
-        //                                 "user1",        $session_id
-        //                                 ); //seting gmae id in HMSET
-        
-        // $session->set('game_id', $game_id);
 
+        try {
+            
+            $this->redirectIfUserActiveInAGame();
+            $session = $this->session;
+            $userId = $session->getId();
+            $gameId = Utility::newGameId();
+            $createdAt = Utility::currentTimeStamp();
+            list($game, $user) = $this->gameService->initializeGame($gameId, $createdAt, $userId);
+            $session->set('g_id', $gameId);
+        } catch (\Exception $e) {
+
+            return $this->handleException($e);
+        }
+        return new JsonResponse([
+            "game" => $game->toArray(),
+            "user" => $user->toArray(),
+        ]);
         // // $data['message'] = 'started';
         // // $pusher->trigger('test_channel', 'my_event', $data);
-        // return $game_id;
-        // return new response("s");
-
     }
 
     /**
@@ -61,25 +59,19 @@ class GameController extends BaseController
     public function indexIdAction($id)
     {
         $this->init();
-        $game        = $this->gameService->fetchById($id);
 
-        if (empty($game)) {
+        try {
 
-            return $this->notFound(sprintf("Game with id: %s not found.", $id));
+            $game = $this->gameService->fetchById($id);
+
+            $this->gameService->validateGame($game, $this->userId);
+
+            $user = $this->gameService->fetchUserById($this->userId);
+
+        } catch (\Exception $e) {
+
+            return $this->handleException($e);
         }
-
-        if ($game->isActive() === false) {
-            $gameService->delete($game);
-
-            return $this->notFound(sprintf("Game with id: %s is not active.", $id));
-        }
-
-        if ($game->hasUser($this->userId) === false) {
-
-            return $this->badRequest(sprintf("You do not belong to game with id: %s.", $id));
-        }
-
-        $user = $this->gameService->fetchUserById($this->userId);
 
         return new JsonResponse([
             "game" => $game->toArray(),
@@ -93,6 +85,34 @@ class GameController extends BaseController
      */
     public function joinAction()
     {
+    }
+
+
+    /**
+     * @param string $id
+     * @param string $card
+     * @param string $fromUserId
+     * @param string $toUserId
+     */
+    public function moveCardAction(
+        string $id,
+        string $card,
+        string $fromUserId,
+        string $toUserId)
+    {
+
+        // Using session data
+        // $id       = $this->gameId
+        // $toUserId = $this->userId
+
+        $this->init();
+        // $this->validateGame();
+
+        // His turn
+        // Validate move conditions; At least one card of a color
+        // Update data
+        // Check game status - Win/Loose etc
+        // Publish response data too
     }
 
     // /**

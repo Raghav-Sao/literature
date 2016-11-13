@@ -18,3 +18,8 @@ game_index_id:
     path:     /game/{id}
     defaults:
         _controller: AppBundle:Game:indexId
+
+game_move_card:
+    path:     /game/{id}/move/card/{card}/from/{fromUserId}/to/{toUserId}
+    defaults:
+        _controller: AppBundle:Game:moveCard

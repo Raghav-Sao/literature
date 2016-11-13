@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use AppBundle\Constants\Service;
 use AppBundle\Constants\SessionKey;
 
+use AppBundle\Exceptions\NotFoundException;
+use AppBundle\Exceptions\BadRequestException;
 
 /**
  *
@@ -37,6 +39,7 @@ class BaseController extends Controller
      */
     protected function init()
     {
+        $this->logger      = $this->container->get('logger');
         $this->request     = $this->container->get('request_stack')->getCurrentRequest();
         $this->session     = $this->request->getSession();
 
@@ -55,22 +58,51 @@ class BaseController extends Controller
      */
     protected function redirectIfUserActiveInAGame()
     {
+
         if ($this->gameId === false) {
 
             return;
         }
 
-        $game        = $this->gameService->fetchById($gameId);
+        $game = $this->gameService->fetchById($this->gameId);
+
+        // var_dump($game->hasUser($this->userId));die;
 
         if ($game && $game->isActive() && $game->hasUser($this->userId)) {
 
-            return new RedirectResponse(
-                $this->generateUrl("game_index_id", ["id" => $this->gameId])
-            );
+            throw new BadRequestException("You are already in an active game.");
+            
         }
 
         if ($game && $game->isActive() === false) {
             $this->gameService->delete($game);
+        }
+    }
+
+    /**
+     * Handles controller catchec exceptions
+     *
+     * @param \Exception $e
+     *
+     * @return JsonResponse
+     */
+    protected function handleException(\Exception $e)
+    {
+        $this->logger->error($e);
+
+        switch (get_class($e)) {
+
+            case "AppBundle\Exceptions\BadRequestException":
+                return $this->badRequest($e);
+                break;
+
+            case "AppBundle\Exceptions\NotFoundException":
+                return $this->notFound($e);
+                break;
+
+            default:
+                return $this->internalError($e);
+                break;
         }
     }
 
@@ -81,7 +113,8 @@ class BaseController extends Controller
      *
      * @return JsonResponse
      */
-    protected function notFound(string $message)
+    protected function notFound(
+        string $message = "Not Found.")
     {
 
         return new JsonResponse(["message" => $message], JsonResponse::HTTP_NOT_FOUND);
@@ -94,10 +127,25 @@ class BaseController extends Controller
      *
      * @return JsonResponse
      */
-    protected function badRequest(string $message)
+    protected function badRequest(
+        string $message = "Bad Request.")
     {
 
         return new JsonResponse(["message" => $message], JsonResponse::HTTP_BAD_REQUEST);
+    }
+
+    /**
+     * Sends a 500 response
+     *
+     * @param string $message
+     *
+     * @return JsonResponse
+     */
+    protected function internalError(
+        string $message = "Internal Error.")
+    {
+
+        return new JsonResponse(["message" => $message], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
     }
 
     // ----- -----

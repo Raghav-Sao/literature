@@ -8,5 +8,5 @@ namespace AppBundle\Constants;
 class SessionKey
 {
 
-    const GAME_ID = "gid";
+    const GAME_ID = "g_id";
 }
