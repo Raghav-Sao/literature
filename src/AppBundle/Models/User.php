@@ -39,6 +39,22 @@ class User
     }
 
     /**
+     * @param string $card
+     *
+     * @return boolean
+     */
+    public function hasCard(
+        string $card)
+    {
+
+        return in_array(
+            $card,
+            $this->cards,
+            true
+        );
+    }
+
+    /**
      *
      * @param string $card
      *
@@ -59,6 +75,33 @@ class User
         }
 
         return false;
+    }
+
+    /**
+     * @param string $card
+     *
+     * @return User
+     */
+    public function addCard($card)
+    {
+        $this->cards[] = $card;
+
+        return $this;
+    }
+
+    /**
+     * @param string $card
+     *
+     * @return User
+     */
+    public function removeCard($card)
+    {
+        $key = array_search($card, $this->cards);
+        if ($key !== false) {
+            unset($this->cards[$key]);
+        }
+
+        return $this;
     }
 
     /**

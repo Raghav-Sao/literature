@@ -123,7 +123,7 @@ class GameController extends BaseController
             $fromUser = $this->gameService->fetchUserById($game->getUserIdBySN($fromUserSN));
             $toUser   = $this->gameService->fetchUserById($game->getUserIdBySN($toUserSN));
 
-            $gameService->moveCard(
+            list($success, $message) = $gameService->moveCard(
                 $game,
                 $card,
                 $fromUser,
@@ -136,8 +136,10 @@ class GameController extends BaseController
         }
 
         return new JsonResponse([
-            "game" => $game->toArray(),
-            "user" => $toUser->toArray(),
+            "success" => $success,
+            "message" => $message,
+            "game"    => $game->toArray(),
+            "user"    => $toUser->toArray(),
         ]);
     }
 

@@ -3,6 +3,7 @@
 namespace AppBundle\Models;
 
 use AppBundle\Constants\Game\Status;
+use AppBundle\Constants\Game\User;
 
 /**
  *
@@ -97,6 +98,34 @@ class Game
             // TODO: Should throw error?
 
             return null;
+        }
+    }
+
+    /**
+     *
+     * @param string $userId
+     *
+     * @return null|string
+     */
+    public function getUserSNById($userId)
+    {
+        switch ($userId) {
+            case $this->u1:
+                return User::USER_1;
+                break;
+            case $this->u2:
+                return User::USER_2;
+                break;
+            case $this->u3:
+                return User::USER_3;
+                break;
+            case $this->u4:
+                return User::USER_4;
+                break;
+
+            default:
+                return null;
+                break;
         }
     }
 

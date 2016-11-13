@@ -7,6 +7,7 @@ use AppBundle\Models;
 use AppBundle\Exceptions\NotFoundException;
 use AppBundle\Exceptions\BadRequestException;
 use AppBundle\Utility;
+use AppBundle\Constants;
 
 /**
  *
@@ -199,10 +200,10 @@ class Game extends BaseService
 
     /**
      *
-     * @param Models\Game $game
-     * @param string      $card
-     * @param string      $fromUserSN
-     * @param string      $toUserSN
+     * @param Models\Game      $game
+     * @param string           $card
+     * @param Models\User      $fromUser
+     * @param Models\User      $toUser
      *
      * @return
      */
@@ -225,9 +226,29 @@ class Game extends BaseService
         }
 
         // TODOs:
-        // Update data
-        // Check game status - Win/Loose etc
         // Publish response data too
         // Ensure $game & $user refreshed
+
+        if ($fromUser->hasCard($card) === false) {
+            $fromUserSN = $game->getUserSNById($fromUser->getId());
+            $this->redis->hset(
+                $game->getId(),
+                Constants\Game\Game::NEXT_TURN,
+                $fromUserSN
+            );
+            $game->setNextTurn($fromUserSN);
+
+            return (false, "The other user does not have that card.");
+        }
+
+        $this->redis->smove(
+            $fromUser->getId(),
+            $toUser->getId(),
+            $card
+        );
+        $this->fromUser->removeCard($card);
+        $this->toUser->addCard($card);
+
+        return (true, "Move successful.");
     }
 }
