@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  *
  */
-class GameController extends Controller
+class GameController extends BaseController
 {
 
     /**
@@ -23,18 +23,25 @@ class GameController extends Controller
      *
      * @return Response
      */
-    public function indexAction()
-    {
-
-        return new Response('Welcome to game!');
-    }
-
-    /**
-     *
-     * @return
-     */
     public function startAction()
     {
+        $this->redirectIfUserActiveInAGame();
+        $game_id = md5(uniqid(rand(), true));
+        $session_id = $session->getId();
+        $this->redis->hMset($game_id, 
+                                        "start_at",     "today", 
+                                        "game_id",      $game_id, 
+                                        "total_user" ,  1,
+                                        "user1",        $session_id
+                                        ); //seting gmae id in HMSET
+        
+        $session->set('game_id', $game_id);
+
+        // $data['message'] = 'started';
+        // $pusher->trigger('test_channel', 'my_event', $data);
+        return $game_id;
+        return new response("s");
+
     }
 
     /**

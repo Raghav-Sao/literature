@@ -10,6 +10,6 @@ default_index:
 # AppBundle > GameController
 
 game_index:
-    path:     /game
+    path:     /game/start
     defaults:
-        _controller: AppBundle:Game:index
+        _controller: AppBundle:Game:start

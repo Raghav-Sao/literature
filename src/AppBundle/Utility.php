@@ -35,4 +35,13 @@ class Utility
 
         return lcfirst(self::camelize($input, $separator));
     }
+
+    /**
+     *
+     *@return string
+     */
+    public static function getRandomString()
+    {
+        return md5(uniqid(rand(), true));
+    }
 }
