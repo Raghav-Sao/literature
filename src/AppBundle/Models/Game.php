@@ -22,7 +22,8 @@ class Game
 
     /**
      *
-     * @param array @params - Array data from redis hmset
+     * @param string $id     - Game id
+     * @param array  $params - Array data from redis hmset
      *
      * @return
      */
@@ -74,13 +75,13 @@ class Game
     {
 
         return [
-            "id"        => $id,
-            "createdAt" => $createdAt,
-            "status"    => $status,
-            "u1"        => $u1,
-            "u2"        => $u2,
-            "u3"        => $u3,
-            "u4"        => $u4,
+            "id"        => $this->id,
+            "createdAt" => $this->createdAt,
+            "status"    => $this->status,
+            "u1"        => $this->u1,
+            "u2"        => $this->u2,
+            "u3"        => $this->u3,
+            "u4"        => $this->u4,
         ];
     }
 }

@@ -65,4 +65,25 @@ class Game extends BaseService
         // TODO
         // - Clean redis data for given gameId
     }
+
+
+
+    /**
+     * @param string $userId
+     *
+     * @return null|Models\User
+     */
+    public function fetchUserById(
+        string $userId)
+    {
+        $redisUserCards = $this->redis->smembers($userId);
+
+        if (empty($redisUserCards)) {
+
+            return null;
+        } else {
+
+            return new Models\User($userId, $redisUserCards);
+        }
+    }
 }

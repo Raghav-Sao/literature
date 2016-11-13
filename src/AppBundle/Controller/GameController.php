@@ -72,12 +72,11 @@ class GameController extends BaseController
             return $this->badRequest(sprintf("You do not belong to game with id: %s.", $id));
         }
 
-        // TODO: Fetch user data
-
+        $user = $this->gameService->fetchUserById($this->userId);
 
         return new JsonResponse([
             "game" => $game->toArray(),
-            // "user" => $user->toArray(),
+            "user" => $user->toArray(),
         ]);
     }
 
