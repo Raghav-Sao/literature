@@ -34,8 +34,8 @@ class GameController extends BaseController
         $this->init();
 
         try {
-            
-            $this->redirectIfUserActiveInAGame();
+
+            $this->checkIfUserActiveInAGame();
 
             list($game, $user) = $this->gameService->initializeGame($this->userId);
 
@@ -81,10 +81,35 @@ class GameController extends BaseController
 
     /**
      *
-     * @return
+     * @return string
+     *
      */
-    public function joinAction()
+    public function joinIdAction($gameId, $userSN)
     {
+        $this->init();
+        try {
+            
+            $this->checkIfUserActiveInAGame();
+            $game = $this->gameService->fetchById($gameId);
+            // var_dump($game, $gameId);
+            $this->gameService->validateGame($game);
+
+            list($game, $user) = $this->gameService->joinMember(
+                $game, 
+                $userSN, 
+                $this->userId
+            );
+
+            return new JsonResponse([
+                "game" => $a->toArray(),
+                "user" => $b->toArray(),
+            ]);
+
+        } catch (\Exception $e) {
+
+            return $this->handleException($e);
+        }
+
     }
 
 

@@ -44,6 +44,7 @@ class BaseController extends Controller
         $this->session     = $this->request->getSession();
 
         $this->gameId      = $this->session->get(SessionKey::GAME_ID, false);
+        // var_dump($this->gameId);die;
         $this->userId      = $this->session->getId();
 
         $this->gameService = $this->container->get(Service::GAME);
@@ -56,7 +57,7 @@ class BaseController extends Controller
      *
      * @return null|RedirectResponse
      */
-    protected function redirectIfUserActiveInAGame()
+    protected function checkIfUserActiveInAGame()
     {
 
         if ($this->gameId === false) {
@@ -65,8 +66,6 @@ class BaseController extends Controller
         }
 
         $game = $this->gameService->fetchById($this->gameId);
-
-        // var_dump($game->hasUser($this->userId));die;
 
         if ($game && $game->isActive() && $game->hasUser($this->userId)) {
 

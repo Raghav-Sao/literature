@@ -60,6 +60,12 @@ class Game
         return ($this->status === Status::ACTIVE);
     }
 
+    public function isUserSNVacant($userSN)
+    {
+
+        return ($this->$userSN == null);
+    }
+
     /**
      *
      * @return boolean

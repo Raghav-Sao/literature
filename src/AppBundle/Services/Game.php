@@ -79,7 +79,7 @@ class Game extends BaseService
     public function fetchUserById(
         string $userId)
     {
-        $redisUserCards = $this->redis->smembers($userId);
+        $redisUserCards = $this->redis->sMembers($userId);
 
         if (empty($redisUserCards)) {
 
@@ -100,7 +100,6 @@ class Game extends BaseService
     {
         $gameId = Utility::newGameId();
         list($u1Cards, $u2Cards, $u3Cards, $u4Cards) = Utility::distributeCards();
-
         $initializeGameResults = $this->redis->hmset(
             $gameId,
             Constants\Game\Game::CREATED_AT,   Utility::currentTimeStamp(), 
@@ -132,7 +131,7 @@ class Game extends BaseService
      */
     public function validateGame(
         Models\Game $game,
-        string $userId)
+        string $userId = null)
     {
         if (empty($game)) {
 
@@ -146,7 +145,7 @@ class Game extends BaseService
             throw new NotFoundException("Game with given id is no longer active.");
         }
 
-        if ($game->hasUser($userId) === false) {
+        if ($userId && $game->hasUser($userId) === false) {
 
             throw new BadRequestException("You do not belong to game with given id.");
         }
@@ -211,4 +210,37 @@ class Game extends BaseService
             "Move successful."
         ];
     }
+
+    /**
+     *
+     *@param Models\Game game
+     *@param string userSN
+     *
+     */
+    public function joinMember(
+        Models\Game $game,
+        string $userSN,
+        string $userId)
+    {
+        if(!$game->isUserSNVacant($userSN)) {
+            
+            throw new BadRequestException("Invalid position to join as member.");
+        }
+
+        $this->redis->hMset(
+            $game->getId(),
+            $userSN,
+            $userId
+            );
+
+        $cards = $this->redis->hMget(
+            $game->getId(),
+            sprintf("%s_cards", $userSN)
+        );
+
+        $this->redis->sadd($userId, $cards);
+        
+        return array($this->fetchById($game->getId()), $this->fetchUserById($userId));
+    }
+
 }
