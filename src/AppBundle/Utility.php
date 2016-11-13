@@ -87,7 +87,7 @@ class Utility
     public static function getCardType($card)
     {
 
-        return explode("_", $card)[0];
+        return substr($card, 0, 1);
     }
 
     /**
@@ -98,7 +98,7 @@ class Utility
     public static function getCardValue($card)
     {
 
-        return explode("_", $card)[1];
+        return substr($card, 1);
     }
 
     /**
@@ -133,6 +133,6 @@ class Utility
             shuffle($cards);
         }
 
-        return array_chunk($cards, 8);
+        return array_chunk($cards, 12);
     }
 }

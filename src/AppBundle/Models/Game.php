@@ -21,6 +21,12 @@ class Game
     private $u3;
     private $u4;
 
+    // Initial cards of all users
+    private $u1Cards;
+    private $u2Cards;
+    private $u3Cards;
+    private $u4Cards;
+
 
     /**
      *
@@ -157,6 +163,20 @@ class Game
     }
 
     /**
+     * @param string $userSN
+     *
+     * @return array
+     */
+    public function getInitialCardsByUserSN(
+        string $userSN)
+    {
+
+        $attribute = sprintf("%sCards", $userSN);
+
+        return explode(",", $this->$attribute);
+    }
+
+    /**
      *
      * @return array
      */
@@ -172,5 +192,34 @@ class Game
             "u3"        => $this->u3,
             "u4"        => $this->u4,
         ];
+    }
+
+    /**
+     * @param string $userSN
+     * @param string $userId
+     *
+     * @return Game
+     */
+    public function setUserSN(
+        string $userSN,
+        string $userId)
+    {
+
+        $this->$userSN = $userId;
+
+        return $this;
+    }
+
+    /**
+     * @param string $userSN
+     *
+     * @return Game
+     */
+    public function setNextTurn(
+        string $userSN)
+    {
+        $this->nextTurn = $userSN;
+
+        return $this;
     }
 }

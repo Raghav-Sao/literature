@@ -14,17 +14,22 @@ game_start:
     defaults:
         _controller: AppBundle:Game:start
 
-game_index_id:
+game_index:
     path:     /game/{id}
     defaults:
-        _controller: AppBundle:Game:indexId
+        _controller: AppBundle:Game:index
 
-game_join_gameid:
-    path:     /join/{gameId}/{userSN}
+game_join:
+    path:     /game/{gameId}/join/{userSN}
     defaults:
-        _controller: AppBundle:Game:joinId
+        _controller: AppBundle:Game:join
 
 game_move_card:
     path:     /game/{id}/move/card/{card}/from/{fromUserSN}/to/{toUserSN}
     defaults:
         _controller: AppBundle:Game:moveCard
+
+game_delete:
+    path:     /game/{id}/delete
+    defaults:
+        _controller: AppBundle:Game:delete

@@ -44,7 +44,6 @@ class BaseController extends Controller
         $this->session     = $this->request->getSession();
 
         $this->gameId      = $this->session->get(SessionKey::GAME_ID, false);
-        // var_dump($this->gameId);die;
         $this->userId      = $this->session->getId();
 
         $this->gameService = $this->container->get(Service::GAME);
@@ -69,7 +68,7 @@ class BaseController extends Controller
 
         if ($game && $game->isActive() && $game->hasUser($this->userId)) {
 
-            throw new BadRequestException("You are already in an active game.");
+            throw new BadRequestException("You are already in an active game.", ["gameId" => $this->gameId]);
             
         }
 
@@ -92,11 +91,11 @@ class BaseController extends Controller
         switch (get_class($e)) {
 
             case "AppBundle\Exceptions\BadRequestException":
-                return $this->badRequest($e);
+                return $this->badRequest($e, $e->getExtra());
                 break;
 
             case "AppBundle\Exceptions\NotFoundException":
-                return $this->notFound($e);
+                return $this->notFound($e, $e->getExtra());
                 break;
 
             default:
@@ -113,10 +112,14 @@ class BaseController extends Controller
      * @return JsonResponse
      */
     protected function notFound(
-        string $message = "Not Found.")
+        string $message = "Not Found.",
+        array $extra = array())
     {
 
-        return new JsonResponse(["message" => $message], JsonResponse::HTTP_NOT_FOUND);
+        return new JsonResponse(
+            ["response" => ["message" => $message, "extra" => $extra]],
+            JsonResponse::HTTP_NOT_FOUND
+        );
     }
 
     /**
@@ -127,10 +130,14 @@ class BaseController extends Controller
      * @return JsonResponse
      */
     protected function badRequest(
-        string $message = "Bad Request.")
+        string $message = "Bad Request.",
+        array $extra = array())
     {
 
-        return new JsonResponse(["message" => $message], JsonResponse::HTTP_BAD_REQUEST);
+        return new JsonResponse(
+            ["response" => ["message" => $message, "extra" => $extra]],
+            JsonResponse::HTTP_BAD_REQUEST
+        );
     }
 
     /**
@@ -141,10 +148,14 @@ class BaseController extends Controller
      * @return JsonResponse
      */
     protected function internalError(
-        string $message = "Internal Error.")
+        string $message = "Internal Error.",
+        array $extra = array())
     {
 
-        return new JsonResponse(["message" => $message], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        return new JsonResponse(
+            ["response" => ["message" => $message, "extra" => $extra]],
+            JsonResponse::HTTP_INTERNAL_SERVER_ERROR
+        );
     }
 
     // ----- -----

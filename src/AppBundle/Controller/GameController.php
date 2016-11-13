@@ -47,8 +47,10 @@ class GameController extends BaseController
         }
 
         return new JsonResponse([
-            "game" => $game->toArray(),
-            "user" => $user->toArray(),
+            "response" => [
+                "game" => $game->toArray(),
+                "user" => $user->toArray(),
+            ]
         ]);
     }
 
@@ -56,7 +58,7 @@ class GameController extends BaseController
      *
      * @return JsonResponse
      */
-    public function indexIdAction($id)
+    public function indexAction($id)
     {
         $this->init();
 
@@ -74,37 +76,46 @@ class GameController extends BaseController
         }
 
         return new JsonResponse([
-            "game" => $game->toArray(),
-            "user" => $user->toArray(),
+            "response" => [
+                "game" => $game->toArray(),
+                "user" => $user->toArray(),
+            ]
         ]);
     }
 
     /**
      *
+     * @param string $gameId
+     * @param string $userSN
+     *
      * @return string
      *
      */
-    public function joinIdAction($gameId, $userSN)
+    public function joinAction($gameId, $userSN)
     {
         $this->init();
         try {
             
             $this->checkIfUserActiveInAGame();
+
             $game = $this->gameService->fetchById($gameId);
-            // var_dump($game, $gameId);
+
             $this->gameService->validateGame($game);
 
-            list($game, $user) = $this->gameService->joinMember(
+            list($game, $user) = $this->gameService->join(
                 $game, 
                 $userSN, 
                 $this->userId
             );
 
-            return new JsonResponse([
-                "game" => $a->toArray(),
-                "user" => $b->toArray(),
-            ]);
+            $this->session->set(SessionKey::GAME_ID, $game->getId());
 
+            return new JsonResponse([
+                "response" => [
+                    "game" => $game->toArray(),
+                    "user" => $user->toArray(),
+                ]
+            ]);
         } catch (\Exception $e) {
 
             return $this->handleException($e);
@@ -146,7 +157,7 @@ class GameController extends BaseController
             $fromUser = $this->gameService->fetchUserById($game->getUserIdBySN($fromUserSN));
             $toUser   = $this->gameService->fetchUserById($game->getUserIdBySN($toUserSN));
 
-            list($success, $message) = $gameService->moveCard(
+            list($success, $message) = $this->gameService->moveCard(
                 $game,
                 $card,
                 $fromUser,
@@ -159,10 +170,45 @@ class GameController extends BaseController
         }
 
         return new JsonResponse([
-            "success" => $success,
-            "message" => $message,
-            "game"    => $game->toArray(),
-            "user"    => $toUser->toArray(),
+            "response" => [
+                "success" => $success,
+                "message" => $message,
+                "game"    => $game->toArray(),
+                "user"    => $toUser->toArray(),
+            ]
+        ]);
+    }
+
+    /**
+     * @param string $id
+     *
+     * @return JsonResponse
+     */
+    public function deleteAction(
+        string $id)
+    {
+        $this->init();
+
+        try {
+
+            $game = $this->gameService->fetchById($this->gameId);
+
+            $this->gameService->validateGame($game, $this->userId);
+
+            $this->gameService->delete($game);
+
+            $this->session->remove(SessionKey::GAME_ID);
+            $this->session->invalidate();
+
+        } catch (\Exception $e) {
+
+            return $this->handleException($e);
+        }
+
+        return new JsonResponse([
+            "response" => [
+                "success" => true
+            ]
         ]);
     }
 }

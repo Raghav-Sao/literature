@@ -52,7 +52,7 @@ class Game extends BaseService
 
         if (empty($redisGameResults)) {
 
-            return null;
+            throw new NotFoundException("Game with given id not found.", ["gameId" => $gameId]);
         } else {
 
             return new Models\Game($gameId, $redisGameResults);
@@ -111,11 +111,8 @@ class Game extends BaseService
             Constants\Game\Game::U3_CARDS,     implode(",", $u3Cards),
             Constants\Game\Game::U4_CARDS,     implode(",", $u4Cards)
         );
-        
-        $initializeUserReuslt = $this->redis->sadd(
-            $userId,
-            $u1Cards
-        );
+
+        call_user_func_array(array($this->redis, "sadd"), array_merge([$userId], $u1Cards));
 
         return [
             $this->fetchById($gameId),
@@ -202,8 +199,8 @@ class Game extends BaseService
             $toUser->getId(),
             $card
         );
-        $this->fromUser->removeCard($card);
-        $this->toUser->addCard($card);
+        $fromUser->removeCard($card);
+        $toUser->addCard($card);
 
         return [
             true,
@@ -213,34 +210,36 @@ class Game extends BaseService
 
     /**
      *
-     *@param Models\Game game
-     *@param string userSN
+     * @param Models\Game $game
+     * @param string      $userSN
+     * @param string      $userId
+     *
+     * @return array
      *
      */
-    public function joinMember(
+    public function join(
         Models\Game $game,
         string $userSN,
         string $userId)
     {
-        if(!$game->isUserSNVacant($userSN)) {
+        if($game->isUserSNVacant($userSN) === false) {
             
             throw new BadRequestException("Invalid position to join as member.");
         }
 
-        $this->redis->hMset(
+        $this->redis->hmset(
             $game->getId(),
             $userSN,
             $userId
-            );
-
-        $cards = $this->redis->hMget(
-            $game->getId(),
-            sprintf("%s_cards", $userSN)
         );
+        $game->setUserSN($userSN, $userId);
 
-        $this->redis->sadd($userId, $cards);
+        call_user_func_array(array($this->redis, "sadd"), array_merge([$userId], $game->getInitialCardsByUserSN($userSN)));
         
-        return array($this->fetchById($game->getId()), $this->fetchUserById($userId));
+        return [
+            $game,
+            $this->fetchUserById($userId)
+        ];
     }
 
 }

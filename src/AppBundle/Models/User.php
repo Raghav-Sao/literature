@@ -66,7 +66,7 @@ class User
         $cardType  = Utility::getCardType($card);
         $cardRange = Utility::getCardRange($card);
 
-        foreach ($this->cards as $key => $value) {
+        foreach ($this->cards as $value) {
             if ($cardType === Utility::getCardType($value)
                 && $cardRange === Utility::getCardRange($value)) {
 
