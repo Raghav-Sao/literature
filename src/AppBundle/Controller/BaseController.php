@@ -41,7 +41,7 @@ class BaseController extends Controller
         $this->session     = $this->request->getSession();
 
         $this->gameId      = $this->session->get(SessionKey::GAME_ID, false);
-        $this->userId      = $this->session->get(SessionKey::USER_ID, false);
+        $this->userId      = $this->session->getId();
 
         $this->gameService = $this->container->get(Service::GAME);
     }
