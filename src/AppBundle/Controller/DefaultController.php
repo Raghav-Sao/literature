@@ -2,20 +2,40 @@
 
 namespace AppBundle\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
-class DefaultController extends Controller
+/**
+ *
+ */
+class DefaultController extends BaseController
 {
+
     /**
-     * @Route("/", name="homepage")
+     *
+     * @return
      */
-    public function indexAction(Request $request)
+    public function __construct()
     {
-        // replace this example code with whatever you need
-        return $this->render('default/index.html.twig', [
-            'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..').DIRECTORY_SEPARATOR,
-        ]);
+        parent::__construct();
+    }
+
+    /**
+     *
+     * @return Response
+     */
+    public function indexAction()
+    {
+
+        $this->init();
+        try {
+            $this->checkIfUserActiveInAGame();
+        } catch (\Exception $e) {
+
+            return $this->handleException($e);
+        }
+
+        return new Response(
+            $this->render('AppBundle:Default:index.html.twig')->getContent()
+        );
     }
 }

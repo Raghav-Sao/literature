@@ -27,11 +27,16 @@
         "symfony/polyfill-apcu": "^1.0",
         "sensio/distribution-bundle": "^5.0",
         "sensio/framework-extra-bundle": "^3.0.2",
-        "incenteev/composer-parameter-handler": "^2.0"
+        "incenteev/composer-parameter-handler": "^2.0",
+        "predis/predis": "^1.0",
+        "snc/redis-bundle": "2.x-dev",
+        "pusher/pusher-php-server": "^2.6"
     },
     "require-dev": {
         "sensio/generator-bundle": "^3.0",
-        "symfony/phpunit-bridge": "^3.0"
+        "symfony/phpunit-bridge": "^3.0",
+        "escapestudios/symfony2-coding-standard": "2.9.1",
+        "squizlabs/php_codesniffer": "2.5.*"
     },
     "scripts": {
         "symfony-scripts": [
