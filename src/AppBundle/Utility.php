@@ -55,6 +55,14 @@ class Utility
     public static function newGameId()
     {
 
-        return sprintf("%s_%s", Game::GAME_ID_PREFIX, self::randomString());
+        return sprintf("%s%s", Game::GAME_ID_PREFIX, self::randomString());
+    }
+
+    /**
+     *@return integer
+     */
+    public static function currentTimeStamp()
+    {
+        return time();
     }
 }

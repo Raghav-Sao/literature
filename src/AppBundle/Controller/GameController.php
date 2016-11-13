@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 use AppBundle\Constants\Service;
 use AppBundle\Constants\SessionKey;
+use AppBundle\Utility;
 
 /**
  *
@@ -28,22 +29,28 @@ class GameController extends BaseController
      */
     public function startAction()
     {
+        $this->init();
         $this->redirectIfUserActiveInAGame();
-        $game_id = md5(uniqid(rand(), true));
-        $session_id = $session->getId();
-        $this->redis->hMset($game_id, 
-                                        "start_at",     "today", 
-                                        "game_id",      $game_id, 
-                                        "total_user" ,  1,
-                                        "user1",        $session_id
-                                        ); //seting gmae id in HMSET
+        $session = $this->session;
+        $userId = $session->getId();
+        $gameId = Utility::newGameId();
+        $createdAt = Utility::currentTimeStamp();
+        $this->gameService->initializeGame($gameId, $createdAt, $userId);
+        return new response ("newGame");
+        // $session_id = $session->getId();
+        // $this->redis->hMset($game_id, 
+        //                                 "start_at",     "today", 
+        //                                 "game_id",      $game_id, 
+        //                                 "total_user" ,  1,
+        //                                 "user1",        $session_id
+        //                                 ); //seting gmae id in HMSET
         
-        $session->set('game_id', $game_id);
+        // $session->set('game_id', $game_id);
 
-        // $data['message'] = 'started';
-        // $pusher->trigger('test_channel', 'my_event', $data);
-        return $game_id;
-        return new response("s");
+        // // $data['message'] = 'started';
+        // // $pusher->trigger('test_channel', 'my_event', $data);
+        // return $game_id;
+        // return new response("s");
 
     }
 
