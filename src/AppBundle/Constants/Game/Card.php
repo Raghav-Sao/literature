@@ -50,6 +50,7 @@ class Card
     const DIAMOND_12 = "D12";
     const DIAMOND_13 = "D13";
 
+
     const HEART_1    = "H1";
     const HEART_2    = "H2";
     const HEART_3    = "H3";
@@ -63,4 +64,66 @@ class Card
     const HEART_11   = "H11";
     const HEART_12   = "H12";
     const HEART_13   = "H13";
+
+    const LOWER_RANGE  = "lower";
+    const HIGHER_RANGE = "higher";
+
+
+    public static all = [
+        CLUB_1,
+        CLUB_2,
+        CLUB_3,
+        CLUB_4,
+        CLUB_5,
+        CLUB_6,
+        CLUB_7,
+        CLUB_8,
+        CLUB_9,
+        CLUB_10,
+        CLUB_11,
+        CLUB_12,
+        CLUB_13,
+
+        SPADE_1,
+        SPADE_2,
+        SPADE_3,
+        SPADE_4,
+        SPADE_5,
+        SPADE_6,
+        SPADE_7,
+        SPADE_8,
+        SPADE_9,
+        SPADE_10,
+        SPADE_11,
+        SPADE_12,
+        SPADE_13,
+
+        DIAMOND_1,
+        DIAMOND_2,
+        DIAMOND_3,
+        DIAMOND_4,
+        DIAMOND_5,
+        DIAMOND_6,
+        DIAMOND_7,
+        DIAMOND_8,
+        DIAMOND_9,
+        DIAMOND_10,
+        DIAMOND_11,
+        DIAMOND_12,
+        DIAMOND_13,
+
+        HEART_1,
+        HEART_2,
+        HEART_3,
+        HEART_4,
+        HEART_5,
+        HEART_6,
+        HEART_7,
+        HEART_8,
+        HEART_9,
+        HEART_10,
+        HEART_11,
+        HEART_12,
+        HEART_13,
+    ];
 }

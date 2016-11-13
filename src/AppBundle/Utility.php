@@ -3,6 +3,7 @@
 namespace AppBundle;
 
 use AppBundle\Constants\Game\Game;
+use AppBundle\Constants\Game\Card;
 
 /**
 *
@@ -64,5 +65,57 @@ class Utility
     public static function currentTimeStamp()
     {
         return time();
+    }
+
+    /**
+     * @param string $card
+     *
+     * @return boolean
+     */
+    public static function isValidCard(
+        string $card)
+    {
+
+        return in_array($card, Card::$all, true);
+    }
+
+    /**
+     * @param string $card
+     *
+     * @return string
+     */
+    public static function getCardType($card)
+    {
+
+        return explode("_", $card)[0];
+    }
+
+    /**
+     * @param string $card
+     *
+     * @return string
+     */
+    public static function getCardValue($card)
+    {
+
+        return explode("_", $card)[1];
+    }
+
+    /**
+     * @param string $card
+     *
+     * @return string
+     */
+    public static function getCardRange($card)
+    {
+        $cardValue = self::getCardValue($card);
+
+        if ($cardValue >= 1 && $cardValue <= 6) {
+
+            return Card::LOWER_RANGE;
+        } else {
+
+            return Card::HIGHER_RANGE;
+        }
     }
 }

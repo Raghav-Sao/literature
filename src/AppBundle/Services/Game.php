@@ -6,6 +6,7 @@ use AppBundle\Models;
 
 use AppBundle\Exceptions\NotFoundException;
 use AppBundle\Exceptions\BadRequestException;
+use AppBundle\Utility;
 
 /**
  *
@@ -211,11 +212,15 @@ class Game extends BaseService
         Models\User $fromUser,
         Models\User $toUser)
     {
+        if (Utility::isValidCard($card) === false) {
+            throw new BadRequestException("Not a valid card.");
+        }
+
         if ($game->getNextTurnUserId() !== $toUser->getId()) {
             throw new BadRequestException("It is not your turn to make a move.");
         }
 
-        if ($toUser->hasAtLeastOneOfType($card) === false) {
+        if ($toUser->hasAtLeastOneCardOfType($card) === false) {
             throw new BadRequestException("You do not have at least one card of that type. Invalid move.");
         }
 

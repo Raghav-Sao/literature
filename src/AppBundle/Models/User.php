@@ -2,6 +2,8 @@
 
 namespace AppBundle\Models;
 
+use AppBundle\Utility;
+
 /**
  *
  */
@@ -42,12 +44,21 @@ class User
      *
      * @return boolean
      */
-    public function hasAtLeastOneOfType(
+    public function hasAtLeastOneCardOfType(
         string $card)
     {
-        // TODO: Implment this
+        $cardType  = Utility::getCardType($card);
+        $cardRange = Utility::getCardRange($card);
 
-        return true;
+        foreach ($this->cards as $key => $value) {
+            if ($cardType === Utility::getCardType($value)
+                && $cardRange === Utility::getCardRange($value)) {
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
