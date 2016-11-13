@@ -4,6 +4,9 @@ namespace AppBundle\Services;
 
 use AppBundle\Models;
 
+use AppBundle\Exceptions\NotFoundException;
+use AppBundle\Exceptions\BadRequestException;
+
 /**
  *
  */
@@ -84,6 +87,35 @@ class Game extends BaseService
         } else {
 
             return new Models\User($userId, $redisUserCards);
+        }
+    }
+
+    /**
+     *
+     * @param Models\Game $game
+     * @param string      $userId
+     *
+     * @return
+     */
+    public function validateGame(
+        Models\Game $game,
+        string $userId)
+    {
+        if (empty($game)) {
+
+            throw new NotFoundException("Game with given id not found.");
+        }
+
+        if ($game->isActive() === false) {
+
+            $this->delete($game);
+
+            throw new NotFoundException("Game with given id is no longer active.");
+        }
+
+        if ($game->hasUser($userId) === false) {
+
+            throw new BadRequestException("You do not belong to game with given id.");
         }
     }
 }
