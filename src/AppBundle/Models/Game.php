@@ -9,6 +9,7 @@ use AppBundle\Constants\Game\Status;
  */
 class Game
 {
+    private $id;
     private $createdAt;
     private $status;
 
@@ -25,8 +26,11 @@ class Game
      *
      * @return
      */
-    public function __construct(array $params)
+    public function __construct(
+        string $id,
+        array $params)
     {
+        $this->id = $id;
         // Sets all attributes of the object
         foreach ($params as $key => $value) {
             $property = \AppBundle\Utility::camelizeLcFirst($key);
@@ -50,6 +54,7 @@ class Game
      */
     public function hasUser($userId)
     {
+
         return in_array(
             [
                 $this->u1,
@@ -59,5 +64,23 @@ class Game
             ],
             $userId
         );
+    }
+
+    /**
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+
+        return [
+            "id"        => $id,
+            "createdAt" => $createdAt,
+            "status"    => $status,
+            "u1"        => $u1,
+            "u2"        => $u2,
+            "u3"        => $u3,
+            "u4"        => $u4,
+        ];
     }
 }

@@ -2,8 +2,11 @@
 
 namespace AppBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
+
+use AppBundle\Constants\Service;
+use AppBundle\Constants\SessionKey;
 
 /**
  *
@@ -42,6 +45,40 @@ class GameController extends BaseController
         return $game_id;
         return new response("s");
 
+    }
+
+    /**
+     *
+     * @return JsonResponse
+     */
+    public function indexIdAction($id)
+    {
+        $this->init();
+        $game        = $this->gameService->fetchById($id);
+
+        if (empty($game)) {
+
+            return $this->notFound(sprintf("Game with id: %s not found.", $id));
+        }
+
+        if ($game->isActive() === false) {
+            $gameService->delete($game);
+
+            return $this->notFound(sprintf("Game with id: %s is not active.", $id));
+        }
+
+        if ($game->hasUser($this->userId) === false) {
+
+            return $this->badRequest(sprintf("You do not belong to game with id: %s.", $id));
+        }
+
+        // TODO: Fetch user data
+
+
+        return new JsonResponse([
+            "game" => $game->toArray(),
+            // "user" => $user->toArray(),
+        ]);
     }
 
     /**

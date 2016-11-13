@@ -3,10 +3,6 @@
 namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-
-use AppBundle\Constants\Service;
-use AppBundle\Constants\SessionKey;
 
 /**
  *
@@ -30,6 +26,7 @@ class DefaultController extends BaseController
     public function indexAction()
     {
 
+        $this->init();
         $this->redirectIfUserActiveInAGame();
 
         return new Response(

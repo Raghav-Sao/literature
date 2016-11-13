@@ -50,7 +50,7 @@ class Game extends BaseService
             return null;
         } else {
 
-            return new Models\Game($redisGameResults);
+            return new Models\Game($gameId, $redisGameResults);
         }
     }
 
