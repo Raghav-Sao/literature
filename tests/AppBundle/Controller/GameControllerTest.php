@@ -10,7 +10,6 @@ class GameControllerTest extends AbstractControllerTest
     {
         $client = static::createClient();
 
-        // On loading this page freshly, should create new game
         $client->request('GET', '/game/start');
         $res = $client->getResponse();
 
@@ -36,7 +35,6 @@ class GameControllerTest extends AbstractControllerTest
 
         $this->assertEquals(12, count($resBody->response->user->cards));
 
-
         // On reloading the same page, should throw 400 saying you're already in a game
         $client->reload();
         $res = $client->getResponse();
@@ -51,17 +49,5 @@ class GameControllerTest extends AbstractControllerTest
         ];
 
         $resBody = self::makeFirstAssertions($res, 400, $expected);
-    }
-
-    public function indexAction()
-    {
-        $client = static::createClient();
-
-        // On hitting without having a game created should return 404
-        $client->request('GET', '/game');
-        $res = $client->getResponse();
-
-        // $this->assertEquals(404, $res->getStatusCode());
-        // $this->assertTrue($res->headers->contains('Content-Type', 'application/json'));
     }
 }

@@ -16,5 +16,5 @@ Refer [this](https://github.com/Raghav-Sao/literature/wiki/Api-Specs) wiki page
 
 ### Unit tests
 
-- Run `phpunit` from `../literature` dir
+- Run `./phpunit.phar  --debug` from `../literature` dir
 - Refer [this](https://symfony.com/doc/current/testing.html) symfony3 doc for more info

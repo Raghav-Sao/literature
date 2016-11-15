@@ -6,8 +6,8 @@ use AppBundle\Utility;
 use AppBundle\Constant\Game;
 
 /**
-*
-*/
+ *
+ */
 class UtilityTest extends \PHPUnit_Framework_TestCase
 {
 

@@ -67,6 +67,11 @@ class Utility
         return time();
     }
 
+    /**
+     * @param mixed $v
+     *
+     * @return boolean
+     */
     public static function isAssocArray($v)
     {
         if (is_array($v) === false) {
