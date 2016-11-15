@@ -19,6 +19,7 @@ parameters:
     secret:            ThisTokenIsNotSoSecretChangeIt
 
     # PubSub: Pusher credentials
+    pusher.mock:       true
     pusher.app_key:    xxxxxx
     pusher.app_secret: xxxxxx
     pusher.app_id:     111111

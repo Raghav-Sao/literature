@@ -39,3 +39,12 @@ game_delete:
     methods:  [DELETE, GET]
     defaults:
         _controller: AppBundle:Game:delete
+
+
+# AppBundle > ChatController
+
+chat_post:
+    path:     /chat
+    methods:  [POST]
+    defaults:
+        _controller: AppBundle:Chat:post
