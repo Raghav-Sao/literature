@@ -2,36 +2,66 @@
 
 namespace Tests\AppBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use AppBundle\Exception;
 
-class GameControllerTest extends WebTestCase
+class GameControllerTest extends AbstractControllerTest
 {
     public function testStartAction()
     {
         $client = static::createClient();
 
+        // On loading this page freshly, should create new game
         $client->request('GET', '/game/start');
         $res = $client->getResponse();
 
-        $this->assertEquals(200, $res->getStatusCode());
-        $this->assertTrue($res->headers->contains('Content-Type', 'application/json'));
+        $expected = [
+            "success"  => true,
+            "response" => [
+                "game" => [
+                    "id"     => "TF_SOMETHING",
+                    "status" => "TF_SOMETHING",
+                    "u1"     => "TF_SOMETHING",
+                    "u2"     => null,
+                    "u3"     => null,
+                    "u4"     => null
+                ],
+                "user" => [
+                    "id"    => "TF_SOMETHING",
+                    "cards" => "TF_SOMETHING"
+                ]
+            ]
+        ];
 
-        $resBody = json_decode($res->getContent());
-        $this->assertTrue(property_exists($resBody, "success"));
-        $this->assertTrue($resBody->success);
-        $this->assertTrue(property_exists($resBody, "response"));
-        $this->assertTrue(property_exists($resBody->response, "game"));
-        $this->assertTrue(property_exists($resBody->response, "user"));
+        $resBody = self::makeFirstAssertions($res, 200, $expected);
 
-        $this->assertTrue(property_exists($resBody->response->game, "id"));
-        $this->assertTrue(property_exists($resBody->response->game, "status"));
-        $this->assertTrue(property_exists($resBody->response->game, "u1"));
-        $this->assertTrue(property_exists($resBody->response->game, "u2"));
-        $this->assertTrue(property_exists($resBody->response->game, "u3"));
-        $this->assertTrue(property_exists($resBody->response->game, "u4"));
-
-        $this->assertTrue(property_exists($resBody->response->user, "id"));
-        $this->assertTrue(property_exists($resBody->response->user, "cards"));
         $this->assertEquals(12, count($resBody->response->user->cards));
+
+
+        // On reloading the same page, should throw 400 saying you're already in a game
+        $client->reload();
+        $res = $client->getResponse();
+
+        $expected = [
+            "success"   => false,
+            "errorCode" => Exception\Code::BAD_REQUEST,
+            "errorMessage" => "You are already in an active game.",
+            "extra"  => [
+                "gameId" => $resBody->response->game->id
+            ]
+        ];
+
+        $resBody = self::makeFirstAssertions($res, 400, $expected);
+    }
+
+    public function indexAction()
+    {
+        $client = static::createClient();
+
+        // On hitting without having a game created should return 404
+        $client->request('GET', '/game');
+        $res = $client->getResponse();
+
+        // $this->assertEquals(404, $res->getStatusCode());
+        // $this->assertTrue($res->headers->contains('Content-Type', 'application/json'));
     }
 }

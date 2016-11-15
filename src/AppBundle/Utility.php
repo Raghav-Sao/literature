@@ -67,6 +67,21 @@ class Utility
         return time();
     }
 
+    public static function isAssocArray($v)
+    {
+        if (is_array($v) === false) {
+
+            return false;
+        }
+
+        if (array() === $v) {
+
+            return false;
+        }
+
+        return array_keys($v) !== range(0, count($v) - 1);
+    }
+
 
 
 

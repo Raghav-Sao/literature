@@ -59,16 +59,16 @@ class BaseController extends Controller
      */
     protected function handleException(\Exception $e)
     {
-        $this->logger->error($e);
+        // $this->logger->error($e);
 
         switch (get_class($e)) {
 
-            case "AppBundle\Exceptions\BadRequestException":
-                return new Response\Error($e, Response\Error::HTTP_NOT_FOUND);
+            case "AppBundle\Exception\BadRequestException":
+                return new Response\Error($e, Response\Error::HTTP_BAD_REQUEST);
                 break;
 
-            case "AppBundle\Exceptions\NotFoundException":
-                return new Response\Error($e, Response\Error::HTTP_BAD_REQUEST);
+            case "AppBundle\Exception\NotFoundException":
+                return new Response\Error($e, Response\Error::HTTP_NOT_FOUND);
                 break;
 
             default:
