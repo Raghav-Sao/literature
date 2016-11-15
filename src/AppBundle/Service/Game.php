@@ -52,10 +52,7 @@ class Game extends BaseService
 
         if (empty($gameHash)) {
 
-            throw new NotFoundException(
-                "Game with given id not found.",
-                ["id" => $id]
-            );
+            throw new NotFoundException("Game not found.");
         } else {
 
             return new Model\Game($id, $gameHash);
