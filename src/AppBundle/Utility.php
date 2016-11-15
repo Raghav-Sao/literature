@@ -2,8 +2,8 @@
 
 namespace AppBundle;
 
-use AppBundle\Constants\Game\Game;
-use AppBundle\Constants\Game\Card;
+use AppBundle\Constant\Game\Game;
+use AppBundle\Constant\Game\Card;
 
 /**
 *
@@ -66,6 +66,12 @@ class Utility
     {
         return time();
     }
+
+
+
+
+    ############################################################
+    // Card related Utility methods
 
     /**
      * @param string $card

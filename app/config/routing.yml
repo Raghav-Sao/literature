@@ -11,25 +11,31 @@ default_index:
 
 game_start:
     path:     /game/start
+    methods:  [GET]
     defaults:
         _controller: AppBundle:Game:start
 
 game_index:
-    path:     /game/{id}
+    path:     /game
+    methods:  [GET]
     defaults:
         _controller: AppBundle:Game:index
 
+# TODO: Remove GET from following routes later
 game_join:
-    path:     /game/{gameId}/join/{userSN}
+    path:     /game/{gameId}/join/{atSN}
+    methods:  [POST, GET]
     defaults:
         _controller: AppBundle:Game:join
 
 game_move_card:
-    path:     /game/{id}/move/card/{card}/from/{fromUserSN}/to/{toUserSN}
+    path:     /game/move/{card}/from/{fromUserId}
+    methods:  [PATCH, GET]
     defaults:
-        _controller: AppBundle:Game:moveCard
+        _controller: AppBundle:Game:moveFrom
 
 game_delete:
-    path:     /game/{id}/delete
+    path:     /game/delete
+    methods:  [DELETE, GET]
     defaults:
         _controller: AppBundle:Game:delete

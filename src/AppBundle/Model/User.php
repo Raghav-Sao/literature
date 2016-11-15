@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Models;
+namespace AppBundle\Model;
 
 use AppBundle\Utility;
 
@@ -78,6 +78,24 @@ class User
     }
 
     /**
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+
+        return [
+            "id" => $this->id,
+            "cards" => $this->cards,
+        ];
+    }
+
+
+
+    ####################################################################
+    // Setters
+
+    /**
      * @param string $card
      *
      * @return User
@@ -102,18 +120,5 @@ class User
         }
 
         return $this;
-    }
-
-    /**
-     *
-     * @return array
-     */
-    public function toArray()
-    {
-
-        return [
-            // "id" => $this->id,
-            "cards" => $this->cards,
-        ];
     }
 }
