@@ -9,18 +9,18 @@ parameters:
 #        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
 services:
     app_bundle.card_distribution:
-        class:        AppBundle\Services\CardDistribution
+        class:        AppBundle\Service\CardDistribution
         arguments:    ["@snc_redis.default"]
 
     app_bundle.initialize_game:
-        class:        AppBundle\Services\CardDistribution
+        class:        AppBundle\Service\CardDistribution
         arguments:    ["@snc_redis.default"]
     app_bundle.add_member:
-        class:        AppBundle\Services\CardDistribution
+        class:        AppBundle\Service\CardDistribution
         arguments:    ["@snc_redis.default"]
 
     app_bundle.pubsub.pusher:
-        class:        AppBundle\Services\PubSub\Pusher
+        class:        AppBundle\Service\PubSub\Pusher
         arguments:
             - "@logger"
             - "%pusher.app_key%"
@@ -28,13 +28,13 @@ services:
             - "%pusher.app_id%"
 
     app_bundle.knowledge:
-        class:        AppBundle\Services\Knowledge
+        class:        AppBundle\Service\Knowledge
         arguments:
             - "@logger"
             - "@snc_redis.default"
 
     app_bundle.game:
-        class:        AppBundle\Services\Game
+        class:        AppBundle\Service\Game
         arguments:
             - "@logger"
             - "@snc_redis.default"

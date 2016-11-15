@@ -1,9 +1,9 @@
 <?php
 
-namespace AppBundle\Services\PubSub;
+namespace AppBundle\Service\PubSub;
 
 use \Pusher as PusherClient;
-use AppBundle\Services\BaseService;
+use AppBundle\Service\BaseService;
 
 /**
 *

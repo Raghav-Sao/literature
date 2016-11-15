@@ -1,9 +1,9 @@
 <?php
 
-namespace AppBundle\Models;
+namespace AppBundle\Model;
 
-use AppBundle\Constants\Game\Status;
-use AppBundle\Constants\Game\User;
+use AppBundle\Constant\Game\Status;
+use AppBundle\Constant\Game\User;
 
 /**
  *
@@ -28,6 +28,11 @@ class Game
     private $u4Cards;
 
 
+    // Following keys are not in redis
+    // private $team1;
+    // private $team2;
+
+
     /**
      *
      * @param string $id     - Game id
@@ -45,6 +50,9 @@ class Game
             $property = \AppBundle\Utility::camelizeLcFirst($key);
             $this->$property = $value;
         }
+
+        // $this->team1 = [$this->u1, $this->u3];
+        // $this->team2 = [$this->u2, $this->u4];
     }
 
     /**
@@ -89,6 +97,21 @@ class Game
             ],
             true
         );
+    }
+
+    /**
+     * @param string $userId1
+     * @param string $userId2
+     *
+     * @return boolean
+     */
+    public function arePartners(
+        string $userId1,
+        string $userId2)
+    {
+        $team = [$this->u1, $this->u3];
+
+        return in_array($userId1, $team, true) === in_array($userId2, $team, true);
     }
 
     /**
@@ -193,6 +216,11 @@ class Game
             "u4"        => $this->u4,
         ];
     }
+
+
+
+    ####################################################################
+    // Setters
 
     /**
      * @param string $userSN

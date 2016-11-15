@@ -25,8 +25,8 @@ class DefaultController extends BaseController
      */
     public function indexAction()
     {
-
         $this->init();
+
         try {
             $this->checkIfUserActiveInAGame();
         } catch (\Exception $e) {
