@@ -10,7 +10,7 @@ class GameControllerTest extends AbstractControllerTest
     {
         $client = static::createClient();
 
-        $client->request('GET', '/game/start');
+        $client->request("GET", "/game/start");
         $res = $client->getResponse();
 
         $expected = [
@@ -42,7 +42,7 @@ class GameControllerTest extends AbstractControllerTest
         $expected = [
             "success"   => false,
             "errorCode" => Exception\Code::BAD_REQUEST,
-            "errorMessage" => "You are already in an active game.",
+            "errorMessage" => "You are already in an active game",
             "extra"  => [
                 "gameId" => $resBody->response->game->id
             ]

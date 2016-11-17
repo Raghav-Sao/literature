@@ -44,7 +44,7 @@ class AbstractControllerTest extends WebTestCase
 
         // Asserts response status code and header
         $this->assertEquals($code, $res->getStatusCode());
-        $this->assertTrue($res->headers->contains('Content-Type', 'application/json'));
+        $this->assertTrue($res->headers->contains("content-type", "application/json"));
 
         // Asserts "expected"
         $this->doMakeFirstAssertions($resBody, $expected);

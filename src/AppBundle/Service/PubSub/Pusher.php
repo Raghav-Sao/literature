@@ -6,10 +6,39 @@ use \Pusher as PusherClient;
 use AppBundle\Service\BaseService;
 
 /**
-*
-*/
+ *
+ */
 class Pusher extends BaseService implements PubSubInterface
 {
+
+    // Static factory method
+
+    public static function create(
+        bool   $mock,
+               $logger,
+        string $appKey,
+        string $appSecret,
+        string $appId)
+    {
+
+        if ($mock) {
+
+            return new PusherMock(
+                $logger
+            );
+
+        } else {
+
+            return new Pusher(
+                $logger,
+                $appKey,
+                $appSecret,
+                $appId
+            );
+        }
+    }
+
+
 
     protected $pusher;
 

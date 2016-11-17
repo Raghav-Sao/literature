@@ -41,13 +41,16 @@ class BaseController extends Controller
      */
     protected function init()
     {
-        $this->logger      = $this->container->get('logger');
-        $this->request     = $this->container->get('request_stack')->getCurrentRequest();
+        $this->logger      = $this->container->get("logger");
+        $this->request     = $this->container->get("request_stack")->getCurrentRequest();
         $this->session     = $this->request->getSession();
         $this->gameService = $this->container->get(Service::GAME);
 
         $this->gameId      = $this->session->get(ContextKey::GAME_ID, false);
         $this->userId      = $this->session->getId();
+
+        // TODO: Validate if is json decodable
+        $this->input       = json_decode($this->request->getContent(), true);
     }
 
     /**
@@ -101,7 +104,7 @@ class BaseController extends Controller
 
         if ($game && $game->isActive() && $game->hasUser($this->userId)) {
 
-            throw new BadRequestException("You are already in an active game.", ["gameId" => $this->gameId]);
+            throw new BadRequestException("You are already in an active game", ["gameId" => $this->gameId]);
         }
 
         if ($game && $game->isActive() === false) {

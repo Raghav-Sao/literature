@@ -4,7 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Constant\Game;
 use AppBundle\Controller\Response;
-use AppBundle\Exception\NotFoundException;
+use AppBundle\Exception;
 
 /**
  *
@@ -25,20 +25,31 @@ class ChatController extends BaseController
      *
      * @return Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function post()
+    public function postAction()
     {
         $this->init();
 
-        if ($this->gameId === false) {
+        try {
+            if ($this->gameId === false) {
 
-            throw new NotFoundException("Game not found.");
+                throw new Exception\NotFoundException("Game not found");
+            }
+
+            if (empty($this->input["message"])) {
+
+                throw new Exception\BadRequestException("No message provided in input");
+            }
+
+            $this->container->get("app_bundle.pubsub.pusher")->trigger(
+                $this->gameId,
+                Game\Event::CHAT_MESSAGE,
+                $this->input["message"]
+            );
+
+        } catch (\Exception $e) {
+
+            return $this->handleException($e);
         }
-
-        // $this->container->get("app_bundle.pubsub.pusher")->trigger(
-        //     $this->gameId,
-        //     Game\Event::CHAT_MESSAGE,
-        //     $this->request->request->get("message")
-        // );
 
         return new Response\Ok();
     }
