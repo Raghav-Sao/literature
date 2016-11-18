@@ -22,7 +22,7 @@ class Utility
         string $separator = "_")
     {
 
-        return str_replace($separator, '', ucwords($input, $separator));
+        return str_replace($separator, "", ucwords($input, $separator));
     }
 
     /**

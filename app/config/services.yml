@@ -22,10 +22,12 @@ services:
     app_bundle.pubsub.pusher:
         class:        AppBundle\Service\PubSub\Pusher
         arguments:
+            - "%pusher.mock%"
             - "@logger"
             - "%pusher.app_key%"
             - "%pusher.app_secret%"
             - "%pusher.app_id%"
+        factory:      ['AppBundle\Service\PubSub\Pusher', create]
 
     app_bundle.knowledge:
         class:        AppBundle\Service\Knowledge

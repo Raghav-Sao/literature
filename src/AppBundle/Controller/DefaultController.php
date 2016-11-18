@@ -35,7 +35,7 @@ class DefaultController extends BaseController
         }
 
         return new Response(
-            $this->render('AppBundle:Default:index.html.twig')->getContent()
+            $this->render("AppBundle:Default:index.html.twig")->getContent()
         );
     }
 }
