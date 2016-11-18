@@ -52,7 +52,7 @@ class Game extends BaseService
 
         if (empty($gameHash)) {
 
-            throw new NotFoundException("Game not found.");
+            throw new NotFoundException("Game not found");
         } else {
 
             return new Model\Game($id, $gameHash);
@@ -85,7 +85,7 @@ class Game extends BaseService
         if (empty($cardsSet)) {
 
             throw new NotFoundException(
-                "Cards not found for given user.",
+                "Cards not found for given user",
                 ["id" => $id]
             );
         } else {
@@ -147,14 +147,14 @@ class Game extends BaseService
             $this->delete($game);
 
             throw new BadRequestException(
-                "Game with given id is no longer active."
+                "Game with given id is no longer active"
             );
         }
 
         if ($userId && $game->hasUser($userId) === false) {
 
             throw new BadRequestException(
-                "You do not belong to game with given id."
+                "You do not belong to game with given id"
             );
         }
 
@@ -181,7 +181,7 @@ class Game extends BaseService
     {
         if (Utility::isValidCard($card) === false) {
 
-            throw new BadRequestException("Not a valid card.");
+            throw new BadRequestException("Not a valid card");
         }
 
         if ($game->hasUser($fromUserId) === false) {
@@ -196,7 +196,7 @@ class Game extends BaseService
 
         if ($game->getNextTurnUserId() !== $toUserId) {
 
-            throw new BadRequestException("It is not your turn to make a move.");
+            throw new BadRequestException("It is not your turn to make a move");
         }
 
         $toUser   = $this->fetchUserById($toUserId);
@@ -204,7 +204,7 @@ class Game extends BaseService
         if ($toUser->hasAtLeastOneCardOfType($card) === false) {
 
             throw new BadRequestException(
-                "You do not have at least one card of that type. Invalid move."
+                "You do not have at least one card of that type. Invalid move"
             );
         }
 
@@ -268,7 +268,7 @@ class Game extends BaseService
 
         if($game->isUserSNVacant($atSN) === false) {
             
-            throw new BadRequestException("Invalid position to join as member.");
+            throw new BadRequestException("Invalid position to join as member");
         }
 
         $this->redis->hmset(
