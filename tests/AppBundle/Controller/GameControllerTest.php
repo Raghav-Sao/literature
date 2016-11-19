@@ -3,6 +3,7 @@
 namespace Tests\AppBundle\Controller;
 
 use AppBundle\Exception;
+use AppBundle\Constant;
 
 class GameControllerTest extends AbstractControllerTest
 {
@@ -18,7 +19,7 @@ class GameControllerTest extends AbstractControllerTest
             "response" => [
                 "game" => [
                     "id"     => "TF_SOMETHING",
-                    "status" => "TF_SOMETHING",
+                    "status" => Constant\Game\Status::INITIALIZED,
                     "u1"     => "TF_SOMETHING",
                     "u2"     => null,
                     "u3"     => null,
@@ -84,7 +85,7 @@ class GameControllerTest extends AbstractControllerTest
             "response" => [
                 "game" => [
                     "id"     => $gameId,
-                    "status" => "TF_SOMETHING",
+                    "status" => Constant\Game\Status::INITIALIZED,
                     "u1"     => $userId,
                     "u2"     => null,
                     "u3"     => null,
@@ -116,7 +117,7 @@ class GameControllerTest extends AbstractControllerTest
 
         $resBody = $this->makeFirstAssertions($res, 200);
 
-        $gameId  = $resBody->response->game->id;
+        $gameId   = $resBody->response->game->id;
         $userId1  = $resBody->response->user->id;
 
         // Same user tries to join again
@@ -175,7 +176,7 @@ class GameControllerTest extends AbstractControllerTest
         $resBody = $this->makeFirstAssertions($res, 400, $expected);
 
         // Other user joins
-        $client2->request("POST", sprintf("/game/%s/join/u3", $gameId));
+        $client2->request("POST", sprintf("/game/%s/join/u2", $gameId));
         $res = $client2->getResponse();
 
         $expected = [
@@ -183,10 +184,10 @@ class GameControllerTest extends AbstractControllerTest
             "response" => [
                 "game" => [
                     "id"     => $gameId,
-                    "status" => "TF_SOMETHING",
+                    "status" => Constant\Game\Status::INITIALIZED,
                     "u1"     => $userId1,
-                    "u2"     => null,
-                    "u3"     => "TF_SOMETHING",
+                    "u2"     => "TF_SOMETHING",
+                    "u3"     => null,
                     "u4"     => null
                 ],
                 "user" => [
@@ -198,6 +199,59 @@ class GameControllerTest extends AbstractControllerTest
 
         $resBody = $this->makeFirstAssertions($res, 200, $expected);
         $this->assertEquals(12, count($resBody->response->user->cards));
+
+        $client3 = static::createClient();
+        $client3->request("POST", sprintf("/game/%s/join/u3", $gameId));
+        $res = $client3->getResponse();
+
+        $client4 = static::createClient();
+        $client4->request("POST", sprintf("/game/%s/join/u4", $gameId));
+        $res = $client4->getResponse();
+
+        $expected = [
+            "success"  => true,
+            "response" => [
+                "game" => [
+                    "id"     => $gameId,
+                    "status" => Constant\Game\Status::ACTIVE,
+                    "u1"     => $userId1,
+                    "u2"     => "TF_SOMETHING",
+                    "u3"     => "TF_SOMETHING",
+                    "u4"     => "TF_SOMETHING"
+                ],
+                "user" => [
+                    "id"    => "TF_SOMETHING",
+                    "cards" => "TF_SOMETHING"
+                ]
+            ]
+        ];
+
+        $resBody = $this->makeFirstAssertions($res, 200, $expected);
+    }
+
+    public function testMoveAction()
+    {
+        // Covers:
+        // - Is valid card
+        // - The other use doesn't exist in game
+        // - These two are partners
+        // - It is not his turn
+        // - You do not have that card
+        // - 2 cases:
+        //   - The other user has the card
+        //   - The other user doesn't have the card
+
+        // Client1 starts a game
+        $client1 = static::createClient();
+        $client1->request("GET", "/game/start");
+
+        $res = $client1->getResponse();
+
+        $resBody = $this->makeFirstAssertions($res, 200);
+
+        $gameId   = $resBody->response->game->id;
+        $userId1  = $resBody->response->user->id;
+
     }
 
     public function testDeleteAction()
