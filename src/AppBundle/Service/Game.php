@@ -43,7 +43,7 @@ class Game extends BaseService
     /**
      * @param string $id
      *
-     * @return null|Model\Game
+     * @return null|Model\Redis\Game
      */
     public function fetchGameById(
         string $id)
@@ -55,7 +55,7 @@ class Game extends BaseService
             throw new NotFoundException("Game not found");
         } else {
 
-            return new Model\Game($id, $gameHash);
+            return new Model\Redis\Game($id, $gameHash);
         }
     }
 
@@ -74,7 +74,7 @@ class Game extends BaseService
     /**
      * @param string $id
      *
-     * @return null|Model\User
+     * @return null|Model\Redis\User
      */
     public function fetchUserById(
         string $id)
@@ -90,7 +90,7 @@ class Game extends BaseService
             );
         } else {
 
-            return new Model\User($id, $cardsSet);
+            return new Model\Redis\User($id, $cardsSet);
         }
     }
 
@@ -166,7 +166,7 @@ class Game extends BaseService
 
     /**
      *
-     * @param Model\Game $game
+     * @param Model\Redis\Game $game
      * @param string      $card
      * @param string      $fromUserId
      * @param string      $toUserId
@@ -174,7 +174,7 @@ class Game extends BaseService
      * @return
      */
     public function moveCard(
-        Model\Game $game,
+        Model\Redis\Game $game,
         string $card,
         string $fromUserId,
         string $toUserId)
