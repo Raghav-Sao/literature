@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Model;
+namespace AppBundle\Model\Redis;
 
 use AppBundle\Utility;
 
