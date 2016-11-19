@@ -20,7 +20,7 @@ class ChatControllerTest extends AbstractControllerTest
             "extra"  => []
         ];
 
-        $resBody = self::makeFirstAssertions($res, 404, $expected);
+        $resBody = $this->makeFirstAssertions($res, 404, $expected);
 
         // Now start a game first and then post a chat message
         $client->request("GET", "/game/start");
@@ -43,7 +43,7 @@ class ChatControllerTest extends AbstractControllerTest
             "response" => null,
         ];
 
-        $resBody = self::makeFirstAssertions($res, 200, $expected);
+        $resBody = $this->makeFirstAssertions($res, 200, $expected);
 
         //     Without message or empty message
         $client->request("POST", "/chat");
@@ -56,7 +56,7 @@ class ChatControllerTest extends AbstractControllerTest
             "extra"  => []
         ];
 
-        $resBody = self::makeFirstAssertions($res, 400, $expected);
+        $resBody = $this->makeFirstAssertions($res, 400, $expected);
 
 
         $client->request(
@@ -78,6 +78,6 @@ class ChatControllerTest extends AbstractControllerTest
             "extra"  => []
         ];
 
-        $resBody = self::makeFirstAssertions($res, 400, $expected);
+        $resBody = $this->makeFirstAssertions($res, 400, $expected);
     }
 }

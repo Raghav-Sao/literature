@@ -4,6 +4,7 @@ namespace AppBundle\Model\Redis;
 
 use AppBundle\Constant\Game\Status;
 use AppBundle\Constant\Game\User;
+use AppBundle\Exception\BadRequestException;
 
 /**
  *
@@ -76,6 +77,10 @@ class Game
 
     public function isUserSNVacant($userSN)
     {
+        if (property_exists($this, $userSN) === false) {
+
+            throw new BadRequestException("Invalid user serial number");
+        }
 
         return ($this->$userSN == null);
     }

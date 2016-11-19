@@ -38,7 +38,7 @@ class AbstractControllerTest extends WebTestCase
     public function makeFirstAssertions(
         Response $res,
         $code,
-        $expected)
+        $expected = array())
     {
         $resBody = json_decode($res->getContent());
 
