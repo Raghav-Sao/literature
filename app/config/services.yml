@@ -8,17 +8,6 @@ parameters:
 #        class: AppBundle\Directory\ClassName
 #        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
 services:
-    app_bundle.card_distribution:
-        class:        AppBundle\Service\CardDistribution
-        arguments:    ["@snc_redis.default"]
-
-    app_bundle.initialize_game:
-        class:        AppBundle\Service\CardDistribution
-        arguments:    ["@snc_redis.default"]
-    app_bundle.add_member:
-        class:        AppBundle\Service\CardDistribution
-        arguments:    ["@snc_redis.default"]
-
     app_bundle.pubsub.pusher:
         class:        AppBundle\Service\PubSub\Pusher
         arguments:

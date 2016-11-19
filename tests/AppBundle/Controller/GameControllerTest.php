@@ -54,7 +54,8 @@ class GameControllerTest extends AbstractControllerTest
     {
         $client = static::createClient();
 
-        $client->request('GET', '/game');
+        // Without a game already created, should throw 404
+        $client->request("GET", "/game");
         $res = $client->getResponse();
 
         $expected = [
@@ -67,13 +68,13 @@ class GameControllerTest extends AbstractControllerTest
         $resBody = self::makeFirstAssertions($res, 404, $expected);
 
         // Now after creating a game
-        $client->request('GET', '/game/start');
+        $client->request("GET", "/game/start");
         $res = $client->getResponse();
         $resBody = self::makeFirstAssertions($res, 200, []);
         $gameId  = $resBody->response->game->id;
         $userId  = $resBody->response->user->id;
 
-        $client->request('GET', '/game');
+        $client->request("GET", "/game");
         $res = $client->getResponse();
 
         $expected = [
@@ -96,5 +97,37 @@ class GameControllerTest extends AbstractControllerTest
 
         $resBody = self::makeFirstAssertions($res, 200, $expected);
         $this->assertEquals(12, count($resBody->response->user->cards));
+    }
+
+    public function testDeleteAction()
+    {
+        $client = static::createClient();
+
+        // Without a game already created, should throw 404
+        $client->request("DELETE", "/game/delete");
+        $res = $client->getResponse();
+
+        $expected = [
+            "success"      => false,
+            "errorCode"    => Exception\Code::NOT_FOUND,
+            "errorMessage" => "Game not found",
+            "extra"        => []
+        ];
+
+        $resBody = self::makeFirstAssertions($res, 404, $expected);
+
+        // Now after starting a game
+        $client->request("GET", "/game/start");
+        $client->request("DELETE", "/game/delete");
+        $res = $client->getResponse();
+
+        $expected = [
+            "success" => true,
+            "response" => [
+                "success" => true
+            ]
+        ];
+
+        $resBody = self::makeFirstAssertions($res, 200, $expected);
     }
 }

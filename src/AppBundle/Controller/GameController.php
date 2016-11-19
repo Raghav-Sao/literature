@@ -169,6 +169,11 @@ class GameController extends BaseController
         $this->init();
 
         try {
+            list($game, $user) = $this->gameService->fetchByIdAndValidateAgainsUser(
+                $this->gameId,
+                $this->userId
+            );
+
             $this->gameService->delete($this->gameId);
 
             $this->resetContext();
