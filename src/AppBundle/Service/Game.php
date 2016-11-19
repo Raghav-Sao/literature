@@ -278,7 +278,7 @@ class Game extends BaseService
 
         $game->setUserSN($atSN, $userId);
         $game->status = $game->isAnyUserSNVacant() ? $game->status : Constant\Game\Status::ACTIVE;
-        $this->redis->hmset(
+        $this->redis->hMset(
             $game->id,
             $atSN,                      $userId,
             Constant\Game\Game::STATUS, $game->status
@@ -287,6 +287,17 @@ class Game extends BaseService
         call_user_func_array(
             array($this->redis, "sadd"),
             array_merge([$userId], $game->getInitialCardsByUserSN($atSN))
+        );
+
+        $data["response"]    = [
+            "game" => $game->toArray(),
+            "atSN" => $atSN
+        ];
+        $data["message"] = "Succesfully Joined";
+        $this->pubSub->trigger(
+            $game->id,
+            Constant\PubSub::NEWJOINING,
+            $data
         );
         
         return [
