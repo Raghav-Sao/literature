@@ -10,8 +10,8 @@ use AppBundle\Utility;
 class User
 {
 
-    private $id;
-    private $cards;
+    public $id;
+    public $cards;
 
     /**
      *
@@ -27,15 +27,6 @@ class User
 
         $this->id    = $id;
         $this->cards = $cards;
-    }
-
-    /**
-     * @return string
-     */
-    public function getId()
-    {
-
-        return $this->id;
     }
 
     /**

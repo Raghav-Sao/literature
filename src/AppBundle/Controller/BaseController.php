@@ -102,12 +102,12 @@ class BaseController extends Controller
 
         $game = $this->gameService->fetchGameById($this->gameId);
 
-        if ($game && $game->isActive() && $game->hasUser($this->userId)) {
+        if ($game && $game->isExpired() === false && $game->hasUser($this->userId)) {
 
             throw new BadRequestException("You are already in an active game", ["gameId" => $this->gameId]);
         }
 
-        if ($game && $game->isActive() === false) {
+        if ($game && $game->isExpired()) {
             $this->gameService->delete($game);
         }
      }

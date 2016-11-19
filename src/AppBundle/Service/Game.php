@@ -52,10 +52,7 @@ class Game extends BaseService
 
         if (empty($gameHash)) {
 
-            throw new NotFoundException(
-                "Game with given id not found",
-                ["id" => $id]
-            );
+            throw new NotFoundException("Game not found");
         } else {
 
             return new Model\Redis\Game($id, $gameHash);
@@ -111,7 +108,7 @@ class Game extends BaseService
             $gameId,
             Constant\Game\Game::CREATED_AT,   Utility::currentTimeStamp(), 
             Constant\Game\User::USER_1,       $userId,
-            Constant\Game\Game::STATUS,       Constant\Game\Status::ACTIVE,
+            Constant\Game\Game::STATUS,       Constant\Game\Status::INITIALIZED,
             Constant\Game\Game::NEXT_TURN,    Constant\Game\User::USER_1,
             Constant\Game\Game::U1_CARDS,     implode(",", $u1Cards),
             Constant\Game\Game::U2_CARDS,     implode(",", $u2Cards),
@@ -145,7 +142,7 @@ class Game extends BaseService
     {
         $game = $this->fetchGameById($gameId);
 
-        if ($game->isActive() === false) {
+        if ($game->isExpired()) {
 
             $this->delete($game);
 
@@ -182,6 +179,11 @@ class Game extends BaseService
         string $fromUserId,
         string $toUserId)
     {
+        if ($game->status !== Constant\Game\Status::ACTIVE) {
+
+            throw new BadRequestException("Game is not active");
+        }
+
         if (Utility::isValidCard($card) === false) {
 
             throw new BadRequestException("Not a valid card");
@@ -225,7 +227,7 @@ class Game extends BaseService
             // Set game turn
             $fromUserSN = $game->getUserSNById($fromUser->getId());
             $this->redis->hset(
-                $game->getId(),
+                $game->id,
                 Constant\Game\Game::NEXT_TURN,
                 $fromUserSN
             );
@@ -274,12 +276,13 @@ class Game extends BaseService
             throw new BadRequestException("Invalid position to join as member");
         }
 
-        $this->redis->hmset(
-            $game->getId(),
-            $atSN,
-            $userId
-        );
         $game->setUserSN($atSN, $userId);
+        $game->status = $game->isAnyUserSNVacant() ? $game->status : Constant\Game\Status::ACTIVE;
+        $this->redis->hmset(
+            $game->id,
+            $atSN,                      $userId,
+            Constant\Game\Game::STATUS, $game->status
+        );
 
         call_user_func_array(
             array($this->redis, "sadd"),

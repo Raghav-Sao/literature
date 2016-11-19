@@ -36,7 +36,7 @@ class GameController extends BaseController
 
             list($game, $user) = $this->gameService->initializeGame($this->userId);
 
-            $this->setContext(ContextKey::GAME_ID, $game->getId());
+            $this->setContext(ContextKey::GAME_ID, $game->id);
 
         } catch (\Exception $e) {
 
@@ -102,7 +102,7 @@ class GameController extends BaseController
                 $this->userId
             );
 
-            $this->setContext(ContextKey::GAME_ID, $game->getId());
+            $this->setContext(ContextKey::GAME_ID, $game->id);
         } catch (\Exception $e) {
 
             return $this->handleException($e);
@@ -169,6 +169,11 @@ class GameController extends BaseController
         $this->init();
 
         try {
+            list($game, $user) = $this->gameService->fetchByIdAndValidateAgainsUser(
+                $this->gameId,
+                $this->userId
+            );
+
             $this->gameService->delete($this->gameId);
 
             $this->resetContext();

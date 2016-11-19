@@ -4,34 +4,29 @@ namespace AppBundle\Model\Redis;
 
 use AppBundle\Constant\Game\Status;
 use AppBundle\Constant\Game\User;
+use AppBundle\Exception\BadRequestException;
 
 /**
  *
  */
 class Game
 {
-    private $id;
-    private $createdAt;
-    private $status;
-    private $nextTurn;
+    public $id;
+    public $createdAt;
+    public $status;
+    public $nextTurn;
 
     // User serial numbers
-    private $u1;
-    private $u2;
-    private $u3;
-    private $u4;
+    public $u1;
+    public $u2;
+    public $u3;
+    public $u4;
 
     // Initial cards of all users
-    private $u1Cards;
-    private $u2Cards;
-    private $u3Cards;
-    private $u4Cards;
-
-
-    // Following keys are not in redis
-    // private $team1;
-    // private $team2;
-
+    public $u1Cards;
+    public $u2Cards;
+    public $u3Cards;
+    public $u4Cards;
 
     /**
      *
@@ -56,28 +51,32 @@ class Game
     }
 
     /**
-     * @return string
-     */
-    public function getId()
-    {
-
-        return $this->id;
-    }
-
-    /**
      *
      * @return boolean
      */
-    public function isActive()
+    public function isExpired()
     {
 
-        return ($this->status === Status::ACTIVE);
+        return ($this->status === Status::EXPIRED);
     }
 
     public function isUserSNVacant($userSN)
     {
+        if (property_exists($this, $userSN) === false) {
+
+            throw new BadRequestException("Invalid user serial number");
+        }
 
         return ($this->$userSN == null);
+    }
+
+    public function isAnyUserSNVacant()
+    {
+
+        return ($this->u1 == null ||
+                $this->u2 == null ||
+                $this->u3 == null ||
+                $this->u4 == null);
     }
 
     /**
