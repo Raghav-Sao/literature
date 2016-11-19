@@ -4,6 +4,7 @@ namespace Tests\AppBundle\Controller;
 
 use AppBundle\Exception;
 use AppBundle\Constant;
+use AppBundle\Utility;
 
 class GameControllerTest extends AbstractControllerTest
 {
@@ -232,10 +233,15 @@ class GameControllerTest extends AbstractControllerTest
     public function testMoveAction()
     {
         // Covers:
+        //
         // - Is valid card
         // - The other use doesn't exist in game
         // - These two are partners
         // - It is not his turn
+
+        // Following will have to cover in unit test
+        // Functional tests for these use cases are flaky :)
+        //
         // - You do not have that card
         // - 2 cases:
         //   - The other user has the card
@@ -247,11 +253,91 @@ class GameControllerTest extends AbstractControllerTest
 
         $res = $client1->getResponse();
 
-        $resBody = $this->makeFirstAssertions($res, 200);
+        $resBody1 = $this->makeFirstAssertions($res, 200);
 
-        $gameId   = $resBody->response->game->id;
-        $userId1  = $resBody->response->user->id;
+        $gameId       = $resBody1->response->game->id;
+        $userId1      = $resBody1->response->user->id;
+        $userId1Cards = $resBody1->response->user->cards;
 
+        // Other clients joins
+        $client2 = static::createClient();
+        $client2->request("POST", sprintf("/game/%s/join/u2", $gameId));
+        $res = $client2->getResponse();
+
+        $resBody2 = $this->makeFirstAssertions($res, 200);
+
+        $userId2      = $resBody2->response->user->id;
+        $userId2Cards = $resBody2->response->user->cards;
+
+        $client3 = static::createClient();
+        $client3->request("POST", sprintf("/game/%s/join/u3", $gameId));
+        $res = $client3->getResponse();
+
+        $resBody3 = $this->makeFirstAssertions($res, 200);
+
+        $userId3      = $resBody3->response->user->id;
+        $userId3Cards = $resBody3->response->user->cards;
+
+        $client4 = static::createClient();
+        $client4->request("POST", sprintf("/game/%s/join/u4", $gameId));
+        $res = $client4->getResponse();
+
+        $resBody4 = $this->makeFirstAssertions($res, 200);
+
+        $userId4      = $resBody4->response->user->id;
+        $userId4Cards = $resBody4->response->user->cards;
+
+        // Attempt invalid card move
+        $client1->request("PATCH", sprintf("/game/move/%s/from/%s", Constant\Game\Card::CLUB_7, $userId2));
+        $res = $client1->getResponse();
+
+        $expected = [
+            "success"      => false,
+            "errorCode"    => Exception\Code::BAD_REQUEST,
+            "errorMessage" => "Not a valid card",
+            "extra"        => []
+        ];
+
+        $resBody = $this->makeFirstAssertions($res, 400, $expected);
+
+        // Attempt with invalid {fromUserId}
+        $client1->request("PATCH", sprintf("/game/move/%s/from/%s", Constant\Game\Card::CLUB_6, "invalid_id"));
+        $res = $client1->getResponse();
+
+        $expected = [
+            "success"      => false,
+            "errorCode"    => Exception\Code::BAD_REQUEST,
+            "errorMessage" => "Bad value for fromUserId, Does not exists",
+            "extra"        => []
+        ];
+
+        $resBody = $this->makeFirstAssertions($res, 400, $expected);
+
+        // Attempt with {fromUserId} = The other partner
+        $client1->request("PATCH", sprintf("/game/move/%s/from/%s", Utility::getRandomCard($userId3Cards), $userId3));
+        $res = $client1->getResponse();
+
+        $expected = [
+            "success"      => false,
+            "errorCode"    => Exception\Code::BAD_REQUEST,
+            "errorMessage" => "Bad value for fromUserId, You are partners",
+            "extra"        => []
+        ];
+
+        $resBody = $this->makeFirstAssertions($res, 400, $expected);
+
+        // Attempt when it is not your turn
+        $client2->request("PATCH", sprintf("/game/move/%s/from/%s", Utility::getRandomCard($userId3Cards), $userId3));
+        $res = $client2->getResponse();
+
+        $expected = [
+            "success"      => false,
+            "errorCode"    => Exception\Code::BAD_REQUEST,
+            "errorMessage" => "It is not your turn to make a move",
+            "extra"        => []
+        ];
+
+        $resBody = $this->makeFirstAssertions($res, 400, $expected);
     }
 
     public function testDeleteAction()

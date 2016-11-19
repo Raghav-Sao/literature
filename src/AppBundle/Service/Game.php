@@ -191,12 +191,12 @@ class Game extends BaseService
 
         if ($game->hasUser($fromUserId) === false) {
 
-            throw new BadRequestException();
+            throw new BadRequestException("Bad value for fromUserId, Does not exists");
         }
 
         if ($game->arePartners($fromUserId, $toUserId) === true) {
 
-            throw new BadRequestException();
+            throw new BadRequestException("Bad value for fromUserId, You are partners");
         }
 
         if ($game->getNextTurnUserId() !== $toUserId) {
