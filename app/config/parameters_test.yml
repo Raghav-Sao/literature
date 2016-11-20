@@ -14,4 +14,4 @@ parameters:
     pusher.app_key: 0a4e78670f01ad56c33a
     pusher.app_secret: 9fdc265469c62346177d
     pusher.app_id: 268031
-    redis.dsn: 'redis://localhost'
+    redis.dsn: 'redis://127.0.0.1'
