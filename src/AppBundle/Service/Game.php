@@ -300,7 +300,7 @@ class Game extends BaseService
 
         $game->$atSN = $userId;
         $game->status = $game->isAnyUserSNVacant() ? $game->status : Constant\Game\Status::ACTIVE;
-        $this->redis->hMset(
+        $this->redis->hmset(
             $game->id,
             $atSN,                      $userId,
             Constant\Game\Game::STATUS, $game->status
