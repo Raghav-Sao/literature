@@ -40,12 +40,14 @@ class ChatController extends BaseController
                 throw new Exception\BadRequestException("No message provided in input");
             }
 
+            $eventPayload = [
+                "user" => $this->userId,
+                "message" => $this->input["message"],
+            ];
             $this->container->get("app_bundle.pubsub.pusher")->trigger(
                 $this->gameId,
                 Game\Event::CHAT_MESSAGE,
-
-                // TODO: Fix all these message format
-                [$this->input["message"]]
+                $eventPayload
             );
 
         } catch (\Exception $e) {
