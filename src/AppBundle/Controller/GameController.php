@@ -174,7 +174,7 @@ class GameController extends BaseController
                 $this->userId
             );
 
-            $this->gameService->delete($this->gameId);
+            $this->gameService->delete($game);
 
             $this->resetContext();
 
