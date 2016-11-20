@@ -91,7 +91,7 @@ class BaseController extends Controller
      *   redirects him to that page.
      * Cleans redis data if game associated is not active
      *
-     * @return null|RedirectResponse
+     * @return
      */
     protected function checkIfUserActiveInAGame()
     {
@@ -121,17 +121,10 @@ class BaseController extends Controller
      * @return
      */
     protected function setContext(
-    string $key,
-    string $value)
+        string $key,
+        string $value)
     {
-        switch ($key) {
-            case ContextKey::USER_ID:
-                break;
-
-            default:
-                $this->session->set($key, $value);
-                break;
-        }
+        $this->session->set($key, $value);
     }
 
     /**

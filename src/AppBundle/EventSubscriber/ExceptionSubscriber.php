@@ -6,6 +6,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
+use PHPUnit\Framework\TestCase;
+
 /**
  *
  */
@@ -37,6 +39,8 @@ class ExceptionSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * @codeCoverageIgnore
+     *
      * @param GetResponseForExceptionEvent $event
      *
      * @return
@@ -47,6 +51,8 @@ class ExceptionSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * @codeCoverageIgnore
+     *
      * @param GetResponseForExceptionEvent $event
      *
      * @return
@@ -57,6 +63,8 @@ class ExceptionSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * @codeCoverageIgnore
+     *
      * @param GetResponseForExceptionEvent $event
      *
      * @return

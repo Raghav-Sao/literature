@@ -115,37 +115,6 @@ class Game
 
     /**
      *
-     * @param string $userSN
-     * @param string $userId
-     *
-     * @return boolean
-     */
-    public function isValidSNAgainstID($userSN, $userId)
-    {
-
-        return property_exists($this, $userSN) && $this->$userSN === $userId;
-    }
-
-    /**
-     *
-     * @param string $userSN
-     *
-     * @return null|string
-     */
-    public function getUserIdBySN($userSN)
-    {
-        if (property_exists($this, $userSN)) {
-
-            return $this->$userSN;
-        } else {
-            // TODO: Should throw error?
-
-            return null;
-        }
-    }
-
-    /**
-     *
      * @param string $userId
      *
      * @return null|string
@@ -195,7 +164,13 @@ class Game
 
         $attribute = sprintf("%sCards", $userSN);
 
-        return explode(",", $this->$attribute);
+        if (empty($this->$attribute)) {
+
+            return [];
+        } else {
+
+            return explode(",", $this->$attribute);
+        }
     }
 
     /**
@@ -214,39 +189,5 @@ class Game
             "u3"        => $this->u3,
             "u4"        => $this->u4,
         ];
-    }
-
-
-
-    ####################################################################
-    // Setters
-
-    /**
-     * @param string $userSN
-     * @param string $userId
-     *
-     * @return Game
-     */
-    public function setUserSN(
-        string $userSN,
-        string $userId)
-    {
-
-        $this->$userSN = $userId;
-
-        return $this;
-    }
-
-    /**
-     * @param string $userSN
-     *
-     * @return Game
-     */
-    public function setNextTurn(
-        string $userSN)
-    {
-        $this->nextTurn = $userSN;
-
-        return $this;
     }
 }

@@ -53,22 +53,27 @@ class Game extends BaseService
         if (empty($gameHash)) {
 
             throw new NotFoundException("Game not found");
-        } else {
-
-            return new Model\Redis\Game($id, $gameHash);
         }
+
+        return new Model\Redis\Game($id, $gameHash);
     }
 
     /**
-     * @param string $id
+     * @param Model\Redis\Game $game
      *
      * @return
      */
     public function delete(
-        string $id)
+        Model\Redis\Game $game)
     {
-        // TODO
-        // - Clean redis data for given gameId
+
+        $this->redis->del(
+            $game->id,
+
+            $game->u1,
+            $game->u2,
+            $game->u3,
+            $game->u4);
     }
 
     /**
@@ -191,12 +196,12 @@ class Game extends BaseService
 
         if ($game->hasUser($fromUserId) === false) {
 
-            throw new BadRequestException();
+            throw new BadRequestException("Bad value for fromUserId, Does not exists");
         }
 
         if ($game->arePartners($fromUserId, $toUserId) === true) {
 
-            throw new BadRequestException();
+            throw new BadRequestException("Bad value for fromUserId, You are partners");
         }
 
         if ($game->getNextTurnUserId() !== $toUserId) {
@@ -231,7 +236,7 @@ class Game extends BaseService
                 Constant\Game\Game::NEXT_TURN,
                 $fromUserSN
             );
-            $game->setNextTurn($fromUserSN);
+            $game->nextTurn = $fromUserSN;
 
             $success = false;
         } else {
@@ -276,7 +281,7 @@ class Game extends BaseService
             throw new BadRequestException("Invalid position to join as member");
         }
 
-        $game->setUserSN($atSN, $userId);
+        $game->$atSN = $userId;
         $game->status = $game->isAnyUserSNVacant() ? $game->status : Constant\Game\Status::ACTIVE;
         $this->redis->hMset(
             $game->id,
