@@ -1,0 +1,7 @@
+languages: php
+php:
+  - '7.0'
+install:
+  - ./composer.phar install --no-interaction
+script:
+  - ./phpunit.phar --debug
