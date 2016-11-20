@@ -44,8 +44,6 @@ class GameTestData
     {
         self::$defaultGameHash["u1_cards"] = implode(",", [Game\Card::CLUB_1, Game\Card::CLUB_2]);
 
-        self::$defaultGameHash = array_merge(self::$defaultGameHash, $overrideWith);
-
-        return self::$defaultGameHash;
+        return array_merge(self::$defaultGameHash, $overrideWith);
     }
 }
