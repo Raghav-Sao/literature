@@ -24,14 +24,14 @@ class PusherMock extends BaseService implements PubSubInterface
     /**
      * @param string $channel
      * @param string $event
-     * @param string $data
+     * @param array $data
      *
      * @return
      */
     public function trigger(
         string $channel,
         string $event,
-        string $data)
+        array $data)
     {
     }
 }

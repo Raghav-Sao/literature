@@ -213,6 +213,18 @@ class Game extends BaseService
 
         if ($toUser->hasAtLeastOneCardOfType($card) === false) {
 
+            $data["response"]   = [
+                "game"      => $game->toArray(),
+                "success"   => false
+            ];
+            $data["message"]    = "You do not have at least one card of that type";
+            $data["eventType"] = Constant\PubSub::CARD_MOVE_ACTION;
+            $this->pubSub->trigger(
+                $game->id,
+                Constant\PubSub::CARD_MOVE_ACTION,
+                $data
+            );
+
             throw new BadRequestException(
                 "You do not have at least one card of that type. Invalid move"
             );
@@ -252,6 +264,18 @@ class Game extends BaseService
 
             $success = true;
         }
+
+        $data["response"]   = [
+            "game"      => $game->toArray(),
+            "success"   => $success
+        ];
+        $data["message"]    = "card move action: " . $success;
+        $data["eventType"] = Constant\PubSub::CARD_MOVE_ACTION;
+        $this->pubSub->trigger(
+            $game->id,
+            Constant\PubSub::CARD_MOVE_ACTION,
+            $data
+        );
 
         return [
             $success,
@@ -294,14 +318,15 @@ class Game extends BaseService
             array_merge([$userId], $game->getInitialCardsByUserSN($atSN))
         );
 
-        $data["response"]    = [
+        $data["response"]   = [
             "game" => $game->toArray(),
-            "atSN" => $atSN
+            "atSN" => $atSN,
         ];
-        $data["message"] = "Succesfully Joined";
+        $data["message"]    = "Succesfully Joined";
+        $data["eventType"]  = Constant\PubSub::NEW_JOINING;
         $this->pubSub->trigger(
             $game->id,
-            Constant\PubSub::NEWJOINING,
+            Constant\PubSub::NEW_JOINING,
             $data
         );
         

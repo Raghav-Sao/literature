@@ -43,7 +43,7 @@ class ChatController extends BaseController
             $this->container->get("app_bundle.pubsub.pusher")->trigger(
                 $this->gameId,
                 Game\Event::CHAT_MESSAGE,
-                $this->input["message"]
+                [$this->input["message"]]
             );
 
         } catch (\Exception $e) {
