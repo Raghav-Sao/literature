@@ -133,13 +133,16 @@ class GameTest extends KernelTestCase
 
     public function testMoveCardWhenFromUserHaveCard()
     {
-        $game = new Redis\Game(GameTestData::getId(), GameTestData::getGameHash([
-                                                                                    "status" => "active",
+        $game = new Redis\Game(
+                                GameTestData::getId(),
+                                GameTestData::getGameHash([
+                                    "status" => "active",
 
-                                                                                    "u2" => "u_2222222222",
-                                                                                    "u3" => "u_3333333333",
-                                                                                    "u4" => "u_4444444444",
-                                                                                ]));
+                                    "u2" => "u_2222222222",
+                                    "u3" => "u_3333333333",
+                                    "u4" => "u_4444444444",
+                                ])
+                            );
 
         $this->redis->method("smembers")
                     ->will($this->onConsecutiveCalls(
@@ -165,13 +168,16 @@ class GameTest extends KernelTestCase
 
     public function testMoveCardWhenFromUserNotHaveCard()
     {
-        $game = new Redis\Game(GameTestData::getId(), GameTestData::getGameHash([
-                                                                                    "status" => "active",
+        $game = new Redis\Game(
+                                GameTestData::getId(),
+                                GameTestData::getGameHash([
+                                    "status" => "active",
 
-                                                                                    "u2" => "u_2222222222",
-                                                                                    "u3" => "u_3333333333",
-                                                                                    "u4" => "u_4444444444",
-                                                                                ]));
+                                    "u2" => "u_2222222222",
+                                    "u3" => "u_3333333333",
+                                    "u4" => "u_4444444444",
+                                ])
+                            );
 
         $this->redis->method("smembers")
                     ->will($this->onConsecutiveCalls(
