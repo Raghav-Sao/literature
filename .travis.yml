@@ -1,0 +1,11 @@
+language: php
+php:
+  - '7.0'
+services:
+    - redis-server
+install:
+  - ./composer.phar install --no-interaction
+before_script:
+  - redis-cli info
+script:
+  - ./phpunit.phar --debug

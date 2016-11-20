@@ -62,8 +62,6 @@ class BaseController extends Controller
      */
     protected function handleException(\Exception $e)
     {
-        // $this->logger->error($e);
-
         switch (get_class($e)) {
 
             case "AppBundle\Exception\BadRequestException":
@@ -75,6 +73,7 @@ class BaseController extends Controller
                 break;
 
             default:
+                $this->logger->error($e);
                 return new Response\Error($e, Response\Error::HTTP_INTERNAL_SERVER_ERROR);
                 break;
         }
