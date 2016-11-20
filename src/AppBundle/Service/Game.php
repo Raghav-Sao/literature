@@ -213,16 +213,14 @@ class Game extends BaseService
 
         if ($toUser->hasAtLeastOneCardOfType($card) === false) {
 
-            $data["response"]   = [
-                "game"      => $game->toArray(),
-                "success"   => false
+            $eventPayload = [
+                "success" => true,
+                "game"    => $game->toArray(),
             ];
-            $data["message"]    = "You do not have at least one card of that type";
-            $data["eventType"] = Constant\PubSub::CARD_MOVE_ACTION;
             $this->pubSub->trigger(
                 $game->id,
-                Constant\PubSub::CARD_MOVE_ACTION,
-                $data
+                Constant\Game\Event::GAME_MOVE_ACTION,
+                $eventPayload
             );
 
             throw new BadRequestException(
@@ -233,8 +231,6 @@ class Game extends BaseService
         $fromUser = $this->fetchUserById($fromUserId);
 
         // TODOs:
-        // Publish response data too
-        // Ensure $game & $user refreshed
         // Check game completion and other stuff
 
         $success = false;
@@ -264,16 +260,14 @@ class Game extends BaseService
             $success = true;
         }
 
-        $data["response"]   = [
-            "game"      => $game->toArray(),
-            "success"   => $success
+        $eventPayload = [
+            "success" => true,
+            "game"    => $game->toArray(),
         ];
-        $data["message"]    = "card move action: " . $success;
-        $data["eventType"] = Constant\PubSub::CARD_MOVE_ACTION;
         $this->pubSub->trigger(
             $game->id,
-            Constant\PubSub::CARD_MOVE_ACTION,
-            $data
+            Constant\Game\Event::GAME_MOVE_ACTION,
+            $eventPayload
         );
 
         return [
@@ -317,16 +311,14 @@ class Game extends BaseService
             array_merge([$userId], $game->getInitialCardsByUserSN($atSN))
         );
 
-        $data["response"]   = [
-            "game" => $game->toArray(),
+        $eventPayload = [
             "atSN" => $atSN,
+            "game" => $game->toArray(),
         ];
-        $data["message"]    = "Succesfully Joined";
-        $data["eventType"]  = Constant\PubSub::NEW_JOINING;
         $this->pubSub->trigger(
             $game->id,
-            Constant\PubSub::NEW_JOINING,
-            $data
+            Constant\Game\Event::GAME_JOIN_ACTION,
+            $eventPayload
         );
         
         return [
