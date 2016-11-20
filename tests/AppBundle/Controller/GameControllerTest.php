@@ -34,7 +34,7 @@ class GameControllerTest extends AbstractControllerTest
         ];
 
         $resBody = $this->makeFirstAssertions($res, 200, $expected);
-        $this->assertEquals(12, count($resBody->response->user->cards));
+        $this->assertCount(12, $resBody->response->user->cards);
 
         // On reloading the same page, should throw 400 saying you're already in a game
         $client->reload();
@@ -100,7 +100,7 @@ class GameControllerTest extends AbstractControllerTest
         ];
 
         $resBody = $this->makeFirstAssertions($res, 200, $expected);
-        $this->assertEquals(12, count($resBody->response->user->cards));
+        $this->assertCount(12, $resBody->response->user->cards);
     }
 
     public function testJoinAction()
@@ -199,7 +199,7 @@ class GameControllerTest extends AbstractControllerTest
         ];
 
         $resBody = $this->makeFirstAssertions($res, 200, $expected);
-        $this->assertEquals(12, count($resBody->response->user->cards));
+        $this->assertCount(12, $resBody->response->user->cards);
 
         $client3 = static::createClient();
         $client3->request("POST", sprintf("/game/%s/join/u3", $gameId));

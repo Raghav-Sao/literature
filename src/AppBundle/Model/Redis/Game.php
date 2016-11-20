@@ -190,38 +190,4 @@ class Game
             "u4"        => $this->u4,
         ];
     }
-
-
-
-    ####################################################################
-    // Setters
-
-    /**
-     * @param string $userSN
-     * @param string $userId
-     *
-     * @return Game
-     */
-    public function setUserSN(
-        string $userSN,
-        string $userId)
-    {
-
-        $this->$userSN = $userId;
-
-        return $this;
-    }
-
-    /**
-     * @param string $userSN
-     *
-     * @return Game
-     */
-    public function setNextTurn(
-        string $userSN)
-    {
-        $this->nextTurn = $userSN;
-
-        return $this;
-    }
 }
