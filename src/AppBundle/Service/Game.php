@@ -60,15 +60,21 @@ class Game extends BaseService
     }
 
     /**
-     * @param string $id
+     * @param Model\Redis\Game $game
      *
      * @return
      */
     public function delete(
-        string $id)
+        Model\Redis\Game $game)
     {
-        // TODO
-        // - Clean redis data for given gameId
+
+        $this->redis->del(
+            $game->id,
+
+            $game->u1,
+            $game->u2,
+            $game->u3,
+            $game->u4);
     }
 
     /**

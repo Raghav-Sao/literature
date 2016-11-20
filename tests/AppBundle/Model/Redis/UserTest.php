@@ -41,4 +41,30 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->user->hasAtLeastOneCardOfType(Card::HEART_8));
         $this->assertFalse($this->user->hasAtLeastOneCardOfType(Card::DIAMOND_2));
     }
+
+    public function testAddCard()
+    {
+
+        $this->assertEquals(5, count($this->user->cards));
+
+        $this->user->addCard(Card::HEART_2);
+        $this->user->addCard(Card::HEART_3);
+
+        $this->assertEquals(7, count($this->user->cards));
+        $this->assertTrue($this->user->hasCard(Card::HEART_2));
+        $this->assertTrue($this->user->hasCard(Card::HEART_3));
+    }
+
+    public function testRemoveCard()
+    {
+
+        $this->assertEquals(5, count($this->user->cards));
+
+        $this->user->removeCard(Card::HEART_1);
+
+        $this->assertEquals(4, count($this->user->cards));
+        $this->assertFalse($this->user->hasCard(Card::HEART_1));
+
+        $this->assertTrue($this->user->hasCard(Card::CLUB_1));
+    }
 }
