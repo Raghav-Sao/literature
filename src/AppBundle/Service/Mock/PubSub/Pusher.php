@@ -1,13 +1,13 @@
 <?php
 
-namespace AppBundle\Service\PubSub;
+namespace AppBundle\Service\Mock\PubSub;
 
-use AppBundle\Service\BaseService;
+use AppBundle\Service;
 
 /**
  *
  */
-class PusherMock extends BaseService implements PubSubInterface
+class Pusher extends Service\BaseService implements Service\PubSub\PubSubInterface
 {
     /**
      *
@@ -24,14 +24,14 @@ class PusherMock extends BaseService implements PubSubInterface
     /**
      * @param string $channel
      * @param string $event
-     * @param string $data
+     * @param array  $data
      *
      * @return
      */
     public function trigger(
         string $channel,
         string $event,
-        string $data)
+        array  $data = array())
     {
     }
 }
