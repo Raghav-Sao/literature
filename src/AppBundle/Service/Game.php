@@ -199,17 +199,22 @@ class Game extends BaseService
             throw new BadRequestException("Bad value for fromUserId, Does not exists");
         }
 
-        if ($game->arePartners($fromUserId, $toUserId) === true) {
-
-            throw new BadRequestException("Bad value for fromUserId, You are partners");
-        }
-
         if ($game->getNextTurnUserId() !== $toUserId) {
 
             throw new BadRequestException("It is not your turn to make a move");
         }
 
+        if ($game->arePartners($fromUserId, $toUserId) === true) {
+
+            throw new BadRequestException("Bad value for fromUserId, You are partners");
+        }
+
         $toUser   = $this->fetchUserById($toUserId);
+
+        if ($toUser->hasCard($card)) {
+
+            throw new BadRequestException("Bad value for card, You have it already");
+        }
 
         if ($toUser->hasAtLeastOneCardOfType($card) === false) {
 

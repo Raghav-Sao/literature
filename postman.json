@@ -1,0 +1,115 @@
+{
+	"variables": [],
+	"info": {
+		"name": "Literature / https://github.com/Raghav-Sao/literature",
+		"_postman_id": "7e4eee46-a758-20b8-784f-127ea5788651",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Index",
+			"request": {
+				"url": "http://www.literature.dev",
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "[Game] Index",
+			"request": {
+				"url": "http://www.literature.dev/game",
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "[Game] Start",
+			"request": {
+				"url": "http://www.literature.dev/game/start",
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "[Game] Delete",
+			"request": {
+				"url": "http://www.literature.dev/game/delete",
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "[Game] Join at given serial number",
+			"request": {
+				"url": "http://www.literature.dev/game/g_89bcb90655012d20a6366e930645cb14/join/u2",
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "[Game] Move: request for a card from other user",
+			"request": {
+				"url": "http://www.literature.dev/game/move/c1/from/u2",
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "[Chat] Post new message",
+			"request": {
+				"url": "http://www.literature.dev/chat",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"message\": \"Sample message\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

@@ -118,6 +118,21 @@ class GameTest extends KernelTestCase
 
     /**
      * @expectedException        \AppBundle\Exception\BadRequestException
+     * @expectedExceptionMessage Bad value for card, You have it already
+     *
+     */
+    public function testMoveCardWhenYouOnlyHaveTheCard()
+    {
+        $game = new Redis\Game(GameTestData::getId(), GameTestData::getGameHash(["status" => "active", "u2" => "u_2222222222"]));
+
+        $this->redis->method("smembers")
+                    ->willReturn(UserTestData::getCardSet());
+
+        $this->gameService->moveCard($game, Game\Card::CLUB_1, "u_2222222222", "u_1111111111");
+    }
+
+    /**
+     * @expectedException        \AppBundle\Exception\BadRequestException
      * @expectedExceptionMessage You do not have at least one card of that type
      *
      */
