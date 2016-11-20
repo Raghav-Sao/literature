@@ -84,9 +84,14 @@ class Pusher extends Service\BaseService implements PubSubInterface
         string $event,
         array $data = array())
     {
+        $formattedData = [
+            "eventType" => $event,
+            "eventData" => $data
+        ];
+
         try {
 
-            $this->pusher->trigger($channel, $event, $data);
+            $this->pusher->trigger($channel, $event, $formattedData);
         } catch (\Exception $e) {
 
             $this->logger->error($e);
