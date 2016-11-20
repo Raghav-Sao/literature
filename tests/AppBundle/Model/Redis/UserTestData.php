@@ -32,9 +32,14 @@ class UserTestData
         }
     }
 
-    public static function getCardSet(array $overrideWith = [])
+    public static function getCardSet(array $overrideWith = [], bool $replace = false)
     {
+        if ($replace) {
 
-        return array_merge(self::$defaultCardSet, $overrideWith);
+            return $overrideWith;
+        } else {
+
+            return array_merge(self::$defaultCardSet, $overrideWith);
+        }
     }
 }

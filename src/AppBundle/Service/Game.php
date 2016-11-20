@@ -242,7 +242,7 @@ class Game extends BaseService
         if ($fromUser->hasCard($card) === false) {
 
             // Set game turn
-            $fromUserSN = $game->getUserSNById($fromUser->getId());
+            $fromUserSN = $game->getUserSNById($fromUser->id);
             $this->redis->hmset(
                 $game->id,
                 Constant\Game\Game::NEXT_TURN, $fromUserSN
@@ -254,8 +254,8 @@ class Game extends BaseService
 
             // Move the card
             $this->redis->smove(
-                $fromUser->getId(),
-                $toUser->getId(),
+                $fromUser->id,
+                $toUser->id,
                 $card
             );
             $fromUser->removeCard($card);
