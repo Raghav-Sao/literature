@@ -213,6 +213,16 @@ class Game extends BaseService
 
         if ($toUser->hasAtLeastOneCardOfType($card) === false) {
 
+            $eventPayload = [
+                "success" => true,
+                "game"    => $game->toArray(),
+            ];
+            $this->pubSub->trigger(
+                $game->id,
+                Constant\Game\Event::GAME_MOVE_ACTION,
+                $eventPayload
+            );
+
             throw new BadRequestException(
                 "You do not have at least one card of that type. Invalid move"
             );
@@ -221,8 +231,6 @@ class Game extends BaseService
         $fromUser = $this->fetchUserById($fromUserId);
 
         // TODOs:
-        // Publish response data too
-        // Ensure $game & $user refreshed
         // Check game completion and other stuff
 
         $success = false;
@@ -251,6 +259,16 @@ class Game extends BaseService
 
             $success = true;
         }
+
+        $eventPayload = [
+            "success" => true,
+            "game"    => $game->toArray(),
+        ];
+        $this->pubSub->trigger(
+            $game->id,
+            Constant\Game\Event::GAME_MOVE_ACTION,
+            $eventPayload
+        );
 
         return [
             $success,
@@ -291,6 +309,16 @@ class Game extends BaseService
         call_user_func_array(
             array($this->redis, "sadd"),
             array_merge([$userId], $game->getInitialCardsByUserSN($atSN))
+        );
+
+        $eventPayload = [
+            "atSN" => $atSN,
+            "game" => $game->toArray(),
+        ];
+        $this->pubSub->trigger(
+            $game->id,
+            Constant\Game\Event::GAME_JOIN_ACTION,
+            $eventPayload
         );
         
         return [
