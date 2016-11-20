@@ -13,17 +13,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->id    = "u_1111111111";
-        $this->cards = [
-            Card::CLUB_1,
-            Card::CLUB_2,
-            Card::CLUB_3,
-            Card::CLUB_4,
-
-            Card::HEART_1,
-        ];
-
-        $this->user  = new User($this->id, $this->cards);
+        $this->user  = new User(UserTestData::getId(), UserTestData::getCardSet());
     }
 
     public function testHasCard()

@@ -243,10 +243,9 @@ class Game extends BaseService
 
             // Set game turn
             $fromUserSN = $game->getUserSNById($fromUser->getId());
-            $this->redis->hset(
+            $this->redis->hmset(
                 $game->id,
-                Constant\Game\Game::NEXT_TURN,
-                $fromUserSN
+                Constant\Game\Game::NEXT_TURN, $fromUserSN
             );
             $game->nextTurn = $fromUserSN;
 

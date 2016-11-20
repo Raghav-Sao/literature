@@ -3,12 +3,12 @@
 namespace AppBundle\Service\PubSub;
 
 use \Pusher as PusherClient;
-use AppBundle\Service\BaseService;
+use AppBundle\Service;
 
 /**
  *
  */
-class Pusher extends BaseService implements PubSubInterface
+class Pusher extends Service\BaseService implements PubSubInterface
 {
 
     // Static factory method
@@ -23,7 +23,7 @@ class Pusher extends BaseService implements PubSubInterface
 
         if ($mock) {
 
-            return new PusherMock(
+            return new Service\Mock\PubSub\Pusher(
                 $logger
             );
 
@@ -75,14 +75,14 @@ class Pusher extends BaseService implements PubSubInterface
     /**
      * @param string $channel
      * @param string $event
-     * @param array $data
+     * @param array  $data
      *
      * @return
      */
     public function trigger(
         string $channel,
         string $event,
-        array $data)
+        array $data = array())
     {
         try {
 
