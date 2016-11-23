@@ -21,24 +21,29 @@ class UserTestData
         Card::HEART_1,
     ];
 
+    /**
+     * @param  string|null $id
+     * @return string
+     */
     public static function getId(string $id = null)
     {
         if (empty($id)) {
-
             return self::$id;
         } else {
-
             return $id;
         }
     }
 
+    /**
+     * @param  array        $overrideWith
+     * @param  bool|boolean $replace
+     * @return array
+     */
     public static function getCardSet(array $overrideWith = [], bool $replace = false)
     {
         if ($replace) {
-
             return $overrideWith;
         } else {
-
             return array_merge(self::$defaultCardSet, $overrideWith);
         }
     }

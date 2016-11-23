@@ -16,31 +16,50 @@ class Redis extends Service\BaseService
      * @return
      */
     public function __construct(
-        $logger)
-    {
+        $logger
+    ) {
+
         parent::__construct($logger);
     }
 
+    /**
+     * @return
+     */
     public function hgetall()
     {
     }
 
+    /**
+     * @return
+     */
     public function del()
     {
     }
 
+    /**
+     * @return
+     */
     public function smembers()
     {
     }
 
+    /**
+     * @return
+     */
     public function hmset()
     {
     }
 
+    /**
+     * @return
+     */
     public function sadd()
     {
     }
 
+    /**
+     * @return
+     */
     public function smove()
     {
     }

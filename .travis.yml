@@ -6,6 +6,7 @@ services:
 install:
   - ./composer.phar install --no-interaction
 before_script:
-  - redis-cli info
+  - ./vendor/bin/phpcs --config-set installed_paths ../../endouble/symfony3-custom-coding-standard
 script:
+  - ./vendor/bin/phpcs --standard=Symfony3Custom --extensions=php src/ tests/
   - ./phpunit.phar --debug

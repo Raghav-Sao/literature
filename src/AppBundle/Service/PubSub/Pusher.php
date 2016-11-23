@@ -10,25 +10,29 @@ use AppBundle\Service;
  */
 class Pusher extends Service\BaseService implements PubSubInterface
 {
+    protected $pusher;
 
-    // Static factory method
-
+    /**
+     * @param  bool   $mock
+     * @param  [type] $logger
+     * @param  string $appKey
+     * @param  string $appSecret
+     * @param  string $appId
+     * @return Service\Mock\PubSub\Pusher|Pusher
+     */
     public static function create(
         bool   $mock,
-               $logger,
+        $logger,
         string $appKey,
         string $appSecret,
-        string $appId)
-    {
+        string $appId
+    ) {
 
         if ($mock) {
-
             return new Service\Mock\PubSub\Pusher(
                 $logger
             );
-
         } else {
-
             return new Pusher(
                 $logger,
                 $appKey,
@@ -37,10 +41,6 @@ class Pusher extends Service\BaseService implements PubSubInterface
             );
         }
     }
-
-
-
-    protected $pusher;
 
     /**
      *
@@ -55,8 +55,8 @@ class Pusher extends Service\BaseService implements PubSubInterface
         $logger,
         string $appKey,
         string $appSecret,
-        string $appId)
-    {
+        string $appId
+    ) {
 
         parent::__construct($logger);
 
@@ -82,18 +82,17 @@ class Pusher extends Service\BaseService implements PubSubInterface
     public function trigger(
         string $channel,
         string $event,
-        array $data = array())
-    {
+        array $data = array()
+    ) {
+
         $formattedData = [
             "eventType" => $event,
-            "eventData" => $data
+            "eventData" => $data,
         ];
 
         try {
-
             $this->pusher->trigger($channel, $event, $formattedData);
         } catch (\Exception $e) {
-
             $this->logger->error($e);
         }
     }

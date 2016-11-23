@@ -27,9 +27,8 @@ class AbstractControllerTest extends WebTestCase
         self::TF_SOMETHING,
     ];
 
-
     /**
-     * @param Response $res      - The Symfony's Http 
+     * @param Response $res      - The Symfony's Http
      * @param integer  $code     - Expected http response code
      * @param array    $expected - Expected response array
      *
@@ -38,8 +37,8 @@ class AbstractControllerTest extends WebTestCase
     public function makeFirstAssertions(
         Response $res,
         $code,
-        $expected = array())
-    {
+        $expected = array()
+    ) {
         $resBody = json_decode($res->getContent());
 
         // Asserts response status code and header
@@ -64,19 +63,17 @@ class AbstractControllerTest extends WebTestCase
      */
     protected function doMakeFirstAssertions(
         $resBody,
-        array $expected)
-    {
+        array $expected
+    ) {
         foreach ($expected as $key => $value) {
-
+            // Asserts if the key exists in res
             $this->assertTrue(property_exists($resBody, $key));
 
+            // Recursively calls same method to resolve nested assertions
             if (Utility::isAssocArray($value)) {
-
                 $this->doMakeFirstAssertions($resBody->$key, $value);
             } else {
-
                 if (in_array($value, self::$allTFs, true) === true) {
-
                     // TODO: Implement this
                     // - For now it's okay
                 } else {

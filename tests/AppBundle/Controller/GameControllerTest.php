@@ -24,13 +24,13 @@ class GameControllerTest extends AbstractControllerTest
                     "u1"     => "TF_SOMETHING",
                     "u2"     => null,
                     "u3"     => null,
-                    "u4"     => null
+                    "u4"     => null,
                 ],
                 "user" => [
                     "id"    => "TF_SOMETHING",
-                    "cards" => "TF_SOMETHING"
-                ]
-            ]
+                    "cards" => "TF_SOMETHING",
+                ],
+            ],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 200, $expected);
@@ -45,8 +45,8 @@ class GameControllerTest extends AbstractControllerTest
             "errorCode" => Exception\Code::BAD_REQUEST,
             "errorMessage" => "You are already in an active game",
             "extra"  => [
-                "gameId" => $resBody->response->game->id
-            ]
+                "gameId" => $resBody->response->game->id,
+            ],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 400, $expected);
@@ -64,7 +64,7 @@ class GameControllerTest extends AbstractControllerTest
             "success"      => false,
             "errorCode"    => Exception\Code::NOT_FOUND,
             "errorMessage" => "Game not found",
-            "extra"        => []
+            "extra"        => [],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 404, $expected);
@@ -90,13 +90,13 @@ class GameControllerTest extends AbstractControllerTest
                     "u1"     => $userId,
                     "u2"     => null,
                     "u3"     => null,
-                    "u4"     => null
+                    "u4"     => null,
                 ],
                 "user" => [
                     "id"    => $userId,
-                    "cards" => "TF_SOMETHING"
-                ]
-            ]
+                    "cards" => "TF_SOMETHING",
+                ],
+            ],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 200, $expected);
@@ -130,8 +130,8 @@ class GameControllerTest extends AbstractControllerTest
             "errorCode"    => Exception\Code::BAD_REQUEST,
             "errorMessage" => "You are already in an active game",
             "extra"        => [
-                "gameId" => $gameId
-            ]
+                "gameId" => $gameId,
+            ],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 400, $expected);
@@ -145,7 +145,7 @@ class GameControllerTest extends AbstractControllerTest
             "success"      => false,
             "errorCode"    => Exception\Code::NOT_FOUND,
             "errorMessage" => "Game not found",
-            "extra"        => []
+            "extra"        => [],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 404, $expected);
@@ -158,7 +158,7 @@ class GameControllerTest extends AbstractControllerTest
             "success"      => false,
             "errorCode"    => Exception\Code::BAD_REQUEST,
             "errorMessage" => "Invalid user serial number",
-            "extra"        => []
+            "extra"        => [],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 400, $expected);
@@ -171,7 +171,7 @@ class GameControllerTest extends AbstractControllerTest
             "success"      => false,
             "errorCode"    => Exception\Code::BAD_REQUEST,
             "errorMessage" => "Invalid position to join as member",
-            "extra"        => []
+            "extra"        => [],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 400, $expected);
@@ -189,13 +189,13 @@ class GameControllerTest extends AbstractControllerTest
                     "u1"     => $userId1,
                     "u2"     => "TF_SOMETHING",
                     "u3"     => null,
-                    "u4"     => null
+                    "u4"     => null,
                 ],
                 "user" => [
                     "id"    => "TF_SOMETHING",
-                    "cards" => "TF_SOMETHING"
-                ]
-            ]
+                    "cards" => "TF_SOMETHING",
+                ],
+            ],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 200, $expected);
@@ -218,13 +218,13 @@ class GameControllerTest extends AbstractControllerTest
                     "u1"     => $userId1,
                     "u2"     => "TF_SOMETHING",
                     "u3"     => "TF_SOMETHING",
-                    "u4"     => "TF_SOMETHING"
+                    "u4"     => "TF_SOMETHING",
                 ],
                 "user" => [
                     "id"    => "TF_SOMETHING",
-                    "cards" => "TF_SOMETHING"
-                ]
-            ]
+                    "cards" => "TF_SOMETHING",
+                ],
+            ],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 200, $expected);
@@ -295,7 +295,7 @@ class GameControllerTest extends AbstractControllerTest
             "success"      => false,
             "errorCode"    => Exception\Code::BAD_REQUEST,
             "errorMessage" => "Not a valid card",
-            "extra"        => []
+            "extra"        => [],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 400, $expected);
@@ -308,7 +308,7 @@ class GameControllerTest extends AbstractControllerTest
             "success"      => false,
             "errorCode"    => Exception\Code::BAD_REQUEST,
             "errorMessage" => "Bad value for fromUserId, Does not exists",
-            "extra"        => []
+            "extra"        => [],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 400, $expected);
@@ -321,7 +321,7 @@ class GameControllerTest extends AbstractControllerTest
             "success"      => false,
             "errorCode"    => Exception\Code::BAD_REQUEST,
             "errorMessage" => "Bad value for fromUserId, You are partners",
-            "extra"        => []
+            "extra"        => [],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 400, $expected);
@@ -334,7 +334,7 @@ class GameControllerTest extends AbstractControllerTest
             "success"      => false,
             "errorCode"    => Exception\Code::BAD_REQUEST,
             "errorMessage" => "It is not your turn to make a move",
-            "extra"        => []
+            "extra"        => [],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 400, $expected);
@@ -352,7 +352,7 @@ class GameControllerTest extends AbstractControllerTest
             "success"      => false,
             "errorCode"    => Exception\Code::NOT_FOUND,
             "errorMessage" => "Game not found",
-            "extra"        => []
+            "extra"        => [],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 404, $expected);
@@ -365,8 +365,8 @@ class GameControllerTest extends AbstractControllerTest
         $expected = [
             "success" => true,
             "response" => [
-                "success" => true
-            ]
+                "success" => true,
+            ],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 200, $expected);

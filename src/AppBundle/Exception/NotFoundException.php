@@ -8,13 +8,20 @@ namespace AppBundle\Exception;
 class NotFoundException extends \Exception
 {
 
-    function __construct(
-        string    $message    = "",
-        array     $extra      = array(),
-        string    $customCode = Code::NOT_FOUND,
-        int       $code       = 0,
-        \Exception $previous   = null)
-    {
+    /**
+     * @param string          $message
+     * @param array           $extra
+     * @param string          $customCode
+     * @param integer         $code
+     * @param \Exception|null $previous
+     */
+    public function __construct(
+        $message = "",
+        $extra = array(),
+        $customCode = Code::NOT_FOUND,
+        $code = 0,
+        \Exception $previous = null
+    ) {
 
         parent::__construct($message, $code, $previous);
 
@@ -22,17 +29,29 @@ class NotFoundException extends \Exception
         $this->customCode = $customCode;
     }
 
-    public function __toString() {
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
 
         return $this->message;
     }
 
-    public function getExtra() {
+    /**
+     * @return array
+     */
+    public function getExtra()
+    {
 
         return $this->extra;
     }
 
-    public function getCustomCode() {
+    /**
+     * @return string
+     */
+    public function getCustomCode()
+    {
 
         return $this->customCode;
     }

@@ -37,9 +37,7 @@ class GameController extends BaseController
             list($game, $user) = $this->gameService->initializeGame($this->userId);
 
             $this->setContext(ContextKey::GAME_ID, $game->id);
-
         } catch (\Exception $e) {
-
             return $this->handleException($e);
         }
 
@@ -64,9 +62,7 @@ class GameController extends BaseController
                 $this->gameId,
                 $this->userId
             );
-
         } catch (\Exception $e) {
-
             return $this->handleException($e);
         }
 
@@ -88,12 +84,12 @@ class GameController extends BaseController
      */
     public function joinAction(
         string $gameId,
-        string $atSN)
-    {
+        string $atSN
+    ) {
+
         $this->init();
 
         try {
-
             $this->checkIfUserActiveInAGame();
 
             list($game, $user) = $this->gameService->joinGame(
@@ -104,7 +100,6 @@ class GameController extends BaseController
 
             $this->setContext(ContextKey::GAME_ID, $game->id);
         } catch (\Exception $e) {
-
             return $this->handleException($e);
         }
 
@@ -114,11 +109,9 @@ class GameController extends BaseController
                 "user" => $user->toArray(),
             ]
         );
-
     }
 
-
-    /**
+/**
      * Attempts to move a card from `fromUserId` to session user
      *
      * @param string $card
@@ -128,8 +121,9 @@ class GameController extends BaseController
      */
     public function moveFromAction(
         string $card,
-        string $fromUserId)
-    {
+        string $fromUserId
+    ) {
+
         $this->init();
 
         try {
@@ -144,9 +138,7 @@ class GameController extends BaseController
                 $fromUserId,
                 $this->userId
             );
-
         } catch (\Exception $e) {
-
             return $this->handleException($e);
         }
 
@@ -160,7 +152,6 @@ class GameController extends BaseController
     }
 
     /**
-     * @param string $id
      *
      * @return Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -177,15 +168,13 @@ class GameController extends BaseController
             $this->gameService->delete($game);
 
             $this->resetContext();
-
         } catch (\Exception $e) {
-
             return $this->handleException($e);
         }
 
         return new Response\Ok(
             [
-                "success" => true
+                "success" => true,
             ]
         );
     }
