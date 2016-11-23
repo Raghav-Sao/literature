@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "87e63d300797408c6ecb50b4e5db47b2",
-    "content-hash": "4621fbeac848df2ed67071362d733649",
+    "hash": "e3b0f3c1e3159f7f2c58a676bbe1b343",
+    "content-hash": "95e60601fe7dbfea145a6508991297de",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -2124,17 +2124,17 @@
     ],
     "packages-dev": [
         {
-            "name": "escapestudios/symfony2-coding-standard",
-            "version": "2.9.1",
+            "name": "endouble/symfony3-custom-coding-standard",
+            "version": "2.16",
             "source": {
                 "type": "git",
-                "url": "https://github.com/djoos/Symfony2-coding-standard.git",
-                "reference": "03bd93ece3dc004fd49e766bf546f8cf58c64cb8"
+                "url": "https://github.com/Endouble/Symfony3-custom-coding-standard.git",
+                "reference": "8059803ce0675580c1327d164aa1eedec3684220"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/djoos/Symfony2-coding-standard/zipball/03bd93ece3dc004fd49e766bf546f8cf58c64cb8",
-                "reference": "03bd93ece3dc004fd49e766bf546f8cf58c64cb8",
+                "url": "https://api.github.com/repos/Endouble/Symfony3-custom-coding-standard/zipball/8059803ce0675580c1327d164aa1eedec3684220",
+                "reference": "8059803ce0675580c1327d164aa1eedec3684220",
                 "shasum": ""
             },
             "require": {
@@ -2146,7 +2146,6 @@
                     "dev-master": "2.x-dev"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -2154,20 +2153,19 @@
                 {
                     "name": "David Joos",
                     "email": "david.joos@escapestudios.com"
-                },
-                {
-                    "name": "Community contributors",
-                    "homepage": "https://github.com/escapestudios/Symfony2-coding-standard/graphs/contributors"
                 }
             ],
-            "description": "CodeSniffer ruleset for the Symfony2 coding standard",
-            "homepage": "https://github.com/escapestudios/Symfony2-coding-standard",
+            "description": "Customized CodeSniffer ruleset for the Symfony3 projects",
+            "homepage": "https://github.com/Endouble/Symfony3-coding-standard",
             "keywords": [
-                "Coding Standard",
-                "Symfony2",
+                "Symfony3",
+                "coding standard",
                 "phpcs"
             ],
-            "time": "2016-03-14 16:38:04"
+            "support": {
+                "source": "https://github.com/Endouble/Symfony3-custom-coding-standard/tree/2.16"
+            },
+            "time": "2016-06-16 14:55:32"
         },
         {
             "name": "sensio/generator-bundle",
@@ -2223,19 +2221,20 @@
         },
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "2.5.1",
+            "version": "2.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "6731851d6aaf1d0d6c58feff1065227b7fda3ba8"
+                "reference": "571e27b6348e5b3a637b2abc82ac0d01e6d7bbed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/6731851d6aaf1d0d6c58feff1065227b7fda3ba8",
-                "reference": "6731851d6aaf1d0d6c58feff1065227b7fda3ba8",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/571e27b6348e5b3a637b2abc82ac0d01e6d7bbed",
+                "reference": "571e27b6348e5b3a637b2abc82ac0d01e6d7bbed",
                 "shasum": ""
             },
             "require": {
+                "ext-simplexml": "*",
                 "ext-tokenizer": "*",
                 "ext-xmlwriter": "*",
                 "php": ">=5.1.2"
@@ -2296,7 +2295,7 @@
                 "phpcs",
                 "standards"
             ],
-            "time": "2016-01-19 23:39:10"
+            "time": "2016-09-01 23:53:02"
         },
         {
             "name": "symfony/phpunit-bridge",
