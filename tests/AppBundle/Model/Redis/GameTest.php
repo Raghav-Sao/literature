@@ -117,7 +117,10 @@ class GameTest extends \PHPUnit_Framework_TestCase
 
     public function testGetInitialCardsByUserSN()
     {
-        $this->assertEquals([Constant\Game\Card::CLUB_1, Constant\Game\Card::CLUB_2], $this->game->getInitialCardsByUserSN("u1"));
+        $this->assertEquals(
+            [Constant\Game\Card::CLUB_1, Constant\Game\Card::CLUB_2],
+            $this->game->getInitialCardsByUserSN("u1")
+        );
         $this->assertEquals([], $this->game->getInitialCardsByUserSN("u2"));
     }
 }

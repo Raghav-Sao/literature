@@ -29,8 +29,8 @@ class DefaultControllerTest extends AbstractControllerTest
             "errorCode" => Exception\Code::BAD_REQUEST,
             "errorMessage" => "You are already in an active game",
             "extra"  => [
-                "gameId" => $resBody->response->game->id
-            ]
+                "gameId" => $resBody->response->game->id,
+            ],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 400, $expected);

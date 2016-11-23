@@ -29,17 +29,25 @@ class GameTestData
         "u4_cards"   => "",
     ];
 
+    /**
+     *
+     * @param  string|null $id
+     * @return string
+     */
     public static function getId(string $id = null)
     {
         if (empty($id)) {
-
             return self::$id;
         } else {
-
             return $id;
         }
     }
 
+    /**
+     *
+     * @param  array $overrideWith
+     * @return array
+     */
     public static function getGameHash(array $overrideWith = [])
     {
         self::$defaultGameHash["u1_cards"] = implode(",", [Game\Card::CLUB_1, Game\Card::CLUB_2]);
