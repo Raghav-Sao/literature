@@ -8,4 +8,5 @@ install:
 before_script:
   - redis-cli info
 script:
+  - ./vendor/bin/phpcs --standard=Symfony3Custom --extensions=php src/ tests/
   - ./phpunit.phar --debug

@@ -63,7 +63,6 @@ class BaseController extends Controller
     protected function handleException(\Exception $e)
     {
         switch (get_class($e)) {
-
             case "AppBundle\Exception\BadRequestException":
                 return new Response\Error($e, Response\Error::HTTP_BAD_REQUEST);
                 break;
@@ -74,6 +73,7 @@ class BaseController extends Controller
 
             default:
                 $this->logger->error($e);
+
                 return new Response\Error($e, Response\Error::HTTP_INTERNAL_SERVER_ERROR);
                 break;
         }
@@ -83,7 +83,7 @@ class BaseController extends Controller
 
 
 
-    ############################################################
+    //
 
     /**
      * If user already engaged in a active game,
@@ -95,21 +95,19 @@ class BaseController extends Controller
     protected function checkIfUserActiveInAGame()
     {
         if ($this->gameId === false) {
-
             return;
         }
 
         $game = $this->gameService->fetchGameById($this->gameId);
 
         if ($game && $game->isExpired() === false && $game->hasUser($this->userId)) {
-
             throw new BadRequestException("You are already in an active game", ["gameId" => $this->gameId]);
         }
 
         if ($game && $game->isExpired()) {
             $this->gameService->delete($game);
         }
-     }
+    }
 
     /**
      * Set key/values in context. Currently it is session.
@@ -121,8 +119,9 @@ class BaseController extends Controller
      */
     protected function setContext(
         string $key,
-        string $value)
-    {
+        string $value
+    ) {
+
         $this->session->set($key, $value);
     }
 

@@ -19,8 +19,8 @@ class Utility
      */
     public static function camelize(
         string $input,
-        string $separator = "_")
-    {
+        string $separator = "_"
+    ) {
 
         return str_replace($separator, "", ucwords($input, $separator));
     }
@@ -33,8 +33,8 @@ class Utility
      */
     public static function camelizeLcFirst(
         string $input,
-        string $separator = "_")
-    {
+        string $separator = "_"
+    ) {
 
         return lcfirst(self::camelize($input, $separator));
     }
@@ -75,12 +75,10 @@ class Utility
     public static function isAssocArray($v)
     {
         if (is_array($v) === false) {
-
             return false;
         }
 
         if (array() === $v) {
-
             return false;
         }
 
@@ -90,7 +88,7 @@ class Utility
 
 
 
-    ############################################################
+    //
     // Card related Utility methods
 
     /**
@@ -99,8 +97,8 @@ class Utility
      * @return boolean
      */
     public static function isValidCard(
-        string $card)
-    {
+        string $card
+    ) {
 
         return in_array($card, Card::$allInGame, true);
     }
@@ -137,10 +135,8 @@ class Utility
         $cardValue = self::getCardValue($card);
 
         if ($cardValue >= 1 && $cardValue <= 6) {
-
             return Card::LOWER_RANGE;
         } else {
-
             return Card::HIGHER_RANGE;
         }
     }
@@ -162,6 +158,10 @@ class Utility
         return array_chunk($cards, 12);
     }
 
+    /**
+     * @param  array $cards
+     * @return string
+     */
     public static function getRandomCard(array & $cards)
     {
 

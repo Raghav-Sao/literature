@@ -31,12 +31,10 @@ class ChatController extends BaseController
 
         try {
             if ($this->gameId === false) {
-
                 throw new Exception\NotFoundException("Game not found");
             }
 
             if (empty($this->input["message"])) {
-
                 throw new Exception\BadRequestException("No message provided in input");
             }
 
@@ -49,9 +47,7 @@ class ChatController extends BaseController
                 Game\Event::CHAT_MESSAGE,
                 $eventPayload
             );
-
         } catch (\Exception $e) {
-
             return $this->handleException($e);
         }
 

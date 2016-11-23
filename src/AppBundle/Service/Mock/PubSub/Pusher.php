@@ -16,8 +16,9 @@ class Pusher extends Service\BaseService implements Service\PubSub\PubSubInterfa
      * @return
      */
     public function __construct(
-        $logger)
-    {
+        $logger
+    ) {
+
         parent::__construct($logger);
     }
 
@@ -31,7 +32,7 @@ class Pusher extends Service\BaseService implements Service\PubSub\PubSubInterfa
     public function trigger(
         string $channel,
         string $event,
-        array  $data = array())
-    {
+        array  $data = array()
+    ) {
     }
 }

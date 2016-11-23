@@ -16,6 +16,7 @@ class Game
     public $status;
     public $nextTurn;
 
+    // @codingStandardsIgnoreStart
     // User serial numbers
     public $u1;
     public $u2;
@@ -27,6 +28,7 @@ class Game
     public $u2Cards;
     public $u3Cards;
     public $u4Cards;
+    // @codingStandardsIgnoreStart
 
     /**
      *
@@ -37,8 +39,9 @@ class Game
      */
     public function __construct(
         string $id,
-        array $params)
-    {
+        array $params
+    ) {
+
         $this->id = $id;
         // Sets all attributes of the object
         foreach ($params as $key => $value) {
@@ -60,16 +63,22 @@ class Game
         return ($this->status === Status::EXPIRED);
     }
 
+    /**
+     * @param  string $userSN
+     * @return boolean
+     */
     public function isUserSNVacant($userSN)
     {
         if (property_exists($this, $userSN) === false) {
-
             throw new BadRequestException("Invalid user serial number");
         }
 
         return ($this->$userSN == null);
     }
 
+    /**
+     * @return boolean
+     */
     public function isAnyUserSNVacant()
     {
 
@@ -80,7 +89,7 @@ class Game
     }
 
     /**
-     *
+     * @param  string $userId
      * @return boolean
      */
     public function hasUser($userId)
@@ -106,8 +115,9 @@ class Game
      */
     public function arePartners(
         string $userId1,
-        string $userId2)
-    {
+        string $userId2
+    ) {
+
         $team = [$this->u1, $this->u3];
 
         return in_array($userId1, $team, true) === in_array($userId2, $team, true);
@@ -159,16 +169,14 @@ class Game
      * @return array
      */
     public function getInitialCardsByUserSN(
-        string $userSN)
-    {
+        string $userSN
+    ) {
 
         $attribute = sprintf("%sCards", $userSN);
 
         if (empty($this->$attribute)) {
-
             return [];
         } else {
-
             return explode(",", $this->$attribute);
         }
     }

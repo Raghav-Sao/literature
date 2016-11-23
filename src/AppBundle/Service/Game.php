@@ -31,8 +31,9 @@ class Game extends BaseService
         $logger,
         $redis,
         PubSub\PubSubInterface $pubSub,
-        Knowledge $knowledge)
-    {
+        Knowledge $knowledge
+    ) {
+
         parent::__construct($logger);
 
         $this->redis     = $redis;
@@ -46,12 +47,12 @@ class Game extends BaseService
      * @return null|Model\Redis\Game
      */
     public function fetchGameById(
-        string $id)
-    {
+        string $id
+    ) {
+
         $gameHash = $this->redis->hgetall($id);
 
         if (empty($gameHash)) {
-
             throw new NotFoundException("Game not found");
         }
 
@@ -64,16 +65,16 @@ class Game extends BaseService
      * @return
      */
     public function delete(
-        Model\Redis\Game $game)
-    {
+        Model\Redis\Game $game
+    ) {
 
         $this->redis->del(
             $game->id,
-
             $game->u1,
             $game->u2,
             $game->u3,
-            $game->u4);
+            $game->u4
+        );
     }
 
     /**
@@ -82,19 +83,18 @@ class Game extends BaseService
      * @return null|Model\Redis\User
      */
     public function fetchUserById(
-        string $id)
-    {
+        string $id
+    ) {
+
         // Get user's cards set
         $cardsSet = $this->redis->smembers($id);
 
         if (empty($cardsSet)) {
-
             throw new NotFoundException(
                 "Cards not found for given user",
                 ["id" => $id]
             );
         } else {
-
             return new Model\Redis\User($id, $cardsSet);
         }
     }
@@ -105,20 +105,29 @@ class Game extends BaseService
      * @return null
      */
     public function initializeGame(
-        string $userId)
-    {
+        string $userId
+    ) {
+
         $gameId = Utility::newGameId();
         list($u1Cards, $u2Cards, $u3Cards, $u4Cards) = Utility::distributeCards();
         $initializeGameResults = $this->redis->hmset(
             $gameId,
-            Constant\Game\Game::CREATED_AT,   Utility::currentTimeStamp(), 
-            Constant\Game\User::USER_1,       $userId,
-            Constant\Game\Game::STATUS,       Constant\Game\Status::INITIALIZED,
-            Constant\Game\Game::NEXT_TURN,    Constant\Game\User::USER_1,
-            Constant\Game\Game::U1_CARDS,     implode(",", $u1Cards),
-            Constant\Game\Game::U2_CARDS,     implode(",", $u2Cards),
-            Constant\Game\Game::U3_CARDS,     implode(",", $u3Cards),
-            Constant\Game\Game::U4_CARDS,     implode(",", $u4Cards)
+            Constant\Game\Game::CREATED_AT,
+            Utility::currentTimeStamp(),
+            Constant\Game\User::USER_1,
+            $userId,
+            Constant\Game\Game::STATUS,
+            Constant\Game\Status::INITIALIZED,
+            Constant\Game\Game::NEXT_TURN,
+            Constant\Game\User::USER_1,
+            Constant\Game\Game::U1_CARDS,
+            implode(",", $u1Cards),
+            Constant\Game\Game::U2_CARDS,
+            implode(",", $u2Cards),
+            Constant\Game\Game::U3_CARDS,
+            implode(",", $u3Cards),
+            Constant\Game\Game::U4_CARDS,
+            implode(",", $u4Cards)
         );
 
         call_user_func_array(
@@ -128,27 +137,27 @@ class Game extends BaseService
 
         return [
             $this->fetchGameById($gameId),
-            $this->fetchUserById($userId)
+            $this->fetchUserById($userId),
         ];
     }
 
-    /*
+    /**
      * Fetches game and user model by given id.
      *     Also, does some validation.
      *
      * @param string $gameId
      * @param string $userId
      *
-     * @return
+     * @return array
      */
     public function fetchByIdAndValidateAgainsUser(
         string $gameId,
-        string $userId)
-    {
+        string $userId
+    ) {
+
         $game = $this->fetchGameById($gameId);
 
         if ($game->isExpired()) {
-
             $this->delete($game);
 
             throw new BadRequestException(
@@ -157,7 +166,6 @@ class Game extends BaseService
         }
 
         if ($userId && $game->hasUser($userId) === false) {
-
             throw new BadRequestException(
                 "You do not belong to game with given id"
             );
@@ -165,59 +173,53 @@ class Game extends BaseService
 
         return [
             $game,
-            $this->fetchUserById($userId)
+            $this->fetchUserById($userId),
         ];
     }
 
     /**
      *
      * @param Model\Redis\Game $game
-     * @param string      $card
-     * @param string      $fromUserId
-     * @param string      $toUserId
+     * @param string           $card
+     * @param string           $fromUserId
+     * @param string           $toUserId
      *
-     * @return
+     * @return array
      */
     public function moveCard(
         Model\Redis\Game $game,
         string $card,
         string $fromUserId,
-        string $toUserId)
-    {
-        if ($game->status !== Constant\Game\Status::ACTIVE) {
+        string $toUserId
+    ) {
 
+        if ($game->status !== Constant\Game\Status::ACTIVE) {
             throw new BadRequestException("Game is not active");
         }
 
         if (Utility::isValidCard($card) === false) {
-
             throw new BadRequestException("Not a valid card");
         }
 
         if ($game->hasUser($fromUserId) === false) {
-
             throw new BadRequestException("Bad value for fromUserId, Does not exists");
         }
 
         if ($game->getNextTurnUserId() !== $toUserId) {
-
             throw new BadRequestException("It is not your turn to make a move");
         }
 
         if ($game->arePartners($fromUserId, $toUserId) === true) {
-
             throw new BadRequestException("Bad value for fromUserId, You are partners");
         }
 
         $toUser   = $this->fetchUserById($toUserId);
 
         if ($toUser->hasCard($card)) {
-
             throw new BadRequestException("Bad value for card, You have it already");
         }
 
         if ($toUser->hasAtLeastOneCardOfType($card) === false) {
-
             $eventPayload = [
                 "success" => true,
                 "game"    => $game->toArray(),
@@ -241,18 +243,17 @@ class Game extends BaseService
         $success = false;
 
         if ($fromUser->hasCard($card) === false) {
-
             // Set game turn
             $fromUserSN = $game->getUserSNById($fromUser->id);
             $this->redis->hmset(
                 $game->id,
-                Constant\Game\Game::NEXT_TURN, $fromUserSN
+                Constant\Game\Game::NEXT_TURN,
+                $fromUserSN
             );
             $game->nextTurn = $fromUserSN;
 
             $success = false;
         } else {
-
             // Move the card
             $this->redis->smove(
                 $fromUser->id,
@@ -278,13 +279,13 @@ class Game extends BaseService
         return [
             $success,
             $game,
-            $toUser
+            $toUser,
         ];
     }
 
     /**
      *
-     * @param string $game
+     * @param string $gameId
      * @param string $atSN
      * @param string $userId
      *
@@ -294,12 +295,12 @@ class Game extends BaseService
     public function joinGame(
         string $gameId,
         string $atSN,
-        string $userId)
-    {
+        string $userId
+    ) {
+
         $game = $this->fetchGameById($gameId);
 
-        if($game->isUserSNVacant($atSN) === false) {
-            
+        if ($game->isUserSNVacant($atSN) === false) {
             throw new BadRequestException("Invalid position to join as member");
         }
 
@@ -307,8 +308,10 @@ class Game extends BaseService
         $game->status = $game->isAnyUserSNVacant() ? $game->status : Constant\Game\Status::ACTIVE;
         $this->redis->hmset(
             $game->id,
-            $atSN,                      $userId,
-            Constant\Game\Game::STATUS, $game->status
+            $atSN,
+            $userId,
+            Constant\Game\Game::STATUS,
+            $game->status
         );
 
         call_user_func_array(
@@ -325,11 +328,10 @@ class Game extends BaseService
             Constant\Game\Event::GAME_JOIN_ACTION,
             $eventPayload
         );
-        
+
         return [
             $game,
-            $this->fetchUserById($userId)
+            $this->fetchUserById($userId),
         ];
     }
-
 }

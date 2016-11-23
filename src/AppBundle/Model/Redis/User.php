@@ -22,8 +22,8 @@ class User
      */
     public function __construct(
         string $id,
-        array  $cards)
-    {
+        array  $cards
+    ) {
 
         $this->id    = $id;
         $this->cards = $cards;
@@ -35,8 +35,8 @@ class User
      * @return boolean
      */
     public function hasCard(
-        string $card)
-    {
+        string $card
+    ) {
 
         return in_array(
             $card,
@@ -52,15 +52,15 @@ class User
      * @return boolean
      */
     public function hasAtLeastOneCardOfType(
-        string $card)
-    {
+        string $card
+    ) {
+
         $cardType  = Utility::getCardType($card);
         $cardRange = Utility::getCardRange($card);
 
         foreach ($this->cards as $value) {
             if ($cardType === Utility::getCardType($value)
                 && $cardRange === Utility::getCardRange($value)) {
-
                 return true;
             }
         }
@@ -83,7 +83,7 @@ class User
 
 
 
-    ####################################################################
+    //
     // Setters
 
     /**

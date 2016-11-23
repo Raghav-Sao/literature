@@ -30,7 +30,6 @@ class DefaultController extends BaseController
         try {
             $this->checkIfUserActiveInAGame();
         } catch (\Exception $e) {
-
             return $this->handleException($e);
         }
 
