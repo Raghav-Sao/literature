@@ -111,7 +111,7 @@ class GameController extends BaseController
         );
     }
 
-/**
+    /**
      * Attempts to move a card from `fromUserId` to session user
      *
      * @param string $card
@@ -138,6 +138,43 @@ class GameController extends BaseController
                 $fromUserId,
                 $this->userId
             );
+        } catch (\Exception $e) {
+            return $this->handleException($e);
+        }
+
+        return new Response\Ok(
+            [
+                "success" => $success,
+                "game"    => $game->toArray(),
+                "user"    => $user->toArray(),
+            ]
+        );
+    }
+
+    /**
+     * @param string $cardType
+     * @param string $cardRange
+     *
+     * @return Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function showAction(string $cardType, string $cardRange)
+    {
+        $this->init();
+
+        try {
+            list($game, $user) = $this->gameService
+                                      ->fetchByIdAndValidateAgainsUser(
+                                          $this->gameId,
+                                          $this->userId
+                                      );
+
+            list($success, $game, $user) = $this->gameService
+                                                ->show(
+                                                    $game,
+                                                    $user,
+                                                    $cardType,
+                                                    $cardRange
+                                                );
         } catch (\Exception $e) {
             return $this->handleException($e);
         }

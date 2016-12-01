@@ -14,6 +14,8 @@ class Game
     public $id;
     public $createdAt;
     public $status;
+    public $prevTurn;
+    public $prevTurnTimeStamp;
     public $nextTurn;
 
     // @codingStandardsIgnoreStart
@@ -22,6 +24,11 @@ class Game
     public $u2;
     public $u3;
     public $u4;
+
+    public $u1Points;
+    public $u2Points;
+    public $u3Points;
+    public $u4Points;
 
     // Initial cards of all users
     public $u1Cards;

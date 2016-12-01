@@ -8,6 +8,7 @@ use AppBundle\Exception\NotFoundException;
 use AppBundle\Exception\BadRequestException;
 use AppBundle\Utility;
 use AppBundle\Constant;
+use AppBundle\Constant\Game\Card;
 
 /**
  *
@@ -281,6 +282,58 @@ class Game extends BaseService
             $game,
             $toUser,
         ];
+    }
+
+    /**
+     * @param Model\Redis\Game $game
+     * @param Model\Redis\User $user
+     * @param string           $cardType
+     * @param string           $cardRange
+     *
+     * @return array
+     */
+    public function show(
+        Model\Redis\Game $game,
+        Model\Redis\User $user,
+        string $cardType,
+        string $cardRange
+    ) {
+
+        // Before RETURN:
+        // - Update cards
+        // - Broadcase the message
+
+        // User has all cards of type and range?
+        // - Give 1 point to user
+        // - RETURN
+        // Pull his partner's card of by type and range
+        // - Both user's combined makes all cards of that type and range?
+        //   - Give points to bother users in ratio of cards count
+        //   - RETURN
+
+        // Check other 2 users card list
+        // - Give point to them in ratio of cards count
+        // - RETURN
+
+        // WIP:
+        // - Set defaults for game in init
+
+        $filteredCards = Utility::filterCardsByTypeAndRange(
+            $user->cards,
+            $cardType,
+            $cardRange
+        );
+
+        $filteredCardsCount = count($filteredCards);
+
+        if ($filteredCardsCount === Card::COUNT_PER_TYPE_RANGE) {
+            // Remove user's cards
+            call_user_func_array(
+                array($this->redis, "srem"),
+                array_merge([$user->id], $filteredCards)
+            );
+            $user->removeCards($filteredCards);
+        }
     }
 
     /**

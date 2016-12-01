@@ -112,4 +112,18 @@ class User
 
         return $this;
     }
+
+    /**
+     * @param array $cards
+     *
+     * @return User
+     */
+    public function removeCards(array $cards)
+    {
+        foreach ($cards as $card) {
+            $this->removeCard($card);
+        }
+
+        return $this;
+    }
 }

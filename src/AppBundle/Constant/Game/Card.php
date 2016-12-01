@@ -7,6 +7,15 @@ namespace AppBundle\Constant\Game;
 */
 class Card
 {
+    const CLUB_TYPE    = "c";
+    const SPADE_TYPE   = "s";
+    const DIAMOND_TYPE = "d";
+    const HEART_TYPE   = "h";
+
+    const LOWER_RANGE  = "lower";
+    const HIGHER_RANGE = "higher";
+
+    const COUNT_PER_TYPE_RANGE = 6;
 
     const CLUB_1     = "c1";
     const CLUB_2     = "c2";
@@ -64,10 +73,6 @@ class Card
     const HEART_11   = "h11";
     const HEART_12   = "h12";
     const HEART_13   = "h13";
-
-    const LOWER_RANGE  = "lower";
-    const HIGHER_RANGE = "higher";
-
 
     // Doesn't include card 7
     public static $allInGame = [

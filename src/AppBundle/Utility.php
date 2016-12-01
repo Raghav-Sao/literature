@@ -167,4 +167,29 @@ class Utility
 
         return $cards[array_rand($cards, 1)];
     }
+
+    /**
+     * @param array  $cards
+     * @param string $cardType
+     * @param string $cardRange
+     *
+     * @return array
+     */
+    public static function filterCardsByTypeAndRange(
+        array $cards,
+        string $cardType,
+        string $cardRange
+    ) {
+
+        return array_filter(
+            $cards,
+            function ($card) use ($cardType, $cardRange) {
+
+                $isCardTypeSame  = ($cardType === self::getCardType($card));
+                $isCardRangeSame = ($cardRange === self::getCardRange($card));
+
+                return $isCardTypeSame && $isCardRangeSame;
+            }
+        );
+    }
 }
