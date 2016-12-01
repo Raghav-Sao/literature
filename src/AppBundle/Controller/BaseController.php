@@ -62,38 +62,6 @@ class BaseController extends Controller
     }
 
     /**
-     * Handles controller catchec exceptions
-     *
-     * @param \Exception $e
-     *
-     * @return JsonResponse
-     */
-    protected function handleException(\Exception $e)
-    {
-        switch (get_class($e)) {
-            case "AppBundle\Exception\BadRequestException":
-                return new Response\Error($e, Response\Error::HTTP_BAD_REQUEST);
-                break;
-
-            case "AppBundle\Exception\NotFoundException":
-                return new Response\Error($e, Response\Error::HTTP_NOT_FOUND);
-                break;
-
-            default:
-                $this->logger->error($e);
-
-                return new Response\Error($e, Response\Error::HTTP_INTERNAL_SERVER_ERROR);
-                break;
-        }
-    }
-
-    // ----- -----
-
-
-
-    //
-
-    /**
      * If user already engaged in a active game,
      *   redirects him to that page.
      * Cleans redis data if game associated is not active

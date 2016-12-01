@@ -27,11 +27,7 @@ class DefaultController extends BaseController
     {
         $this->init();
 
-        try {
-            $this->checkIfUserActiveInAGame();
-        } catch (\Exception $e) {
-            return $this->handleException($e);
-        }
+        $this->checkIfUserActiveInAGame();
 
         return new Response(
             $this->render("AppBundle:Default:index.html.twig")->getContent()

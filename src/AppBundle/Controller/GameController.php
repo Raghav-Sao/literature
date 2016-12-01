@@ -31,15 +31,11 @@ class GameController extends BaseController
     {
         $this->init();
 
-        try {
-            $this->checkIfUserActiveInAGame();
+        $this->checkIfUserActiveInAGame();
 
-            list($game, $user) = $this->gameService->initializeGame($this->userId);
+        list($game, $user) = $this->gameService->initializeGame($this->userId);
 
-            $this->setContext(ContextKey::GAME_ID, $game->id);
-        } catch (\Exception $e) {
-            return $this->handleException($e);
-        }
+        $this->setContext(ContextKey::GAME_ID, $game->id);
 
         return new Response\Ok(
             [
@@ -57,14 +53,10 @@ class GameController extends BaseController
     {
         $this->init();
 
-        try {
-            list($game, $user) = $this->gameService->fetchByIdAndValidateAgainsUser(
-                $this->gameId,
-                $this->userId
-            );
-        } catch (\Exception $e) {
-            return $this->handleException($e);
-        }
+        list($game, $user) = $this->gameService->fetchByIdAndValidateAgainsUser(
+            $this->gameId,
+            $this->userId
+        );
 
         return new Response\Ok(
             [
@@ -89,19 +81,15 @@ class GameController extends BaseController
 
         $this->init();
 
-        try {
-            $this->checkIfUserActiveInAGame();
+        $this->checkIfUserActiveInAGame();
 
-            list($game, $user) = $this->gameService->joinGame(
-                $gameId,
-                $atSN,
-                $this->userId
-            );
+        list($game, $user) = $this->gameService->joinGame(
+            $gameId,
+            $atSN,
+            $this->userId
+        );
 
-            $this->setContext(ContextKey::GAME_ID, $game->id);
-        } catch (\Exception $e) {
-            return $this->handleException($e);
-        }
+        $this->setContext(ContextKey::GAME_ID, $game->id);
 
         return new Response\Ok(
             [
@@ -126,21 +114,17 @@ class GameController extends BaseController
 
         $this->init();
 
-        try {
-            list($game, $user) = $this->gameService->fetchByIdAndValidateAgainsUser(
-                $this->gameId,
-                $this->userId
-            );
+        list($game, $user) = $this->gameService->fetchByIdAndValidateAgainsUser(
+            $this->gameId,
+            $this->userId
+        );
 
-            list($success, $game, $user) = $this->gameService->moveCard(
-                $game,
-                $card,
-                $fromUserId,
-                $this->userId
-            );
-        } catch (\Exception $e) {
-            return $this->handleException($e);
-        }
+        list($success, $game, $user) = $this->gameService->moveCard(
+            $game,
+            $card,
+            $fromUserId,
+            $this->userId
+        );
 
         return new Response\Ok(
             [
@@ -159,18 +143,14 @@ class GameController extends BaseController
     {
         $this->init();
 
-        try {
-            list($game, $user) = $this->gameService->fetchByIdAndValidateAgainsUser(
-                $this->gameId,
-                $this->userId
-            );
+        list($game, $user) = $this->gameService->fetchByIdAndValidateAgainsUser(
+            $this->gameId,
+            $this->userId
+        );
 
-            $this->gameService->delete($game);
+        $this->gameService->delete($game);
 
-            $this->resetContext();
-        } catch (\Exception $e) {
-            return $this->handleException($e);
-        }
+        $this->resetContext();
 
         return new Response\Ok(
             [
