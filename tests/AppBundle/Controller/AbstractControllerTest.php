@@ -16,17 +16,6 @@ use AppBundle\Utility;
  */
 class AbstractControllerTest extends WebTestCase
 {
-
-    /**
-     * TF: Test flags
-     * It helps with a feature (Will explain later :) )
-     */
-    const TF_SOMETHING = "TF_SOMETHING";
-
-    public static $allTFs = [
-        self::TF_SOMETHING,
-    ];
-
     /**
      * @param Response $res      - The Symfony's Http
      * @param integer  $code     - Expected http response code
@@ -39,13 +28,19 @@ class AbstractControllerTest extends WebTestCase
         $code,
         $expected = array()
     ) {
+
+        // Asserts:
+        // - Respons content type
+        // - Response status code
+        // - Response body
+
+        $isResJson = $res->headers->contains("content-type", "application/json");
+        $this->assertTrue($isResJson);
+
+        $resStatusCode = $res->getStatusCode();
+        $this->assertEquals($code, $resStatusCode);
+
         $resBody = json_decode($res->getContent());
-
-        // Asserts response status code and header
-        $this->assertEquals($code, $res->getStatusCode());
-        $this->assertTrue($res->headers->contains("content-type", "application/json"));
-
-        // Asserts "expected"
         $this->doMakeFirstAssertions($resBody, $expected);
 
         return $resBody;
@@ -73,7 +68,7 @@ class AbstractControllerTest extends WebTestCase
             if (Utility::isAssocArray($value)) {
                 $this->doMakeFirstAssertions($resBody->$key, $value);
             } else {
-                if (in_array($value, self::$allTFs, true) === true) {
+                if (is_string($value) && TestFlag::isDefined($value)) {
                     // TODO: Implement this
                     // - For now it's okay
                 } else {

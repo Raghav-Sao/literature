@@ -19,16 +19,16 @@ class GameControllerTest extends AbstractControllerTest
             "success"  => true,
             "response" => [
                 "game" => [
-                    "id"     => "TF_SOMETHING",
+                    "id"     => TestFlag::SOMETHING,
                     "status" => Constant\Game\Status::INITIALIZED,
-                    "u1"     => "TF_SOMETHING",
+                    "u1"     => TestFlag::SOMETHING,
                     "u2"     => null,
                     "u3"     => null,
                     "u4"     => null,
                 ],
                 "user" => [
-                    "id"    => "TF_SOMETHING",
-                    "cards" => "TF_SOMETHING",
+                    "id"    => TestFlag::SOMETHING,
+                    "cards" => TestFlag::SOMETHING,
                 ],
             ],
         ];
@@ -36,16 +36,17 @@ class GameControllerTest extends AbstractControllerTest
         $resBody = $this->makeFirstAssertions($res, 200, $expected);
         $this->assertCount(12, $resBody->response->user->cards);
 
-        // On reloading the same page, should throw 400 saying you're already in a game
+        // On reloading the same page,
+        // should throw 400 saying you're already in a game
         $client->reload();
         $res = $client->getResponse();
 
         $expected = [
-            "success"   => false,
-            "errorCode" => Exception\Code::BAD_REQUEST,
+            "success"      => false,
+            "errorCode"    => Exception\Code::BAD_REQUEST,
             "errorMessage" => "You are already in an active game",
-            "extra"  => [
-                "gameId" => $resBody->response->game->id,
+            "extra"        => [
+                "gameId"   => $resBody->response->game->id,
             ],
         ];
 
@@ -94,7 +95,7 @@ class GameControllerTest extends AbstractControllerTest
                 ],
                 "user" => [
                     "id"    => $userId,
-                    "cards" => "TF_SOMETHING",
+                    "cards" => TestFlag::SOMETHING,
                 ],
             ],
         ];
@@ -187,13 +188,13 @@ class GameControllerTest extends AbstractControllerTest
                     "id"     => $gameId,
                     "status" => Constant\Game\Status::INITIALIZED,
                     "u1"     => $userId1,
-                    "u2"     => "TF_SOMETHING",
+                    "u2"     => TestFlag::SOMETHING,
                     "u3"     => null,
                     "u4"     => null,
                 ],
                 "user" => [
-                    "id"    => "TF_SOMETHING",
-                    "cards" => "TF_SOMETHING",
+                    "id"    => TestFlag::SOMETHING,
+                    "cards" => TestFlag::SOMETHING,
                 ],
             ],
         ];
@@ -216,13 +217,13 @@ class GameControllerTest extends AbstractControllerTest
                     "id"     => $gameId,
                     "status" => Constant\Game\Status::ACTIVE,
                     "u1"     => $userId1,
-                    "u2"     => "TF_SOMETHING",
-                    "u3"     => "TF_SOMETHING",
-                    "u4"     => "TF_SOMETHING",
+                    "u2"     => TestFlag::SOMETHING,
+                    "u3"     => TestFlag::SOMETHING,
+                    "u4"     => TestFlag::SOMETHING,
                 ],
                 "user" => [
-                    "id"    => "TF_SOMETHING",
-                    "cards" => "TF_SOMETHING",
+                    "id"    => TestFlag::SOMETHING,
+                    "cards" => TestFlag::SOMETHING,
                 ],
             ],
         ];
@@ -288,7 +289,8 @@ class GameControllerTest extends AbstractControllerTest
         $userId4Cards = $resBody4->response->user->cards;
 
         // Attempt invalid card move
-        $client1->request("PATCH", sprintf("/game/move/%s/from/%s", Constant\Game\Card::CLUB_7, $userId2));
+        $url = sprintf("/game/move/%s/from/%s", Constant\Game\Card::CLUB_7, $userId2);
+        $client1->request("PATCH", $url);
         $res = $client1->getResponse();
 
         $expected = [
@@ -301,7 +303,8 @@ class GameControllerTest extends AbstractControllerTest
         $resBody = $this->makeFirstAssertions($res, 400, $expected);
 
         // Attempt with invalid {fromUserId}
-        $client1->request("PATCH", sprintf("/game/move/%s/from/%s", Constant\Game\Card::CLUB_6, "invalid_id"));
+        $url = sprintf("/game/move/%s/from/%s", Constant\Game\Card::CLUB_6, "invalid_id");
+        $client1->request("PATCH", $url);
         $res = $client1->getResponse();
 
         $expected = [
@@ -314,7 +317,8 @@ class GameControllerTest extends AbstractControllerTest
         $resBody = $this->makeFirstAssertions($res, 400, $expected);
 
         // Attempt with {fromUserId} = The other partner
-        $client1->request("PATCH", sprintf("/game/move/%s/from/%s", Utility::getRandomCard($userId3Cards), $userId3));
+        $url = sprintf("/game/move/%s/from/%s", Utility::getRandomCard($userId3Cards), $userId3);
+        $client1->request("PATCH", $url);
         $res = $client1->getResponse();
 
         $expected = [
@@ -327,7 +331,8 @@ class GameControllerTest extends AbstractControllerTest
         $resBody = $this->makeFirstAssertions($res, 400, $expected);
 
         // Attempt when it is not your turn
-        $client2->request("PATCH", sprintf("/game/move/%s/from/%s", Utility::getRandomCard($userId3Cards), $userId3));
+        $url = sprintf("/game/move/%s/from/%s", Utility::getRandomCard($userId3Cards), $userId3);
+        $client2->request("PATCH", $url);
         $res = $client2->getResponse();
 
         $expected = [

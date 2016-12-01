@@ -14,10 +14,10 @@ class ChatControllerTest extends AbstractControllerTest
         $res = $client->getResponse();
 
         $expected = [
-            "success"   => false,
-            "errorCode" => Exception\Code::NOT_FOUND,
+            "success"      => false,
+            "errorCode"    => Exception\Code::NOT_FOUND,
             "errorMessage" => "Game not found",
-            "extra"  => [],
+            "extra"        => [],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 404, $expected);
@@ -32,7 +32,7 @@ class ChatControllerTest extends AbstractControllerTest
             [],
             [],
             [
-                "content_type" => "application/json",
+                "CONTENT_TYPE" => "application/json",
             ],
             '{"message": "A sample message.."}'
         );
@@ -50,10 +50,10 @@ class ChatControllerTest extends AbstractControllerTest
         $res = $client->getResponse();
 
         $expected = [
-            "success"   => false,
-            "errorCode" => Exception\Code::BAD_REQUEST,
+            "success"      => false,
+            "errorCode"    => Exception\Code::BAD_REQUEST,
             "errorMessage" => "No message provided in input",
-            "extra"  => [],
+            "extra"        => [],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 400, $expected);
@@ -64,17 +64,17 @@ class ChatControllerTest extends AbstractControllerTest
             [],
             [],
             [
-                "content_type" => "application/json",
+                "CONTENT_TYPE" => "application/json",
             ],
             '{"message": ""}'
         );
         $res = $client->getResponse();
 
         $expected = [
-            "success"   => false,
-            "errorCode" => Exception\Code::BAD_REQUEST,
+            "success"      => false,
+            "errorCode"    => Exception\Code::BAD_REQUEST,
             "errorMessage" => "No message provided in input",
-            "extra"  => [],
+            "extra"        => [],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 400, $expected);

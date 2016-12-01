@@ -25,11 +25,11 @@ class DefaultControllerTest extends AbstractControllerTest
         $res = $client->getResponse();
 
         $expected = [
-            "success"   => false,
-            "errorCode" => Exception\Code::BAD_REQUEST,
+            "success"      => false,
+            "errorCode"    => Exception\Code::BAD_REQUEST,
             "errorMessage" => "You are already in an active game",
-            "extra"  => [
-                "gameId" => $resBody->response->game->id,
+            "extra"        => [
+                "gameId"   => $resBody->response->game->id,
             ],
         ];
 

@@ -21,6 +21,4 @@ class UtilityTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(false, Utility::isValidCard(Game\Card::HEART_7));
         $this->assertEquals(true, Utility::isValidCard(Game\Card::HEART_11));
     }
-
-    // TODO: Cover more Utility tests
 }
