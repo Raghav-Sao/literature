@@ -21,22 +21,21 @@ game_index:
     defaults:
         _controller: AppBundle:Game:index
 
-# TODO: Remove GET from following routes later
 game_join:
     path:     /game/{gameId}/join/{atSN}
-    methods:  [POST, GET]
+    methods:  [POST]
     defaults:
         _controller: AppBundle:Game:join
 
 game_move_card:
     path:     /game/move/{card}/from/{fromUserId}
-    methods:  [PATCH, GET]
+    methods:  [PATCH]
     defaults:
         _controller: AppBundle:Game:moveFrom
 
 game_delete:
     path:     /game/delete
-    methods:  [DELETE, GET]
+    methods:  [DELETE]
     defaults:
         _controller: AppBundle:Game:delete
 

@@ -22,20 +22,20 @@ class GameTest extends \PHPUnit_Framework_TestCase
     {
         // Assert $game's properties
 
-        $this->assertEquals($this->game->id, $this->gameId);
-        $this->assertEquals($this->game->createdAt, $this->gameHash["created_at"]);
-        $this->assertEquals($this->game->status, $this->gameHash["status"]);
-        $this->assertEquals($this->game->nextTurn, $this->gameHash["next_turn"]);
+        $this->assertEquals($this->gameId, $this->game->id);
+        $this->assertEquals($this->gameHash["created_at"], $this->game->createdAt);
+        $this->assertEquals($this->gameHash["status"], $this->game->status);
+        $this->assertEquals($this->gameHash["next_turn"], $this->game->nextTurn);
 
-        $this->assertEquals($this->game->u1, $this->gameHash["u1"]);
-        $this->assertEquals($this->game->u2, $this->gameHash["u2"]);
-        $this->assertEquals($this->game->u3, $this->gameHash["u3"]);
-        $this->assertEquals($this->game->u4, $this->gameHash["u4"]);
+        $this->assertEquals($this->gameHash["u1"], $this->game->u1);
+        $this->assertEquals($this->gameHash["u2"], $this->game->u2);
+        $this->assertEquals($this->gameHash["u3"], $this->game->u3);
+        $this->assertEquals($this->gameHash["u4"], $this->game->u4);
 
-        $this->assertEquals($this->game->u1Cards, $this->gameHash["u1_cards"]);
-        $this->assertEquals($this->game->u2Cards, $this->gameHash["u2_cards"]);
-        $this->assertEquals($this->game->u3Cards, $this->gameHash["u3_cards"]);
-        $this->assertEquals($this->game->u4Cards, $this->gameHash["u4_cards"]);
+        $this->assertEquals($this->gameHash["u1_cards"], $this->game->u1Cards);
+        $this->assertEquals($this->gameHash["u2_cards"], $this->game->u2Cards);
+        $this->assertEquals($this->gameHash["u3_cards"], $this->game->u3Cards);
+        $this->assertEquals($this->gameHash["u4_cards"], $this->game->u4Cards);
     }
 
     public function testIsExpired()
@@ -53,6 +53,7 @@ class GameTest extends \PHPUnit_Framework_TestCase
     public function testIsUserSNVacant()
     {
         $this->assertFalse($this->game->isUserSNVacant("u1"));
+
         $this->assertTrue($this->game->isUserSNVacant("u2"));
         $this->assertTrue($this->game->isUserSNVacant("u3"));
         $this->assertTrue($this->game->isUserSNVacant("u4"));

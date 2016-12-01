@@ -18,6 +18,8 @@
             <file>tests/AppBundle/Utility.php</file>
             <!-- Following is re-usable base class -->
             <exclude>tests/AppBundle/Controller/AbstractControllerTest.php</exclude>
+            <exclude>tests/AppBundle/Controller/TestFlag.php</exclude>
+            <!-- -->
         </testsuite>
     </testsuites>
 

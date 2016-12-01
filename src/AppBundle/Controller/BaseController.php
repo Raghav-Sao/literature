@@ -17,6 +17,8 @@ use AppBundle\Controller\Response;
  */
 class BaseController extends Controller
 {
+    const APPLICATION_JSON = 'application/json';
+
     protected $logger;
     protected $request;
     protected $session;
@@ -49,8 +51,14 @@ class BaseController extends Controller
         $this->gameId      = $this->session->get(ContextKey::GAME_ID, false);
         $this->userId      = $this->session->getId();
 
-        // TODO: Validate if is json decodable
-        $this->input       = json_decode($this->request->getContent(), true);
+        $requestContentType       = $this->request->headers->get('Content-Type');
+        $isRequestContentTypeJson = (strtolower($requestContentType) === self::APPLICATION_JSON);
+
+        if ($isRequestContentTypeJson) {
+            $this->input = json_decode($this->request->getContent(), true);
+        } else {
+            $this->input = [];
+        }
     }
 
     /**
