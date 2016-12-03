@@ -11,14 +11,9 @@ class TestFlag
 {
     const SOMETHING = "SOMETHING";
 
-    /**
-     * Is given value defined as constant?
-     *
-     * @param string $value
-     *
-     * @return boolean
-     */
-    public static function isDefined(string $value)
+    public static function isDefined(
+        string $value
+    )
     {
         return defined('self::' . $value);
     }

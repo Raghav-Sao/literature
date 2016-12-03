@@ -2,12 +2,8 @@
 
 namespace AppBundle\Constant\Game;
 
-/**
-*
-*/
 class Event
 {
-
     const CHAT_MESSAGE     = "CHAT_MESSAGE";
 
     const GAME_INIT_ACTION = "GAME_INIT_ACTION";

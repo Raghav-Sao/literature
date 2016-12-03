@@ -4,33 +4,22 @@ namespace AppBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- *
- */
 class DefaultController extends BaseController
 {
-
-    /**
-     *
-     * @return
-     */
     public function __construct()
     {
         parent::__construct();
     }
 
-    /**
-     *
-     * @return Response
-     */
     public function indexAction()
     {
         $this->init();
 
         $this->checkIfUserActiveInAGame();
 
-        return new Response(
-            $this->render("AppBundle:Default:index.html.twig")->getContent()
-        );
+        $content = $this->render('AppBundle:Default:index.html.twig')
+                        ->getContent();
+
+        return new Response($content);
     }
 }

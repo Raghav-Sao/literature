@@ -6,17 +6,11 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 use AppBundle\Service;
 use AppBundle\Exception;
-
 use AppBundle\Model\Redis;
-
 use AppBundle\Constant\Game;
-
 use Tests\AppBundle\Model\Redis\GameTestData;
 use Tests\AppBundle\Model\Redis\UserTestData;
 
-/**
- *
- */
 class GameTest extends KernelTestCase
 {
 
@@ -38,9 +32,9 @@ class GameTest extends KernelTestCase
         $this->logger    = $this->container->get('logger');
         $this->redis     = $this->createMock(Service\Mock\Redis::class);
         $this->pubSub    = $this->createMock(Service\Mock\PubSub\Pusher::class);
-        $this->knowledge = $this->createMock(Service\Knowledge::class);
+        $this->knowledge = $this->createMock(Service\KnowledgeService::class);
 
-        $this->gameService = new Service\Game(
+        $this->gameService = new Service\gameService(
             $this->logger,
             $this->redis,
             $this->pubSub,
@@ -53,12 +47,12 @@ class GameTest extends KernelTestCase
      * @expectedExceptionMessage Game not found
      *
      */
-    public function testFetchGameByIdWhenNotFound()
+    public function testGetWhenNotFound()
     {
-        $this->redis->method("hgetall")
+        $this->redis->method('hgetall')
                     ->willReturn(null);
 
-        $this->gameService->fetchGameById(GameTestData::getId());
+        $this->gameService->get(GameTestData::getId());
     }
 
     /**
@@ -66,12 +60,12 @@ class GameTest extends KernelTestCase
      * @expectedExceptionMessage Cards not found for given user
      *
      */
-    public function testFetchUserByIdWhenNotFound()
+    public function testGetUserWhenNotFound()
     {
-        $this->redis->method("smembers")
+        $this->redis->method('smembers')
                     ->willReturn(null);
 
-        $this->gameService->fetchUserById(UserTestData::getId());
+        $this->gameService->getUser(UserTestData::getId());
     }
 
     /**
@@ -79,15 +73,15 @@ class GameTest extends KernelTestCase
      * @expectedExceptionMessage Game with given id is no longer active
      *
      */
-    public function testFetchByIdAndValidateAgainsUserWhenGameIsExpired()
+    public function testGetAndValidateWhenGameIsExpired()
     {
-        $this->redis->method("hgetall")
+        $this->redis->method('hgetall')
                     ->willReturn(
-                        GameTestData::getGameHash(["status" => "expired"])
+                        GameTestData::getGameHash(['status' => 'expired'])
                     );
 
         $this->gameService
-             ->fetchByIdAndValidateAgainsUser(
+             ->getAndValidate(
                  GameTestData::getId(),
                  UserTestData::getId()
              );
@@ -98,15 +92,15 @@ class GameTest extends KernelTestCase
      * @expectedExceptionMessage You do not belong to game with given id
      *
      */
-    public function testFetchByIdAndValidateAgainsUserWhenUserIsNotValid()
+    public function testGetAndValidateWhenUserIsNotValid()
     {
-        $this->redis->method("hgetall")
+        $this->redis->method('hgetall')
                     ->willReturn(GameTestData::getGameHash());
 
         $this->gameService
-             ->fetchByIdAndValidateAgainsUser(
+             ->getAndValidate(
                  GameTestData::getId(),
-                 UserTestData::getId("u_2222222222")
+                 UserTestData::getId('u_2222222222')
              );
     }
 
@@ -123,7 +117,7 @@ class GameTest extends KernelTestCase
     {
         $game = new Redis\Game(GameTestData::getId(), GameTestData::getGameHash());
 
-        $this->gameService->moveCard($game, Game\Card::CLUB_5, "u_2222222222", "u_1111111111");
+        $this->gameService->moveCard($game, Game\Card::CLUB_5, 'u_2222222222', 'u_1111111111');
     }
 
     /**
@@ -135,13 +129,13 @@ class GameTest extends KernelTestCase
     {
         $game = new Redis\Game(
             GameTestData::getId(),
-            GameTestData::getGameHash(["status" => "active", "u2" => "u_2222222222"])
+            GameTestData::getGameHash(['status' => 'active', 'u2' => 'u_2222222222'])
         );
 
-        $this->redis->method("smembers")
+        $this->redis->method('smembers')
                     ->willReturn(UserTestData::getCardSet());
 
-        $this->gameService->moveCard($game, Game\Card::CLUB_1, "u_2222222222", "u_1111111111");
+        $this->gameService->moveCard($game, Game\Card::CLUB_1, 'u_2222222222', 'u_1111111111');
     }
 
     /**
@@ -153,13 +147,13 @@ class GameTest extends KernelTestCase
     {
         $game = new Redis\Game(
             GameTestData::getId(),
-            GameTestData::getGameHash(["status" => "active", "u2" => "u_2222222222"])
+            GameTestData::getGameHash(['status' => 'active', 'u2' => 'u_2222222222'])
         );
 
-        $this->redis->method("smembers")
+        $this->redis->method('smembers')
                     ->willReturn(UserTestData::getCardSet());
 
-        $this->gameService->moveCard($game, Game\Card::CLUB_8, "u_2222222222", "u_1111111111");
+        $this->gameService->moveCard($game, Game\Card::CLUB_8, 'u_2222222222', 'u_1111111111');
     }
 
     public function testMoveCardWhenFromUserHaveCard()
@@ -167,15 +161,15 @@ class GameTest extends KernelTestCase
         $game = new Redis\Game(
             GameTestData::getId(),
             GameTestData::getGameHash([
-                "status" => "active",
+                'status' => 'active',
 
-                "u2" => "u_2222222222",
-                "u3" => "u_3333333333",
-                "u4" => "u_4444444444",
+                'u2' => 'u_2222222222',
+                'u3' => 'u_3333333333',
+                'u4' => 'u_4444444444',
             ])
         );
 
-        $this->redis->method("smembers")
+        $this->redis->method('smembers')
                     ->will(
                         $this->onConsecutiveCalls(
                             UserTestData::getCardSet(),
@@ -188,19 +182,19 @@ class GameTest extends KernelTestCase
                         )
                     );
 
-        $this->redis->method("smove")
+        $this->redis->method('smove')
                     ->willReturn(null);
 
         list($success, $game, $user) = $this->gameService
                                             ->moveCard(
                                                 $game,
                                                 Game\Card::CLUB_5,
-                                                "u_2222222222",
-                                                "u_1111111111"
+                                                'u_2222222222',
+                                                'u_1111111111'
                                             );
 
         $this->assertTrue($success);
-        $this->assertEquals("u1", $game->nextTurn);
+        $this->assertEquals('u1', $game->nextTurn);
         $this->assertContains(Game\Card::CLUB_5, $user->cards);
         $this->assertCount(6, $user->cards);
     }
@@ -210,15 +204,15 @@ class GameTest extends KernelTestCase
         $game = new Redis\Game(
             GameTestData::getId(),
             GameTestData::getGameHash([
-                "status" => "active",
+                'status' => 'active',
 
-                "u2" => "u_2222222222",
-                "u3" => "u_3333333333",
-                "u4" => "u_4444444444",
+                'u2' => 'u_2222222222',
+                'u3' => 'u_3333333333',
+                'u4' => 'u_4444444444',
             ])
         );
 
-        $this->redis->method("smembers")
+        $this->redis->method('smembers')
                     ->will(
                         $this->onConsecutiveCalls(
                             UserTestData::getCardSet(),
@@ -231,19 +225,19 @@ class GameTest extends KernelTestCase
                         )
                     );
 
-        $this->redis->method("hmset")
+        $this->redis->method('hmset')
                     ->willReturn(null);
 
         list($success, $game, $user) = $this->gameService
                                             ->moveCard(
                                                 $game,
                                                 Game\Card::HEART_2,
-                                                "u_2222222222",
-                                                "u_1111111111"
+                                                'u_2222222222',
+                                                'u_1111111111'
                                             );
 
         $this->assertFalse($success);
-        $this->assertEquals("u2", $game->nextTurn);
+        $this->assertEquals('u2', $game->nextTurn);
         $this->assertNotContains(Game\Card::HEART_2, $user->cards);
         $this->assertCount(5, $user->cards);
     }

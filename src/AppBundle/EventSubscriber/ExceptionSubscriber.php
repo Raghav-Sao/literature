@@ -8,43 +8,30 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 use AppBundle\Controller\Response;
 
-/**
- *
- */
 class ExceptionSubscriber implements EventSubscriberInterface
 {
-    /**
-     *
-     * @return array
-     */
     public static function getSubscribedEvents()
     {
-        return [
-           KernelEvents::EXCEPTION => [
-               ["processException", 10],
-           ],
+        $subscribedEvents = [
+            KernelEvents::EXCEPTION => [
+                ['processException', 10],
+            ],
         ];
+
+        return $subscribedEvents;
     }
 
-    /**
-     * @param object $logger
-     *
-     * @return
-     */
-    public function __construct($logger)
+    public function __construct(
+        $logger
+    )
     {
         $this->logger = $logger;
     }
 
-    /**
-     *
-     * @param GetResponseForExceptionEvent $event
-     *
-     * @return
-     */
-    public function processException(GetResponseForExceptionEvent $event)
+    public function processException(
+        GetResponseForExceptionEvent $event
+    )
     {
-        // ...
         $e = $event->getException();
 
         /**
@@ -54,12 +41,13 @@ class ExceptionSubscriber implements EventSubscriberInterface
 
         $response = null;
 
-        switch (get_class($e)) {
-            case "AppBundle\Exception\BadRequestException":
+        switch (get_class($e))
+        {
+            case 'AppBundle\Exception\BadRequestException':
                 $response = new Response\Error($e, Response\Error::HTTP_BAD_REQUEST);
                 break;
 
-            case "AppBundle\Exception\NotFoundException":
+            case 'AppBundle\Exception\NotFoundException':
                 $response = new Response\Error($e, Response\Error::HTTP_NOT_FOUND);
                 break;
 
@@ -67,7 +55,8 @@ class ExceptionSubscriber implements EventSubscriberInterface
                 break;
         }
 
-        if ($response) {
+        if ($response)
+        {
             $event->setResponse($response);
         }
 

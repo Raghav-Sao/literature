@@ -2,25 +2,16 @@
 
 namespace AppBundle\Service;
 
-/**
- *
- */
-class Knowledge extends BaseService
+class KnowledgeService extends BaseService
 {
 
     protected $redis;
 
-    /**
-     * @param object $logger
-     * @param object $redis
-     *
-     * @return
-     */
     public function __construct(
         $logger,
         $redis
-    ) {
-
+    )
+    {
         parent::__construct($logger);
 
         $this->redis  = $redis;

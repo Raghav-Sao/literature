@@ -4,53 +4,47 @@ namespace Tests\AppBundle\Model\Redis;
 
 use AppBundle\Constant\Game;
 
-/**
- *
- */
 class GameTestData
 {
 
-    public static $id              = "g_1234567890";
+    public static $id              = 'g_1234567890';
 
     public static $defaultGameHash = [
 
-        "created_at" => "1479581289",
-        "status"     => Game\Status::INITIALIZED,
-        "next_turn"  => "u1",
+        'created_at' => '1479581289',
+        'status'     => Game\Status::INITIALIZED,
+        'next_turn'  => 'u1',
 
-        "u1"         => "u_1111111111",
-        "u2"         => null,
-        "u3"         => null,
-        "u4"         => null,
+        'u1'         => 'u_1111111111',
+        'u2'         => null,
+        'u3'         => null,
+        'u4'         => null,
 
-        "u1_cards"   => "",
-        "u2_cards"   => "",
-        "u3_cards"   => "",
-        "u4_cards"   => "",
+        'u1_cards'   => '',
+        'u2_cards'   => '',
+        'u3_cards'   => '',
+        'u4_cards'   => '',
     ];
 
-    /**
-     *
-     * @param  string|null $id
-     * @return string
-     */
-    public static function getId(string $id = null)
+    public static function getId(
+        string $id = null
+    )
     {
-        if (empty($id)) {
+        if (empty($id))
+        {
             return self::$id;
-        } else {
+        }
+        else
+        {
             return $id;
         }
     }
 
-    /**
-     *
-     * @param  array $overrideWith
-     * @return array
-     */
-    public static function getGameHash(array $overrideWith = [])
+    public static function getGameHash(
+        array $overrideWith = []
+    )
     {
-        self::$defaultGameHash["u1_cards"] = implode(",", [Game\Card::CLUB_1, Game\Card::CLUB_2]);
+        self::$defaultGameHash['u1_cards'] = implode(',', [Game\Card::CLUB_1, Game\Card::CLUB_2]);
 
         return array_merge(self::$defaultGameHash, $overrideWith);
     }
