@@ -3,36 +3,29 @@
 namespace AppBundle\Service\PubSub;
 
 use \Pusher as PusherClient;
-use AppBundle\Service;
+use AppBundle\Service\BaseService;
+use AppBundle\Service\Mock\PubSub\Pusher as PusherMock;
 
-/**
- *
- */
-class Pusher extends Service\BaseService implements PubSubInterface
+class Pusher extends BaseService implements PubSubInterface
 {
     protected $pusher;
 
-    /**
-     * @param  bool   $mock
-     * @param  [type] $logger
-     * @param  string $appKey
-     * @param  string $appSecret
-     * @param  string $appId
-     * @return Service\Mock\PubSub\Pusher|Pusher
-     */
     public static function create(
         bool   $mock,
-        $logger,
+               $logger,
         string $appKey,
         string $appSecret,
         string $appId
-    ) {
-
-        if ($mock) {
-            return new Service\Mock\PubSub\Pusher(
+    )
+    {
+        if ($mock)
+        {
+            return new PusherMock(
                 $logger
             );
-        } else {
+        }
+        else
+        {
             return new Pusher(
                 $logger,
                 $appKey,
@@ -42,21 +35,13 @@ class Pusher extends Service\BaseService implements PubSubInterface
         }
     }
 
-    /**
-     *
-     * @param object $logger
-     * @param string $appKey
-     * @param string $appSecret
-     * @param string $appId
-     *
-     * @return
-     */
     public function __construct(
-        $logger,
+               $logger,
         string $appKey,
         string $appSecret,
         string $appId
-    ) {
+    )
+    {
 
         parent::__construct($logger);
 
@@ -72,27 +57,24 @@ class Pusher extends Service\BaseService implements PubSubInterface
         );
     }
 
-    /**
-     * @param string $channel
-     * @param string $event
-     * @param array  $data
-     *
-     * @return
-     */
     public function trigger(
         string $channel,
         string $event,
-        array $data = array()
-    ) {
+        array  $data = []
+    )
+    {
 
         $formattedData = [
-            "eventType" => $event,
-            "eventData" => $data,
+            'type' => $event,
+            'data' => $data,
         ];
 
-        try {
+        try
+        {
             $this->pusher->trigger($channel, $event, $formattedData);
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e)
+        {
             $this->logger->error($e);
         }
     }

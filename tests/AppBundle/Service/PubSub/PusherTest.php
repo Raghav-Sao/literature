@@ -6,18 +6,13 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 use AppBundle\Service;
 use AppBundle\Model\Redis;
-
-use AppBundle\Constant;
-
+use AppBundle\Constant\Game\Card;
+use AppBundle\Constant\Game\Event;
+use AppBundle\Constant\Game\Game as GameK;
 use AppBundle\Service\PubSub;
-
-
 use Tests\AppBundle\Model\Redis\GameTestData;
 use Tests\AppBundle\Model\Redis\UserTestData;
 
-/**
- *
- */
 class PusherTest extends KernelTestCase
 {
     private $container;
@@ -38,9 +33,9 @@ class PusherTest extends KernelTestCase
         $this->logger    = $this->container->get('logger');
         $this->redis     = $this->createMock(Service\Mock\Redis::class);
         $this->pubSub    = $this->createMock(Service\Mock\PubSub\Pusher::class);
-        $this->knowledge = $this->createMock(Service\Knowledge::class);
+        $this->knowledge = $this->createMock(Service\KnowledgeService::class);
 
-        $this->gameService = new Service\Game(
+        $this->gameService = new Service\gameService(
             $this->logger,
             $this->redis,
             $this->pubSub,
@@ -54,32 +49,32 @@ class PusherTest extends KernelTestCase
 
         $expectedGame = new Redis\Game(
             GameTestData::getId(),
-            GameTestData::getGameHash(["u2" => "u_2222222222"])
+            GameTestData::getGameHash(['u2' => 'u_2222222222'])
         );
 
-        $atSN   = Constant\Game\User::USER_2;
-        $userId = "u_2222222222";
+        $atSN   = GameK::U2;
+        $userId = 'u_2222222222';
 
         $expected  = [
-            "game" => $expectedGame->toArray(), // u2 will get added after join api call
-            "atSN" => $atSN,
+            'game' => $expectedGame->toArray(), // u2 will get added after join api call
+            'atSN' => $atSN,
         ];
 
-        $this->redis->method("hgetall")
+        $this->redis->method('hgetall')
                     ->willReturn(GameTestData::getGameHash());
 
-        $this->redis->method("smembers")
+        $this->redis->method('smembers')
                     ->will(
                         $this->onConsecutiveCalls(
                             UserTestData::getCardSet(),
                             UserTestData::getCardSet(
                                 [
-                                    Constant\Game\Card::CLUB_6,
-                                    Constant\Game\Card::CLUB_5,
-                                    Constant\Game\Card::CLUB_4,
-                                    Constant\Game\Card::CLUB_3,
-                                    Constant\Game\Card::CLUB_2,
-                                    Constant\Game\Card::CLUB_1,
+                                    Card::CLUB_6,
+                                    Card::CLUB_5,
+                                    Card::CLUB_4,
+                                    Card::CLUB_3,
+                                    Card::CLUB_2,
+                                    Card::CLUB_1,
                                 ],
                                 true
                             )
@@ -90,10 +85,10 @@ class PusherTest extends KernelTestCase
                      ->method('trigger')
                      ->with(
                          $this->equalTo($game->id),
-                         $this->equalTo(Constant\Game\Event::GAME_JOIN_ACTION),
+                         $this->equalTo(Event::GAME_JOIN_ACTION),
                          $this->equalTo($expected)
                      );
 
-        $this->gameService->joinGame($game->id, $atSN, $userId);
+        $this->gameService->join($game->id, $atSN, $userId);
     }
 }

@@ -2,13 +2,11 @@
 
 namespace AppBundle\Model\Redis;
 
+use AppBundle\Utility;
 use AppBundle\Constant\Game\Status;
-use AppBundle\Constant\Game\User;
+use AppBundle\Constant\Game\Game as GameK;
 use AppBundle\Exception\BadRequestException;
 
-/**
- *
- */
 class Game
 {
     public $id;
@@ -37,56 +35,53 @@ class Game
     public $u4Cards;
     // @codingStandardsIgnoreStart
 
-    /**
-     *
-     * @param string $id     - Game id
-     * @param array  $params - Array data from redis hmset
-     *
-     * @return
-     */
     public function __construct(
         string $id,
-        array $params
-    ) {
-
-        $this->id = $id;
-        // Sets all attributes of the object
-        foreach ($params as $key => $value) {
-            $property = \AppBundle\Utility::camelizeLcFirst($key);
-            $this->$property = $value;
-        }
-
-        // $this->team1 = [$this->u1, $this->u3];
-        // $this->team2 = [$this->u2, $this->u4];
-    }
-
-    /**
-     *
-     * @return boolean
-     */
-    public function isExpired()
+        array  $params
+    )
     {
 
+        $this->id = $id;
+
+        // Sets all attributes of the object
+        foreach ($params as $key => $value)
+        {
+            $property        = Utility::camelizeLcFirst($key);
+            $this->$property = $value;
+        }
+    }
+
+    //
+    // Getters
+
+    public function isActive()
+    {
+        return ($this->status === Status::ACTIVE);
+    }
+
+    public function isExpired()
+    {
         return ($this->status === Status::EXPIRED);
     }
 
-    /**
-     * @param  string $userSN
-     * @return boolean
-     */
-    public function isUserSNVacant($userSN)
+    public function isNotExpired()
     {
-        if (property_exists($this, $userSN) === false) {
-            throw new BadRequestException("Invalid user serial number");
+        return !($this->isExpired());
+    }
+
+    public function isSNVacant(
+        string $userSN
+    )
+    {
+        if (property_exists($this, $userSN) === false)
+        {
+            throw new BadRequestException('Invalid user serial number');
         }
 
         return ($this->$userSN == null);
     }
 
-    /**
-     * @return boolean
-     */
-    public function isAnyUserSNVacant()
+    public function isAnySNVacant()
     {
 
         return ($this->u1 == null ||
@@ -95,11 +90,9 @@ class Game
                 $this->u4 == null);
     }
 
-    /**
-     * @param  string $userId
-     * @return boolean
-     */
-    public function hasUser($userId)
+    public function hasUser(
+        string $userId
+    )
     {
 
         return in_array(
@@ -114,42 +107,40 @@ class Game
         );
     }
 
-    /**
-     * @param string $userId1
-     * @param string $userId2
-     *
-     * @return boolean
-     */
-    public function arePartners(
+    public function areTeam(
         string $userId1,
         string $userId2
-    ) {
+    )
+    {
 
         $team = [$this->u1, $this->u3];
 
-        return in_array($userId1, $team, true) === in_array($userId2, $team, true);
+        $x = in_array($userId1, $team, true);
+        $y = in_array($userId2, $team, true);
+
+        return ($x === $y);
     }
 
-    /**
-     *
-     * @param string $userId
-     *
-     * @return null|string
-     */
-    public function getUserSNById($userId)
+    public function getSNByUserId(
+        string $userId
+    )
     {
-        switch ($userId) {
+        switch ($userId)
+        {
             case $this->u1:
-                return User::USER_1;
+                return GameK::U1;
                 break;
+
             case $this->u2:
-                return User::USER_2;
+                return GameK::U2;
                 break;
+
             case $this->u3:
-                return User::USER_3;
+                return GameK::U3;
                 break;
+
             case $this->u4:
-                return User::USER_4;
+                return GameK::U4;
                 break;
 
             default:
@@ -158,11 +149,6 @@ class Game
         }
     }
 
-    /**
-     * Gets user id with next turn
-     *
-     * @return string
-     */
     public function getNextTurnUserId()
     {
         $nextTurnSN = $this->nextTurn;
@@ -170,39 +156,35 @@ class Game
         return $this->$nextTurnSN;
     }
 
-    /**
-     * @param string $userSN
-     *
-     * @return array
-     */
-    public function getInitialCardsByUserSN(
+    public function getInitCardsBySN(
         string $userSN
-    ) {
+    )
+    {
 
-        $attribute = sprintf("%sCards", $userSN);
+        $attribute = $userSN . 'Cards';
 
-        if (empty($this->$attribute)) {
+        if (empty($this->$attribute))
+        {
             return [];
-        } else {
-            return explode(",", $this->$attribute);
+        }
+        else
+        {
+            return explode(',', $this->$attribute);
         }
     }
 
-    /**
-     *
-     * @return array
-     */
     public function toArray()
     {
 
         return [
-            "id"        => $this->id,
-            "createdAt" => $this->createdAt,
-            "status"    => $this->status,
-            "u1"        => $this->u1,
-            "u2"        => $this->u2,
-            "u3"        => $this->u3,
-            "u4"        => $this->u4,
+            'id'        => $this->id,
+            'createdAt' => $this->createdAt,
+            'status'    => $this->status,
+
+            'u1'        => $this->u1,
+            'u2'        => $this->u2,
+            'u3'        => $this->u3,
+            'u4'        => $this->u4,
         ];
     }
 }

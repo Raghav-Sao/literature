@@ -19,13 +19,13 @@ services:
         factory:      ['AppBundle\Service\PubSub\Pusher', create]
 
     app_bundle.knowledge:
-        class:        AppBundle\Service\Knowledge
+        class:        AppBundle\Service\KnowledgeService
         arguments:
             - "@logger"
             - "@snc_redis.default"
 
     app_bundle.game:
-        class:        AppBundle\Service\Game
+        class:        AppBundle\Service\GameService
         arguments:
             - "@logger"
             - "@snc_redis.default"

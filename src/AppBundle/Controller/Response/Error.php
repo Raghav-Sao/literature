@@ -6,34 +6,35 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 use AppBundle\Exception;
 
-/**
- *
- */
 class Error extends JsonResponse
 {
 
-    /**
-     * @param \Exception $e
-     * @param integer    $status
-     * @param array      $headers
-     * @param boolean    $json
-     */
     public function __construct(
         \Exception $e,
-        $status = 200,
-        $headers = array(),
-        $json = false
-    ) {
+        int        $status  = 200,
+        array      $headers = [],
+        bool       $json    = false
+    )
+    {
+        $customCode = Exception\Code::DEFAULT;
+        $extra      = [];
 
-        $customCode = method_exists($e, "getCustomCode") ? $e->getCustomCode() : Exception\Code::DEFAULT;
-        $extra      = method_exists($e, "getExtra") ? $e->getExtra() : [];
+        if (method_exists($e, 'getCustomCode'))
+        {
+            $customCode = $e->getCustomCode();
+        }
+
+        if (method_exists($e, 'getExtra'))
+        {
+            $extra = $e->getExtra();
+        }
 
         parent::__construct(
             [
-                "success"      => false,
-                "errorCode"    => $customCode,
-                "errorMessage" => $e->__toString(),
-                "extra"        => $extra,
+                'success'      => false,
+                'errorCode'    => $customCode,
+                'errorMessage' => $e->__toString(),
+                'extra'        => $extra,
             ],
             $status,
             $headers,

@@ -12,23 +12,23 @@ class GameControllerTest extends AbstractControllerTest
     {
         $client = static::createClient();
 
-        $client->request("GET", "/game/start");
+        $client->request('GET', '/game/start');
         $res = $client->getResponse();
 
         $expected = [
-            "success"  => true,
-            "response" => [
-                "game" => [
-                    "id"     => TestFlag::SOMETHING,
-                    "status" => Constant\Game\Status::INITIALIZED,
-                    "u1"     => TestFlag::SOMETHING,
-                    "u2"     => null,
-                    "u3"     => null,
-                    "u4"     => null,
+            'success'  => true,
+            'response' => [
+                'game' => [
+                    'id'     => TestFlag::SOMETHING,
+                    'status' => Constant\Game\Status::INITIALIZED,
+                    'u1'     => TestFlag::SOMETHING,
+                    'u2'     => null,
+                    'u3'     => null,
+                    'u4'     => null,
                 ],
-                "user" => [
-                    "id"    => TestFlag::SOMETHING,
-                    "cards" => TestFlag::SOMETHING,
+                'user' => [
+                    'id'    => TestFlag::SOMETHING,
+                    'cards' => TestFlag::SOMETHING,
                 ],
             ],
         ];
@@ -42,11 +42,11 @@ class GameControllerTest extends AbstractControllerTest
         $res = $client->getResponse();
 
         $expected = [
-            "success"      => false,
-            "errorCode"    => Exception\Code::BAD_REQUEST,
-            "errorMessage" => "You are already in an active game",
-            "extra"        => [
-                "gameId"   => $resBody->response->game->id,
+            'success'      => false,
+            'errorCode'    => Exception\Code::BAD_REQUEST,
+            'errorMessage' => 'You are already in an active game',
+            'extra'        => [
+                'gameId'   => $resBody->response->game->id,
             ],
         ];
 
@@ -58,20 +58,20 @@ class GameControllerTest extends AbstractControllerTest
         $client = static::createClient();
 
         // Without a game already created, should throw 404
-        $client->request("GET", "/game");
+        $client->request('GET', '/game');
         $res = $client->getResponse();
 
         $expected = [
-            "success"      => false,
-            "errorCode"    => Exception\Code::NOT_FOUND,
-            "errorMessage" => "Game not found",
-            "extra"        => [],
+            'success'      => false,
+            'errorCode'    => Exception\Code::NOT_FOUND,
+            'errorMessage' => 'Game not found',
+            'extra'        => [],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 404, $expected);
 
         // Now after creating a game
-        $client->request("GET", "/game/start");
+        $client->request('GET', '/game/start');
         $res = $client->getResponse();
 
         $resBody = $this->makeFirstAssertions($res, 200, []);
@@ -79,23 +79,23 @@ class GameControllerTest extends AbstractControllerTest
         $gameId  = $resBody->response->game->id;
         $userId  = $resBody->response->user->id;
 
-        $client->request("GET", "/game");
+        $client->request('GET', '/game');
         $res = $client->getResponse();
 
         $expected = [
-            "success"  => true,
-            "response" => [
-                "game" => [
-                    "id"     => $gameId,
-                    "status" => Constant\Game\Status::INITIALIZED,
-                    "u1"     => $userId,
-                    "u2"     => null,
-                    "u3"     => null,
-                    "u4"     => null,
+            'success'  => true,
+            'response' => [
+                'game' => [
+                    'id'     => $gameId,
+                    'status' => Constant\Game\Status::INITIALIZED,
+                    'u1'     => $userId,
+                    'u2'     => null,
+                    'u3'     => null,
+                    'u4'     => null,
                 ],
-                "user" => [
-                    "id"    => $userId,
-                    "cards" => TestFlag::SOMETHING,
+                'user' => [
+                    'id'    => $userId,
+                    'cards' => TestFlag::SOMETHING,
                 ],
             ],
         ];
@@ -114,7 +114,7 @@ class GameControllerTest extends AbstractControllerTest
 
         // Creates a game
         $client1 = static::createClient();
-        $client1->request("GET", "/game/start");
+        $client1->request('GET', '/game/start');
         $res = $client1->getResponse();
 
         $resBody = $this->makeFirstAssertions($res, 200);
@@ -123,15 +123,15 @@ class GameControllerTest extends AbstractControllerTest
         $userId1  = $resBody->response->user->id;
 
         // Same user tries to join again
-        $client1->request("POST", sprintf("/game/%s/join/u2", $gameId));
+        $client1->request('POST', sprintf('/game/%s/join/u2', $gameId));
         $res = $client1->getResponse();
 
         $expected = [
-            "success"      => false,
-            "errorCode"    => Exception\Code::BAD_REQUEST,
-            "errorMessage" => "You are already in an active game",
-            "extra"        => [
-                "gameId" => $gameId,
+            'success'      => false,
+            'errorCode'    => Exception\Code::BAD_REQUEST,
+            'errorMessage' => 'You are already in an active game',
+            'extra'        => [
+                'gameId' => $gameId,
             ],
         ];
 
@@ -139,62 +139,62 @@ class GameControllerTest extends AbstractControllerTest
 
         // Other user joins with invalid gameId
         $client2 = static::createClient();
-        $client2->request("POST", sprintf("/game/%s_invalid/join/u2", $gameId));
+        $client2->request('POST', sprintf('/game/%s_invalid/join/u2', $gameId));
         $res = $client2->getResponse();
 
         $expected = [
-            "success"      => false,
-            "errorCode"    => Exception\Code::NOT_FOUND,
-            "errorMessage" => "Game not found",
-            "extra"        => [],
+            'success'      => false,
+            'errorCode'    => Exception\Code::NOT_FOUND,
+            'errorMessage' => 'Game not found',
+            'extra'        => [],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 404, $expected);
 
         // Other user joins with invalid serial number
-        $client2->request("POST", sprintf("/game/%s/join/u8", $gameId));
+        $client2->request('POST', sprintf('/game/%s/join/u8', $gameId));
         $res = $client2->getResponse();
 
         $expected = [
-            "success"      => false,
-            "errorCode"    => Exception\Code::BAD_REQUEST,
-            "errorMessage" => "Invalid user serial number",
-            "extra"        => [],
+            'success'      => false,
+            'errorCode'    => Exception\Code::BAD_REQUEST,
+            'errorMessage' => 'Invalid user serial number',
+            'extra'        => [],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 400, $expected);
 
         // Other user joins at occupied serial number
-        $client2->request("POST", sprintf("/game/%s/join/u1", $gameId));
+        $client2->request('POST', sprintf('/game/%s/join/u1', $gameId));
         $res = $client2->getResponse();
 
         $expected = [
-            "success"      => false,
-            "errorCode"    => Exception\Code::BAD_REQUEST,
-            "errorMessage" => "Invalid position to join as member",
-            "extra"        => [],
+            'success'      => false,
+            'errorCode'    => Exception\Code::BAD_REQUEST,
+            'errorMessage' => 'Invalid position to join as member',
+            'extra'        => [],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 400, $expected);
 
         // Other user joins
-        $client2->request("POST", sprintf("/game/%s/join/u2", $gameId));
+        $client2->request('POST', sprintf('/game/%s/join/u2', $gameId));
         $res = $client2->getResponse();
 
         $expected = [
-            "success"  => true,
-            "response" => [
-                "game" => [
-                    "id"     => $gameId,
-                    "status" => Constant\Game\Status::INITIALIZED,
-                    "u1"     => $userId1,
-                    "u2"     => TestFlag::SOMETHING,
-                    "u3"     => null,
-                    "u4"     => null,
+            'success'  => true,
+            'response' => [
+                'game' => [
+                    'id'     => $gameId,
+                    'status' => Constant\Game\Status::INITIALIZED,
+                    'u1'     => $userId1,
+                    'u2'     => TestFlag::SOMETHING,
+                    'u3'     => null,
+                    'u4'     => null,
                 ],
-                "user" => [
-                    "id"    => TestFlag::SOMETHING,
-                    "cards" => TestFlag::SOMETHING,
+                'user' => [
+                    'id'    => TestFlag::SOMETHING,
+                    'cards' => TestFlag::SOMETHING,
                 ],
             ],
         ];
@@ -203,27 +203,27 @@ class GameControllerTest extends AbstractControllerTest
         $this->assertCount(12, $resBody->response->user->cards);
 
         $client3 = static::createClient();
-        $client3->request("POST", sprintf("/game/%s/join/u3", $gameId));
+        $client3->request('POST', sprintf('/game/%s/join/u3', $gameId));
         $res = $client3->getResponse();
 
         $client4 = static::createClient();
-        $client4->request("POST", sprintf("/game/%s/join/u4", $gameId));
+        $client4->request('POST', sprintf('/game/%s/join/u4', $gameId));
         $res = $client4->getResponse();
 
         $expected = [
-            "success"  => true,
-            "response" => [
-                "game" => [
-                    "id"     => $gameId,
-                    "status" => Constant\Game\Status::ACTIVE,
-                    "u1"     => $userId1,
-                    "u2"     => TestFlag::SOMETHING,
-                    "u3"     => TestFlag::SOMETHING,
-                    "u4"     => TestFlag::SOMETHING,
+            'success'  => true,
+            'response' => [
+                'game' => [
+                    'id'     => $gameId,
+                    'status' => Constant\Game\Status::ACTIVE,
+                    'u1'     => $userId1,
+                    'u2'     => TestFlag::SOMETHING,
+                    'u3'     => TestFlag::SOMETHING,
+                    'u4'     => TestFlag::SOMETHING,
                 ],
-                "user" => [
-                    "id"    => TestFlag::SOMETHING,
-                    "cards" => TestFlag::SOMETHING,
+                'user' => [
+                    'id'    => TestFlag::SOMETHING,
+                    'cards' => TestFlag::SOMETHING,
                 ],
             ],
         ];
@@ -250,7 +250,7 @@ class GameControllerTest extends AbstractControllerTest
 
         // Client1 starts a game
         $client1 = static::createClient();
-        $client1->request("GET", "/game/start");
+        $client1->request('GET', '/game/start');
 
         $res = $client1->getResponse();
 
@@ -262,7 +262,7 @@ class GameControllerTest extends AbstractControllerTest
 
         // Other clients joins
         $client2 = static::createClient();
-        $client2->request("POST", sprintf("/game/%s/join/u2", $gameId));
+        $client2->request('POST', sprintf('/game/%s/join/u2', $gameId));
         $res = $client2->getResponse();
 
         $resBody2 = $this->makeFirstAssertions($res, 200);
@@ -271,7 +271,7 @@ class GameControllerTest extends AbstractControllerTest
         $userId2Cards = $resBody2->response->user->cards;
 
         $client3 = static::createClient();
-        $client3->request("POST", sprintf("/game/%s/join/u3", $gameId));
+        $client3->request('POST', sprintf('/game/%s/join/u3', $gameId));
         $res = $client3->getResponse();
 
         $resBody3 = $this->makeFirstAssertions($res, 200);
@@ -280,7 +280,7 @@ class GameControllerTest extends AbstractControllerTest
         $userId3Cards = $resBody3->response->user->cards;
 
         $client4 = static::createClient();
-        $client4->request("POST", sprintf("/game/%s/join/u4", $gameId));
+        $client4->request('POST', sprintf('/game/%s/join/u4', $gameId));
         $res = $client4->getResponse();
 
         $resBody4 = $this->makeFirstAssertions($res, 200);
@@ -294,10 +294,10 @@ class GameControllerTest extends AbstractControllerTest
         $res = $client1->getResponse();
 
         $expected = [
-            "success"      => false,
-            "errorCode"    => Exception\Code::BAD_REQUEST,
-            "errorMessage" => "Not a valid card",
-            "extra"        => [],
+            'success'      => false,
+            'errorCode'    => Exception\Code::BAD_REQUEST,
+            'errorMessage' => 'Not a valid card',
+            'extra'        => [],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 400, $expected);
@@ -308,10 +308,10 @@ class GameControllerTest extends AbstractControllerTest
         $res = $client1->getResponse();
 
         $expected = [
-            "success"      => false,
-            "errorCode"    => Exception\Code::BAD_REQUEST,
-            "errorMessage" => "Bad value for fromUserId, Does not exists",
-            "extra"        => [],
+            'success'      => false,
+            'errorCode'    => Exception\Code::BAD_REQUEST,
+            'errorMessage' => 'Bad value for fromUserId, Does not exists',
+            'extra'        => [],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 400, $expected);
@@ -322,10 +322,10 @@ class GameControllerTest extends AbstractControllerTest
         $res = $client1->getResponse();
 
         $expected = [
-            "success"      => false,
-            "errorCode"    => Exception\Code::BAD_REQUEST,
-            "errorMessage" => "Bad value for fromUserId, You are partners",
-            "extra"        => [],
+            'success'      => false,
+            'errorCode'    => Exception\Code::BAD_REQUEST,
+            'errorMessage' => 'Bad value for fromUserId, You are partners',
+            'extra'        => [],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 400, $expected);
@@ -336,10 +336,10 @@ class GameControllerTest extends AbstractControllerTest
         $res = $client2->getResponse();
 
         $expected = [
-            "success"      => false,
-            "errorCode"    => Exception\Code::BAD_REQUEST,
-            "errorMessage" => "It is not your turn to make a move",
-            "extra"        => [],
+            'success'      => false,
+            'errorCode'    => Exception\Code::BAD_REQUEST,
+            'errorMessage' => 'It is not your turn to make a move',
+            'extra'        => [],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 400, $expected);
@@ -350,27 +350,27 @@ class GameControllerTest extends AbstractControllerTest
         $client = static::createClient();
 
         // Without a game already created, should throw 404
-        $client->request("DELETE", "/game/delete");
+        $client->request('DELETE', '/game/delete');
         $res = $client->getResponse();
 
         $expected = [
-            "success"      => false,
-            "errorCode"    => Exception\Code::NOT_FOUND,
-            "errorMessage" => "Game not found",
-            "extra"        => [],
+            'success'      => false,
+            'errorCode'    => Exception\Code::NOT_FOUND,
+            'errorMessage' => 'Game not found',
+            'extra'        => [],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 404, $expected);
 
         // Now after starting a game
-        $client->request("GET", "/game/start");
-        $client->request("DELETE", "/game/delete");
+        $client->request('GET', '/game/start');
+        $client->request('DELETE', '/game/delete');
         $res = $client->getResponse();
 
         $expected = [
-            "success" => true,
-            "response" => [
-                "success" => true,
+            'success' => true,
+            'response' => [
+                'success' => true,
             ],
         ];
 

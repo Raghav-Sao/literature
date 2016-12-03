@@ -4,13 +4,10 @@ namespace Tests\AppBundle\Model\Redis;
 
 use AppBundle\Constant\Game\Card;
 
-/**
- *
- */
 class UserTestData
 {
 
-    public static $id              = "u_1111111111";
+    public static $id              = 'u_1111111111';
 
     public static $defaultCardSet  = [
         Card::CLUB_1,
@@ -21,29 +18,31 @@ class UserTestData
         Card::HEART_1,
     ];
 
-    /**
-     * @param  string|null $id
-     * @return string
-     */
-    public static function getId(string $id = null)
+    public static function getId(
+        string $id = null
+    )
     {
-        if (empty($id)) {
+        if (empty($id))
+        {
             return self::$id;
-        } else {
+        }
+        else
+        {
             return $id;
         }
     }
 
-    /**
-     * @param  array        $overrideWith
-     * @param  bool|boolean $replace
-     * @return array
-     */
-    public static function getCardSet(array $overrideWith = [], bool $replace = false)
+    public static function getCardSet(
+        array $overrideWith = [],
+        bool  $replace      = false
+    )
     {
-        if ($replace) {
+        if ($replace)
+        {
             return $overrideWith;
-        } else {
+        }
+        else
+        {
             return array_merge(self::$defaultCardSet, $overrideWith);
         }
     }
