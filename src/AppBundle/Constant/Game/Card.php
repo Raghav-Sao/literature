@@ -12,7 +12,7 @@ class Card
     const LOWER_RANGE          = 'lower';
     const HIGHER_RANGE         = 'higher';
     
-    const COUNT_PER_TYPE_RANGE = 6;
+    const MAX_PER_TYPE_RANGE   = 6;
     
     const CLUB_1               = 'c1';
     const CLUB_2               = 'c2';

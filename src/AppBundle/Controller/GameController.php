@@ -111,10 +111,10 @@ class GameController extends BaseController
         $this->init();
 
         list($game, $user) = $this->gameService
-                                  ->fetchByIdAndValidateAgainsUser(
-                                      $this->gameId,
-                                      $this->userId
-                                  );
+                                  ->getAndValidate(
+                                        $this->gameId,
+                                        $this->userId
+                                    );
 
         list($success, $game, $user) = $this->gameService
                                             ->show(

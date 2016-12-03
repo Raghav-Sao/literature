@@ -35,6 +35,8 @@ class Game
     public $u4Cards;
     // @codingStandardsIgnoreStart
 
+    public $teams;
+
     public function __construct(
         string $id,
         array  $params
@@ -49,6 +51,11 @@ class Game
             $property        = Utility::camelizeLcFirst($key);
             $this->$property = $value;
         }
+
+        $this->teams = [
+            GameK::TEAM_1 => [$this->u1, $this->u3],
+            GameK::TEAM_2 => [$this->u2, $this->u4],
+        ];
     }
 
     //
@@ -171,6 +178,13 @@ class Game
         {
             return explode(',', $this->$attribute);
         }
+    }
+
+    public function getUserIdsOfTeam(
+        string $team
+    )
+    {
+        return $this->teams[$team];
     }
 
     public function toArray()

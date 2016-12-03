@@ -10,6 +10,7 @@ use AppBundle\Utility;
 use AppBundle\Constant\Game\Game as GameK;
 use AppBundle\Constant\Game\Status;
 use AppBundle\Constant\Game\Event;
+use AppBundle\Constant\Game\Card;
 
 class GameService extends BaseService
 {
@@ -89,6 +90,9 @@ class GameService extends BaseService
         $id = Utility::newGameId();
 
         list($u1Cards, $u2Cards, $u3Cards, $u4Cards) = Utility::distributeCards();
+
+        // TODO:
+        // - Set other defaults
 
         $hash = $this->redis->hmset(
             $id,
@@ -320,30 +324,129 @@ class GameService extends BaseService
     }
 
     public function show(
-        Model\Redis\Game $game,
-        Model\Redis\User $user,
+        Game $game,
+        User $user,
         string $cardType,
         string $cardRange
     )
     {
+        list($success, $payload) = $this->attemptConsumeCardsOfTypeAndRange(
+            $game,
+            $game->getTeamForUserId($user->id),
+            $cardType,
+            $cardRange
+        );
 
-        // Before RETURN:
-        // - Update cards
-        // - Broadcase the message
+        if ($success)
+        {
+            return [$success, $payload, []];
+        }
 
-        // User has all cards of type and range?
-        // - Give 1 point to user
-        // - RETURN
-        // Pull his partner's card of by type and range
-        // - Both user's combined makes all cards of that type and range?
-        //   - Give points to bother users in ratio of cards count
-        //   - RETURN
+        list($success, $payload2) = $this->attemptConsumeCardsOfTypeAndRange(
+            $game,
+            $game->getTeamOppositeForUserId($user->id),
+            $cardType,
+            $cardRange,
+            true
+        );
 
-        // Check other 2 users card list
-        // - Give point to them in ratio of cards count
-        // - RETURN
+        return [false, $payload, $payload2];
+    }
 
-        // WIP:
-        // - Set defaults for game in init
+    protected function attemptConsumeCardsOfTypeAndRange(
+        Game   $game,
+        string $team,
+        string $cardType,
+        string $cardRange,
+        bool   $partial = false
+    )
+    {
+        $userIds      = $game->getUserIdsOfTeam($team);
+
+        $user1        = $this->getUser($userIds[0]);
+        $u1Cards      = Utility::filterCardsByTypeAndRange($cardType, $cardRange);
+        $u1CardsCount = count($u1Cards);
+
+        $u2Cards      = [];
+        $u2CardsCount = 0;
+
+        if ($u1CardsCount < Card::MAX_PER_TYPE_RANGE)
+        {
+            $user2        = $this->getUser($userIds[1]);
+            $u2Cards      = Utility::filterCardsByTypeAndRange($cardType, $cardRange);
+            $u2CardsCount = count($u2Cards);
+        }
+
+        $payload = [
+            'game' => $game->toArray(),
+            'u1'   => [
+                'id'    => $user1->id,
+                'cards' => $u1Cards,
+            ],
+            'u2'   => [
+                'id'    => $user2->id,
+                'cards' => $u2Cards,
+            ],
+        ];
+
+        if ($u1CardsCount + $u2CardsCount < Card::MAX_PER_TYPE_RANGE &&
+            $partial === false)
+        {
+            return [false, $payload];
+        }
+
+        $u1Points = 0;
+        $u2Points = 0;
+
+        if ($u1CardsCount > 0)
+        {
+            call_user_func_array(
+                [$this->redis, 'srem'],
+                array_merge([$user1->id], $u1Cards)
+            );
+            $user1->removeCards($u1Cards);
+
+            $u1Points = $u1CardsCount / (float) Card::MAX_PER_TYPE_RANGE;
+        }
+
+        if ($u2CardsCount > 0)
+        {
+            call_user_func_array(
+                [$this->redis, 'srem'],
+                array_merge([$user2->id], $u1Cards)
+            );
+            $user2->removeCards($u1Cards);
+
+            $u1Points = $u2CardsCount / (float) Card::MAX_PER_TYPE_RANGE;
+        }
+
+        $hash = [
+            $game->id,
+
+            GameK::U1_POINTS,
+            $u1Points,
+
+            GameK::U2_POINTS,
+            $u2Points,
+        ];
+
+        // TODO:
+        // - Update local model too
+        // - Implement those game model methods too
+        // - Add tests
+        // - Refactor and refactor again :)
+
+        call_user_func_array(
+            [$this->redis, 'hincrby'],
+            $hash
+        );
+
+        $this->pubSub->trigger(
+            $game->id,
+            Event::GAME_SHOW_ACTION,
+            $payload
+        );
+
+        return [true, $payload];
     }
 }
