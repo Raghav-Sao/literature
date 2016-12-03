@@ -9,11 +9,6 @@ use AppBundle\Controller\Response;
 
 class GameController extends BaseController
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function startAction()
     {
         $this->init();
@@ -53,7 +48,8 @@ class GameController extends BaseController
     public function joinAction(
         string $gameId,
         string $atSN
-    ) {
+    )
+    {
 
         $this->init();
 
@@ -79,7 +75,8 @@ class GameController extends BaseController
     public function moveFromAction(
         string $card,
         string $fromUserId
-    ) {
+    )
+    {
 
         $this->init();
 
@@ -113,31 +110,27 @@ class GameController extends BaseController
     {
         $this->init();
 
-        try {
-            list($game, $user) = $this->gameService
-                                      ->fetchByIdAndValidateAgainsUser(
-                                          $this->gameId,
-                                          $this->userId
-                                      );
+        list($game, $user) = $this->gameService
+                                  ->fetchByIdAndValidateAgainsUser(
+                                      $this->gameId,
+                                      $this->userId
+                                  );
 
-            list($success, $game, $user) = $this->gameService
-                                                ->show(
-                                                    $game,
-                                                    $user,
-                                                    $cardType,
-                                                    $cardRange
-                                                );
-        } catch (\Exception $e) {
-            return $this->handleException($e);
-        }
+        list($success, $game, $user) = $this->gameService
+                                            ->show(
+                                                $game,
+                                                $user,
+                                                $cardType,
+                                                $cardRange
+                                            );
 
-        return new Response\Ok(
-            [
-                "success" => $success,
-                "game"    => $game->toArray(),
-                "user"    => $user->toArray(),
-            ]
-        );
+        $res = [
+            "success" => $success,
+            "game"    => $game->toArray(),
+            "user"    => $user->toArray(),
+        ];
+
+        return new Response\Ok($res);
     }
 
     public function deleteAction()

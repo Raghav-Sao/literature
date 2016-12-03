@@ -132,7 +132,8 @@ class GameService extends BaseService
     public function getAndValidate(
         string $id,
         string $userId
-    ) {
+    )
+    {
 
         $game = $this->get($id);
 
@@ -162,7 +163,8 @@ class GameService extends BaseService
         string $gameId,
         string $atSN,
         string $userId
-    ) {
+    )
+    {
 
         $game = $this->get($gameId);
 

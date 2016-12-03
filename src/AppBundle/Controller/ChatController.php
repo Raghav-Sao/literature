@@ -9,11 +9,6 @@ use AppBundle\Exception\BadRequestException;
 
 class ChatController extends BaseController
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function postAction()
     {
         $this->init();
@@ -35,11 +30,7 @@ class ChatController extends BaseController
 
         $pusher = $this->container->get('app_bundle.pubsub.pusher');
 
-        $pusher->trigger(
-            $this->gameId,
-            Game\Event::CHAT_MESSAGE,
-            $payload
-        );
+        $pusher->trigger($this->gameId, Game\Event::CHAT_MESSAGE, $payload);
 
         return new Response\Ok();
     }

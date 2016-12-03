@@ -289,8 +289,8 @@ class GameControllerTest extends AbstractControllerTest
         $userId4Cards = $resBody4->response->user->cards;
 
         // Attempt invalid card move
-        $url = sprintf("/game/move/%s/from/%s", Constant\Game\Card::CLUB_7, $userId2);
-        $client1->request("POST", $url);
+        $url = sprintf('/game/move/%s/from/%s', Constant\Game\Card::CLUB_7, $userId2);
+        $client1->request('POST', $url);
         $res = $client1->getResponse();
 
         $expected = [
@@ -303,8 +303,8 @@ class GameControllerTest extends AbstractControllerTest
         $resBody = $this->makeFirstAssertions($res, 400, $expected);
 
         // Attempt with invalid {fromUserId}
-        $url = sprintf("/game/move/%s/from/%s", Constant\Game\Card::CLUB_6, "invalid_id");
-        $client1->request("POST", $url);
+        $url = sprintf('/game/move/%s/from/%s', Constant\Game\Card::CLUB_6, 'invalid_id');
+        $client1->request('POST', $url);
         $res = $client1->getResponse();
 
         $expected = [
@@ -317,8 +317,8 @@ class GameControllerTest extends AbstractControllerTest
         $resBody = $this->makeFirstAssertions($res, 400, $expected);
 
         // Attempt with {fromUserId} = The other partner
-        $url = sprintf("/game/move/%s/from/%s", Utility::getRandomCard($userId3Cards), $userId3);
-        $client1->request("POST", $url);
+        $url = sprintf('/game/move/%s/from/%s', Utility::getRandomCard($userId3Cards), $userId3);
+        $client1->request('POST', $url);
         $res = $client1->getResponse();
 
         $expected = [
@@ -331,8 +331,8 @@ class GameControllerTest extends AbstractControllerTest
         $resBody = $this->makeFirstAssertions($res, 400, $expected);
 
         // Attempt when it is not your turn
-        $url = sprintf("/game/move/%s/from/%s", Utility::getRandomCard($userId3Cards), $userId3);
-        $client2->request("POST", $url);
+        $url = sprintf('/game/move/%s/from/%s', Utility::getRandomCard($userId3Cards), $userId3);
+        $client2->request('POST', $url);
         $res = $client2->getResponse();
 
         $expected = [

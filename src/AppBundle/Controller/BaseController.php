@@ -24,10 +24,6 @@ class BaseController extends Controller
     protected $userId;
     protected $gameId;
 
-    public function __construct()
-    {
-    }
-
     // ----- Protected methods -----
 
     protected function init()

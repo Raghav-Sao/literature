@@ -6,11 +6,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DefaultController extends BaseController
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function indexAction()
     {
         $this->init();
