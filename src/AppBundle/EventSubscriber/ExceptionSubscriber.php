@@ -6,7 +6,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-use PHPUnit\Framework\TestCase;
+use AppBundle\Controller\Response;
 
 /**
  *
@@ -22,8 +22,6 @@ class ExceptionSubscriber implements EventSubscriberInterface
         return [
            KernelEvents::EXCEPTION => [
                ["processException", 10],
-               ["logException",      0],
-               ["notifyException", -10],
            ],
         ];
     }
@@ -39,7 +37,6 @@ class ExceptionSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @codeCoverageIgnore
      *
      * @param GetResponseForExceptionEvent $event
      *
@@ -48,29 +45,37 @@ class ExceptionSubscriber implements EventSubscriberInterface
     public function processException(GetResponseForExceptionEvent $event)
     {
         // ...
-    }
+        $e = $event->getException();
 
-    /**
-     * @codeCoverageIgnore
-     *
-     * @param GetResponseForExceptionEvent $event
-     *
-     * @return
-     */
-    public function logException(GetResponseForExceptionEvent $event)
-    {
-        // ...
-    }
+        /**
+         * Handles controller's exceptions
+         * - Sets error response in event and sends it back
+         */
 
-    /**
-     * @codeCoverageIgnore
-     *
-     * @param GetResponseForExceptionEvent $event
-     *
-     * @return
-     */
-    public function notifyException(GetResponseForExceptionEvent $event)
-    {
-        // ...
+        $response = null;
+
+        switch (get_class($e)) {
+            case "AppBundle\Exception\BadRequestException":
+                $response = new Response\Error($e, Response\Error::HTTP_BAD_REQUEST);
+                break;
+
+            case "AppBundle\Exception\NotFoundException":
+                $response = new Response\Error($e, Response\Error::HTTP_NOT_FOUND);
+                break;
+
+            default:
+                break;
+        }
+
+        if ($response) {
+            $event->setResponse($response);
+        }
+
+        /** --- */
+
+        /**
+         * In other unknown cases, just log it and let it bubble up as 5xx
+         */
+        $this->logger->error($e);
     }
 }
