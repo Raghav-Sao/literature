@@ -52,6 +52,7 @@ class Game
             $this->$property = $value;
         }
 
+        // Sets teams
         $this->teams = [
             GameK::TEAM_1 => [$this->u1, $this->u3],
             GameK::TEAM_2 => [$this->u2, $this->u4],
@@ -80,6 +81,8 @@ class Game
         string $userSN
     )
     {
+        // Checks if given serial number is vacant for new users
+
         if (property_exists($this, $userSN) === false)
         {
             throw new BadRequestException('Invalid user serial number');
@@ -90,6 +93,7 @@ class Game
 
     public function isAnySNVacant()
     {
+        // Checks if any serial number is vacant at all in the game
 
         return ($this->u1 == null ||
                 $this->u2 == null ||
@@ -120,10 +124,10 @@ class Game
     )
     {
 
-        $team = [$this->u1, $this->u3];
+        // Checks if given two users are team
 
-        $x = in_array($userId1, $team, true);
-        $y = in_array($userId2, $team, true);
+        $x = in_array($userId1, $this->teams[GameK::TEAM_1], true);
+        $y = in_array($userId2, $this->teams[GameK::TEAM_1], true);
 
         return ($x === $y);
     }
@@ -180,11 +184,43 @@ class Game
         }
     }
 
-    public function getUserIdsOfTeam(
+    public function getTeamUsers(
         string $team
     )
     {
         return $this->teams[$team];
+    }
+
+    public function getTeam(
+        string $userId
+    )
+    {
+        // Returns team of given user id
+
+        if (in_array($userId, $this->teams[GameK::TEAM_1]))
+        {
+            return GameK::TEAM_1;
+        }
+        else
+        {
+            return GameK::TEAM_2;
+        }
+    }
+
+    public function getOppTeam(
+        string $userId
+    )
+    {
+        // Returns opposite team for given user id
+
+        if (in_array($userId, $this->teams[GameK::TEAM_1]))
+        {
+            return GameK::TEAM_2;
+        }
+        else
+        {
+            return GameK::TEAM_1;
+        }
     }
 
     public function toArray()
@@ -201,4 +237,22 @@ class Game
             'u4'        => $this->u4,
         ];
     }
+
+    //
+    // Setters
+
+    public function incrPoint(
+        string $userId,
+        float  $point
+    )
+    {
+        // Increments points by given amount for given user
+
+        $property = $this->getSNByUserId($userId) . "Points";
+
+        $this->$property += $point;
+
+        return $this;
+    }
+
 }

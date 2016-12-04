@@ -309,12 +309,12 @@ class GameControllerTest extends AbstractControllerTest
 
         $expected = [
             'success'      => false,
-            'errorCode'    => Exception\Code::BAD_REQUEST,
-            'errorMessage' => 'Bad value for fromUserId, Does not exists',
-            'extra'        => [],
+            'errorCode'    => Exception\Code::NOT_FOUND,
+            'errorMessage' => 'Cards not found for given user',
+            // 'extra'        => [],
         ];
 
-        $resBody = $this->makeFirstAssertions($res, 400, $expected);
+        $resBody = $this->makeFirstAssertions($res, 404, $expected);
 
         // Attempt with {fromUserId} = The other partner
         $url = sprintf('/game/move/%s/from/%s', Utility::getRandomCard($userId3Cards), $userId3);

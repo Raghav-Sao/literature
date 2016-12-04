@@ -37,6 +37,7 @@ class GameService extends BaseService
         string $id
     )
     {
+        // Gets game model by id
 
         $hash = $this->redis->hgetall($id);
 
@@ -48,89 +49,23 @@ class GameService extends BaseService
         return new Game($id, $hash);
     }
 
-    public function delete(
-        Game $game
-    )
-    {
-        $this->redis->del(
-            $game->id,
-            $game->u1,
-            $game->u2,
-            $game->u3,
-            $game->u4
-        );
-
-        return $this;
-    }
-
     public function getUser(
         string $id
     )
     {
+        // Gets user model by id
+
         $set = $this->redis->smembers($id);
 
         if (empty($set))
         {
-            throw new NotFoundException(
-                'Cards not found for given user',
-                ['id' => $id]
-            );
+            $error = 'Cards not found for given user';
+            $extra   = ['id' => $id];
+
+            throw new NotFoundException($error, $extra);
         }
-        else
-        {
-            return new User($id, $set);
-        }
-    }
 
-    public function init(
-        string $userId
-    )
-    {
-
-        $id = Utility::newGameId();
-
-        list($u1Cards, $u2Cards, $u3Cards, $u4Cards) = Utility::distributeCards();
-
-        // TODO:
-        // - Set other defaults
-
-        $hash = $this->redis->hmset(
-            $id,
-
-            GameK::CREATED_AT,
-            Utility::currentTimeStamp(),
-
-            GameK::U1,
-            $userId,
-
-            GameK::STATUS,
-            Status::INITIALIZED,
-
-            GameK::NEXT_TURN,
-            GameK::U1,
-
-            GameK::U1_CARDS,
-            implode(',', $u1Cards),
-
-            GameK::U2_CARDS,
-            implode(',', $u2Cards),
-
-            GameK::U3_CARDS,
-            implode(',', $u3Cards),
-
-            GameK::U4_CARDS,
-            implode(',', $u4Cards)
-        );
-
-        call_user_func_array(
-            [$this->redis, 'sadd'],
-            array_merge([$userId], $u1Cards)
-        );
-
-        return [
-            $this->get($id),
-            $this->getUser($userId),
-        ];
+        return new User($id, $set);
     }
 
     public function getAndValidate(
@@ -138,6 +73,8 @@ class GameService extends BaseService
         string $userId
     )
     {
+        // Gets game model by given id and validates
+        // if given userId belongs to the game.
 
         $game = $this->get($id);
 
@@ -145,22 +82,48 @@ class GameService extends BaseService
         {
             $this->delete($game);
 
-            throw new BadRequestException(
-                'Game with given id is no longer active'
-            );
+            $error = 'Game with given id is no longer active';
+
+            throw new BadRequestException($error);
         }
 
         if ($userId && $game->hasUser($userId) === false)
         {
-            throw new BadRequestException(
-                'You do not belong to game with given id'
-            );
+            $error = 'You do not belong to game with given id';
+
+            throw new BadRequestException($error);
         }
 
-        return [
-            $game,
-            $this->getUser($userId),
-        ];
+        $user = $this->getUser($userId);
+
+        return [$game, $user];
+    }
+
+    public function init(
+        string $userId
+    )
+    {
+        // Initializes a game with given userId as first member
+
+        // - Creates game hash
+
+        $id    = Utility::newGameId();
+        $cards = Utility::distributeCards();
+
+        $hash = $this->getInitHash($id, $userId, $cards);
+
+        call_user_func_array([$this->redis, 'hmset'], $hash);
+
+        // - Creates user's cards set
+
+        $arg = array_merge([$userId], $cards[0]);
+
+        call_user_func_array([$this->redis, 'sadd'], $arg);
+
+        $game = $this->get($id);
+        $user = $this->getUser($userId);
+
+        return [$game, $user];
     }
 
     public function join(
@@ -169,6 +132,7 @@ class GameService extends BaseService
         string $userId
     )
     {
+        // Given userId joins the game at given position(serial number)
 
         $game = $this->get($gameId);
 
@@ -178,10 +142,16 @@ class GameService extends BaseService
         }
 
         $game->$atSN = $userId;
+
+        // If all 4 users joined then update game hash with required info
+
         if ($game->isAnySNVacant() === false)
         {
-            $game->status = Status::ACTIVE;
+            $game->status            = Status::ACTIVE;
+            $game->prevTurnTimeStamp = time();
         }
+
+        // Update game hash with updated info
 
         $this->redis->hmset(
             $game->id,
@@ -190,28 +160,30 @@ class GameService extends BaseService
             $userId,
 
             GameK::STATUS,
-            $game->status
+            $game->status,
+
+            GameK::PREV_TURN_TIMESTAMP,
+            $game->prevTurnTimeStamp
         );
 
-        call_user_func_array(
-            [$this->redis, 'sadd'],
-            array_merge([$userId], $game->getInitCardsBySN($atSN))
-        );
+        // Creates init cards set for new users who joined
+
+        $cards = $game->getInitCardsBySN($atSN);
+        $arg   = array_merge([$userId], $cards);
+
+        call_user_func_array([$this->redis, 'sadd'], $arg);
+
+        // Publish this action
 
         $payload = [
             'atSN' => $atSN,
             'game' => $game->toArray(),
         ];
-        $this->pubSub->trigger(
-            $game->id,
-            Event::GAME_JOIN_ACTION,
-            $payload
-        );
+        $this->pubSub->trigger($game->id, Event::GAME_JOIN_ACTION, $payload);
 
-        return [
-            $game,
-            $this->getUser($userId),
-        ];
+        $user = $this->getUser($userId);
+
+        return [$game, $user];
     }
 
     public function moveCard(
@@ -221,106 +193,63 @@ class GameService extends BaseService
         string $toUserId
     )
     {
-        if ($game->isActive() === false)
-        {
-            throw new BadRequestException('Game is not active');
-        }
-
-        if (Utility::isValidCard($card) === false)
-        {
-            throw new BadRequestException('Not a valid card');
-        }
-
-        if ($game->hasUser($fromUserId) === false)
-        {
-            throw new BadRequestException('Bad value for fromUserId, Does not exists');
-        }
-
-        if ($game->getNextTurnUserId() !== $toUserId)
-        {
-            throw new BadRequestException('It is not your turn to make a move');
-        }
-
-        if ($game->areTeam($fromUserId, $toUserId))
-        {
-            throw new BadRequestException('Bad value for fromUserId, You are partners');
-        }
+        // Attempts moving given card between given users of game
 
         $toUser   = $this->getUser($toUserId);
-
-        if ($toUser->hasCard($card))
-        {
-            throw new BadRequestException('Bad value for card, You have it already');
-        }
-
-        if ($toUser->hasAtLeastOneCardOfType($card) === false)
-        {
-            $payload = [
-                'success' => true,
-                'game'    => $game->toArray(),
-            ];
-
-            $this->pubSub->trigger(
-                $game->id,
-                Event::GAME_MOVE_ACTION,
-                $payload
-            );
-
-            throw new BadRequestException(
-                'You do not have at least one card of that type. Invalid move'
-            );
-        }
-
         $fromUser = $this->getUser($fromUserId);
 
-        // TODOs:
+        $this->validateMove($game, $card, $fromUser, $toUser);
+
+        // TODO:
         // Check game completion and other stuff
 
-        $success = false;
+        $success = true;
 
-        if ($fromUser->hasCard($card) === false)
+        if ($fromUser->hasCard($card))
         {
-            // Set game turn
-            $fromUserSN = $game->getSNByUserId($fromUser->id);
-            $this->redis->hmset(
-                $game->id,
+            $this->redis->smove($fromUser->id, $toUser->id, $card);
 
-                GameK::NEXT_TURN,
-                $fromUserSN
-            );
-            $game->nextTurn = $fromUserSN;
-
-            $success = false;
-        }
-        else
-        {
-            // Move the card
-            $this->redis->smove(
-                $fromUser->id,
-                $toUser->id,
-                $card
-            );
             $fromUser->removeCard($card);
             $toUser->addCard($card);
 
             $success = true;
         }
+        else
+        {
+            // Else, update turns in the game
+
+            $game->prevTurn = $game->nextTurn;
+
+            $fromUserSN     = $game->getSNByUserId($fromUser->id);
+            $game->nextTurn = $fromUserSN;
+
+            $success = false;
+        }
+
+        // Update game has with nextTurn, prevTurn, prevTurnTimeStamp
+
+        $this->redis->hmset(
+            $game->id,
+
+            GameK::PREV_TURN,
+            $game->prevTurn,
+
+            GameK::PREV_TURN_TIMESTAMP,
+            time(),
+
+            GameK::NEXT_TURN,
+            $game->nextTurn
+        );
+
+        // Publish this action
 
         $payload = [
             'success' => $success,
             'game'    => $game->toArray(),
         ];
-        $this->pubSub->trigger(
-            $game->id,
-            Event::GAME_MOVE_ACTION,
-            $payload
-        );
+        $this->pubSub->trigger($game->id, Event::GAME_MOVE_ACTION, $payload);
 
-        return [
-            $success,
-            $game,
-            $toUser,
-        ];
+        return [$success, $game, $toUser];
     }
 
     public function show(
@@ -332,7 +261,7 @@ class GameService extends BaseService
     {
         list($success, $payload) = $this->attemptConsumeCardsOfTypeAndRange(
             $game,
-            $game->getTeamForUserId($user->id),
+            $game->getTeam($user->id),
             $cardType,
             $cardRange
         );
@@ -344,7 +273,7 @@ class GameService extends BaseService
 
         list($success, $payload2) = $this->attemptConsumeCardsOfTypeAndRange(
             $game,
-            $game->getTeamOppositeForUserId($user->id),
+            $game->getOppTeam($user->id),
             $cardType,
             $cardRange,
             true
@@ -361,7 +290,7 @@ class GameService extends BaseService
         bool   $partial = false
     )
     {
-        $userIds      = $game->getUserIdsOfTeam($team);
+        $userIds      = $game->getTeamUsers($team);
 
         $user1        = $this->getUser($userIds[0]);
         $u1Cards      = Utility::filterCardsByTypeAndRange($cardType, $cardRange);
@@ -430,11 +359,8 @@ class GameService extends BaseService
             $u2Points,
         ];
 
-        // TODO:
-        // - Update local model too
-        // - Implement those game model methods too
-        // - Add tests
-        // - Refactor and refactor again :)
+        $game->incrPoint($user1->id, $u1Points);
+        $game->incrPoint($user2->id, $u2Points);
 
         call_user_func_array(
             [$this->redis, 'hincrby'],
@@ -448,5 +374,139 @@ class GameService extends BaseService
         );
 
         return [true, $payload];
+    }
+
+    public function delete(
+        Game $game
+    )
+    {
+        // Deletes all redis keys for given game
+
+        $this->redis->del(
+            $game->id,
+            $game->u1,
+            $game->u2,
+            $game->u3,
+            $game->u4
+        );
+
+        return $this;
+    }
+
+    // ----------------------------------------------------------------------
+    // Protected methods
+
+    protected function getInitHash(
+        string $id,     // Game id
+        string $userId, // First user in game
+        array  $cards   // 4 Set of cards for all users in game
+    )
+    {
+        // Returns initial game hash, with userId as firt member
+
+        $hash = [
+            $id,
+
+            GameK::CREATED_AT,
+            Utility::currentTimeStamp(),
+
+            GameK::STATUS,
+            Status::INITIALIZED,
+
+            // prevTurn, prevTurnTimeStamp null at this point
+
+            GameK::NEXT_TURN,
+            GameK::U1,
+
+            GameK::U1,
+            $userId,
+
+            // u2, u3 & u4 null at this point
+
+            GameK::U1_POINTS,
+            0,
+
+            GameK::U2_POINTS,
+            0,
+
+            GameK::U3_POINTS,
+            0,
+
+            GameK::U4_POINTS,
+            0,
+
+            GameK::U1_CARDS,
+            implode(',', $cards[0]),
+
+            GameK::U2_CARDS,
+            implode(',', $cards[1]),
+
+            GameK::U3_CARDS,
+            implode(',', $cards[2]),
+
+            GameK::U4_CARDS,
+            implode(',', $cards[3]),
+        ];
+
+        return $hash;
+    }
+
+    protected function validateMove(
+        Game   $game,
+        string $card,
+        User   $fromUser,
+        User   $toUser
+    )
+    {
+        // Does necessary validations for move action in a game
+
+        if ($game->isActive() === false)
+        {
+            $error = 'Game is not active';
+
+            throw new BadRequestException($error);
+        }
+
+        if (Utility::isValidCard($card) === false)
+        {
+            $error = 'Not a valid card';
+
+            throw new BadRequestException($error);
+        }
+
+        if ($game->hasUser($fromUser->id) === false)
+        {
+            $error = 'Bad value for fromUserId, Does not exists';
+
+            throw new BadRequestException($error);
+        }
+
+        if ($game->getNextTurnUserId() !== $toUser->id)
+        {
+            $error = 'It is not your turn to make a move';
+
+            throw new BadRequestException($error);
+        }
+
+        if ($game->areTeam($fromUser->id, $toUser->id))
+        {
+            $error = 'Bad value for fromUserId, You are partners';
+
+            throw new BadRequestException($error);
+        }
+
+        if ($toUser->hasCard($card))
+        {
+            $error = 'Bad value for card, You have it already';
+
+            throw new BadRequestException($error);
+        }
+
+        if ($toUser->hasAtLeastOneCardOfType($card) === false)
+        {
+            $error = 'You do not have at least one card of that type. Invalid move';
+
+            throw new BadRequestException($error);
+        }
     }
 }

@@ -60,10 +60,10 @@ class BaseController extends Controller
 
         if ($game && $game->isNotExpired() && $game->hasUser($this->userId))
         {
-            throw new BadRequestException(
-                'You are already in an active game',
-                ['gameId' => $this->gameId]
-            );
+            $error = 'You are already in an active game';
+            $extra = ['gameId' => $this->gameId];
+
+            throw new BadRequestException($error, $extra);
         }
 
         if ($game && $game->isExpired())
