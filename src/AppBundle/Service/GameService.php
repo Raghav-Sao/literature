@@ -200,9 +200,6 @@ class GameService extends BaseService
 
         $this->validateMove($game, $card, $fromUser, $toUser);
 
-        // TODO:
-        // Check game completion and other stuff
-
         $success = true;
 
         if ($fromUser->hasCard($card))
@@ -227,6 +224,12 @@ class GameService extends BaseService
         }
 
         // Update game has with nextTurn, prevTurn, prevTurnTimeStamp
+
+        // TODO:
+        // - Proper assignment of nextTurn
+        //   If the user doesn't have any cards left then do not assign him
+        //   as nextTurn user
+        // - Proper publishing of such action/event
 
         $this->redis->hmset(
             $game->id,
@@ -284,6 +287,9 @@ class GameService extends BaseService
             $cardRange,
             true
         );
+
+        // TODO:
+        // - Check game completion: Complete game and publish the action
 
         return [false, $payload1, $payload2];
     }
