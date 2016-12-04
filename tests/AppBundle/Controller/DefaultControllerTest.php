@@ -6,7 +6,7 @@ use AppBundle\Exception;
 
 class DefaultControllerTest extends AbstractControllerTest
 {
-    public function testIndex()
+    public function testIndexWithoutGame()
     {
         $client = static::createClient();
 
@@ -14,22 +14,32 @@ class DefaultControllerTest extends AbstractControllerTest
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
         $this->assertContains('Start a game', $crawler->filter('a')->text());
+    }
 
-        // Now after creating a game, index page should throw 400
+    public function testIndexWithGame()
+    {
+        $client = static::createClient();
+
+        // Start a game
+
         $client->request('GET', '/game/start');
+
         $res = $client->getResponse();
 
         $resBody = $this->makeFirstAssertions($res, 200);
 
+        // Now, visit index page
+
         $client->request('GET', '/');
+
         $res = $client->getResponse();
 
         $expected = [
             'success'      => false,
             'errorCode'    => Exception\Code::BAD_REQUEST,
-            'errorMessage' => 'You are already in an active game',
+            'errorMessage' => 'You appear to be active in a game',
             'extra'        => [
-                'gameId'   => $resBody->response->game->id,
+                'id'       => $resBody->response->game->id,
             ],
         ];
 

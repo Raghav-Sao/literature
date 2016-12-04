@@ -51,8 +51,8 @@ class ExceptionSubscriber implements EventSubscriberInterface
                 $response = new Response\Error($e, Response\Error::HTTP_NOT_FOUND);
                 break;
 
-            default:
-                break;
+            // default:
+            //     break;
         }
 
         if ($response)

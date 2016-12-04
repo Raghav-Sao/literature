@@ -148,7 +148,7 @@ class GameService extends BaseService
         if ($game->isAnySNVacant() === false)
         {
             $game->status            = Status::ACTIVE;
-            $game->prevTurnTimeStamp = time();
+            $game->prevTurnTime = time();
         }
 
         // Update game hash with updated info
@@ -163,7 +163,7 @@ class GameService extends BaseService
             $game->status,
 
             GameK::PREV_TURN_TIMESTAMP,
-            $game->prevTurnTimeStamp
+            $game->prevTurnTime
         );
 
         // Creates init cards set for new users who joined
@@ -223,7 +223,7 @@ class GameService extends BaseService
             $success = false;
         }
 
-        // Update game has with nextTurn, prevTurn, prevTurnTimeStamp
+        // Update game has with nextTurn, prevTurn, prevTurnTime
 
         // TODO:
         // - Proper assignment of nextTurn
@@ -331,7 +331,7 @@ class GameService extends BaseService
             GameK::STATUS,
             Status::INITIALIZED,
 
-            // prevTurn, prevTurnTimeStamp null at this point
+            // prevTurn, prevTurnTime null at this point
 
             GameK::NEXT_TURN,
             GameK::U1,

@@ -13,7 +13,7 @@ class Game
     public $createdAt;
     public $status;
     public $prevTurn;
-    public $prevTurnTimeStamp;
+    public $prevTurnTime;
     public $nextTurn;
 
     // @codingStandardsIgnoreStart
@@ -37,6 +37,8 @@ class Game
 
     public $teams;
 
+    public $index;
+
     public function __construct(
         string $id,
         array  $params
@@ -56,6 +58,14 @@ class Game
         $this->teams = [
             GameK::TEAM_1 => [$this->u1, $this->u3],
             GameK::TEAM_2 => [$this->u2, $this->u4],
+        ];
+
+        // Sets index
+        $this->index = [
+            $this->u1 => GameK::U1,
+            $this->u2 => GameK::U2,
+            $this->u3 => GameK::U3,
+            $this->u4 => GameK::U4,
         ];
     }
 
@@ -105,17 +115,7 @@ class Game
         string $userId
     )
     {
-
-        return in_array(
-            $userId,
-            [
-                $this->u1,
-                $this->u2,
-                $this->u3,
-                $this->u4,
-            ],
-            true
-        );
+        return in_array($userId, array_keys($this->index), true);
     }
 
     public function areTeam(
@@ -136,28 +136,7 @@ class Game
         string $userId
     )
     {
-        switch ($userId)
-        {
-            case $this->u1:
-                return GameK::U1;
-                break;
-
-            case $this->u2:
-                return GameK::U2;
-                break;
-
-            case $this->u3:
-                return GameK::U3;
-                break;
-
-            case $this->u4:
-                return GameK::U4;
-                break;
-
-            default:
-                return null;
-                break;
-        }
+        return $this->index[$userId];
     }
 
     public function getNextTurnUserId()

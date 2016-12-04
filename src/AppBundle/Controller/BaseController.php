@@ -49,27 +49,17 @@ class BaseController extends Controller
         }
     }
 
-    protected function checkIfUserActiveInAGame()
+    protected function throwIfUserActiveInAnotherGame()
     {
         if ($this->gameId === false)
         {
             return;
         }
 
-        $game = $this->gameService->get($this->gameId);
+        $error = 'You appear to be active in a game';
+        $extra = ['id' => $this->gameId];
 
-        if ($game && $game->isNotExpired() && $game->hasUser($this->userId))
-        {
-            $error = 'You are already in an active game';
-            $extra = ['gameId' => $this->gameId];
-
-            throw new BadRequestException($error, $extra);
-        }
-
-        if ($game && $game->isExpired())
-        {
-            $this->gameService->delete($game);
-        }
+        throw new BadRequestException($error, $extra);
     }
 
     protected function setContext(

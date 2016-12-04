@@ -13,7 +13,7 @@ class GameController extends BaseController
     {
         $this->init();
 
-        $this->checkIfUserActiveInAGame();
+        $this->throwIfUserActiveInAnotherGame();
 
         list($game, $user) = $this->gameService->init($this->userId);
 
@@ -53,7 +53,7 @@ class GameController extends BaseController
 
         $this->init();
 
-        $this->checkIfUserActiveInAGame();
+        $this->throwIfUserActiveInAnotherGame();
 
         list($game, $user) = $this->gameService
                                   ->join(

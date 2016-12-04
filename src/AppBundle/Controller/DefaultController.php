@@ -10,7 +10,7 @@ class DefaultController extends BaseController
     {
         $this->init();
 
-        $this->checkIfUserActiveInAGame();
+        $this->throwIfUserActiveInAnotherGame();
 
         $content = $this->render('AppBundle:Default:index.html.twig')
                         ->getContent();

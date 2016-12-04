@@ -107,12 +107,12 @@ class Utility
         return array_chunk($cards, 12);
     }
 
-    public static function getRandomCard(
-        array & $cards
-    )
-    {
-        return $cards[array_rand($cards, 1)];
-    }
+    // public static function getRandomCard(
+    //     array & $cards
+    // )
+    // {
+    //     return $cards[array_rand($cards, 1)];
+    // }
 
     public static function filterCardsByTypeAndRange(
         array $cards,
