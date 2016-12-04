@@ -51,20 +51,17 @@ class ExceptionSubscriber implements EventSubscriberInterface
                 $response = new Response\Error($e, Response\Error::HTTP_NOT_FOUND);
                 break;
 
-            // default:
-            //     break;
+            // @codeCoverageIgnoreStart
+            default:
+                // In other unkown cases, just log the error and let it bubble up
+                $this->logger->error($e);
+                break;
+            // @codeCoverageIgnoreEnd
         }
 
         if ($response)
         {
             $event->setResponse($response);
         }
-
-        /** --- */
-
-        /**
-         * In other unknown cases, just log it and let it bubble up as 5xx
-         */
-        $this->logger->error($e);
     }
 }
