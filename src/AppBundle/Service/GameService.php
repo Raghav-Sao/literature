@@ -259,7 +259,11 @@ class GameService extends BaseService
         string $cardRange
     )
     {
-        list($success, $payload) = $this->attemptConsumeCardsOfTypeAndRange(
+        // Consumes cards of given type and range and set points
+
+        // - Attemps consume for team of given user
+
+        list($success, $payload1) = $this->showAndConsumeCardsByTeam(
             $game,
             $game->getTeam($user->id),
             $cardType,
@@ -268,10 +272,12 @@ class GameService extends BaseService
 
         if ($success)
         {
-            return [$success, $payload, []];
+            return [$success, $payload1, []];
         }
 
-        list($success, $payload2) = $this->attemptConsumeCardsOfTypeAndRange(
+        // - Else, consumes for opposite team of given user
+
+        list($success, $payload2) = $this->showAndConsumeCardsByTeam(
             $game,
             $game->getOppTeam($user->id),
             $cardType,
@@ -279,101 +285,7 @@ class GameService extends BaseService
             true
         );
 
-        return [false, $payload, $payload2];
-    }
-
-    protected function attemptConsumeCardsOfTypeAndRange(
-        Game   $game,
-        string $team,
-        string $cardType,
-        string $cardRange,
-        bool   $partial = false
-    )
-    {
-        $userIds      = $game->getTeamUsers($team);
-
-        $user1        = $this->getUser($userIds[0]);
-        $u1Cards      = Utility::filterCardsByTypeAndRange($cardType, $cardRange);
-        $u1CardsCount = count($u1Cards);
-
-        $u2Cards      = [];
-        $u2CardsCount = 0;
-
-        if ($u1CardsCount < Card::MAX_PER_TYPE_RANGE)
-        {
-            $user2        = $this->getUser($userIds[1]);
-            $u2Cards      = Utility::filterCardsByTypeAndRange($cardType, $cardRange);
-            $u2CardsCount = count($u2Cards);
-        }
-
-        $payload = [
-            'game' => $game->toArray(),
-            'u1'   => [
-                'id'    => $user1->id,
-                'cards' => $u1Cards,
-            ],
-            'u2'   => [
-                'id'    => $user2->id,
-                'cards' => $u2Cards,
-            ],
-        ];
-
-        if ($u1CardsCount + $u2CardsCount < Card::MAX_PER_TYPE_RANGE &&
-            $partial === false)
-        {
-            return [false, $payload];
-        }
-
-        $u1Points = 0;
-        $u2Points = 0;
-
-        if ($u1CardsCount > 0)
-        {
-            call_user_func_array(
-                [$this->redis, 'srem'],
-                array_merge([$user1->id], $u1Cards)
-            );
-            $user1->removeCards($u1Cards);
-
-            $u1Points = $u1CardsCount / (float) Card::MAX_PER_TYPE_RANGE;
-        }
-
-        if ($u2CardsCount > 0)
-        {
-            call_user_func_array(
-                [$this->redis, 'srem'],
-                array_merge([$user2->id], $u1Cards)
-            );
-            $user2->removeCards($u1Cards);
-
-            $u1Points = $u2CardsCount / (float) Card::MAX_PER_TYPE_RANGE;
-        }
-
-        $hash = [
-            $game->id,
-
-            GameK::U1_POINTS,
-            $u1Points,
-
-            GameK::U2_POINTS,
-            $u2Points,
-        ];
-
-        $game->incrPoint($user1->id, $u1Points);
-        $game->incrPoint($user2->id, $u2Points);
-
-        call_user_func_array(
-            [$this->redis, 'hincrby'],
-            $hash
-        );
-
-        $this->pubSub->trigger(
-            $game->id,
-            Event::GAME_SHOW_ACTION,
-            $payload
-        );
-
-        return [true, $payload];
+        return [false, $payload1, $payload2];
     }
 
     public function delete(
@@ -508,5 +420,114 @@ class GameService extends BaseService
 
             throw new BadRequestException($error);
         }
+    }
+
+    protected function showAndConsumeCardsByTeam(
+        Game   $game,
+        string $team,
+        string $cardType,
+        string $cardRange,
+        bool   $partial = false
+    )
+    {
+        // Flow:
+
+        // - Gets team users
+        // - Gets cards of given type and range for both users
+        // - Assign scores to the users based in ratio
+
+        // - If partial is set to false:
+        //   - If total filtered cards count is not complete, return and dont' give
+        //     any score
+        // - If partial is set to true:
+        //   - Even if total filtered cards count is not complete, assign scores in
+        //     ration (Case: opposite team has the missing cards)
+
+        // - Publishes the action with pre-defined payload
+
+        $userIds      = $game->getTeamUsers($team);
+
+        $user1        = $this->getUser($userIds[0]);
+        $u1Cards      = Utility::filterCardsByTypeAndRange($cardType, $cardRange);
+        $u1CardsCount = count($u1Cards);
+
+        $u2Cards      = [];
+        $u2CardsCount = 0;
+
+        if ($u1CardsCount < Card::MAX_PER_TYPE_RANGE)
+        {
+            $user2        = $this->getUser($userIds[1]);
+            $u2Cards      = Utility::filterCardsByTypeAndRange($cardType, $cardRange);
+            $u2CardsCount = count($u2Cards);
+        }
+
+        $payload = [
+            'game' => $game->toArray(),
+            'u1'   => [
+                'id'    => $user1->id,
+                'cards' => $u1Cards,
+            ],
+            'u2'   => [
+                'id'    => $user2->id,
+                'cards' => $u2Cards,
+            ],
+        ];
+
+        if ($u1CardsCount + $u2CardsCount < Card::MAX_PER_TYPE_RANGE &&
+            $partial === false)
+        {
+            return [false, $payload];
+        }
+
+        $u1Points = 0;
+        $u2Points = 0;
+
+        if ($u1CardsCount > 0)
+        {
+            call_user_func_array(
+                [$this->redis, 'srem'],
+                array_merge([$user1->id], $u1Cards)
+            );
+            $user1->removeCards($u1Cards);
+
+            $u1Points = $u1CardsCount / (float) Card::MAX_PER_TYPE_RANGE;
+        }
+
+        if ($u2CardsCount > 0)
+        {
+            call_user_func_array(
+                [$this->redis, 'srem'],
+                array_merge([$user2->id], $u1Cards)
+            );
+            $user2->removeCards($u1Cards);
+
+            $u1Points = $u2CardsCount / (float) Card::MAX_PER_TYPE_RANGE;
+        }
+
+        $hash = [
+            $game->id,
+
+            GameK::U1_POINTS,
+            $u1Points,
+
+            GameK::U2_POINTS,
+            $u2Points,
+        ];
+
+        $game->incrPoint($user1->id, $u1Points);
+        $game->incrPoint($user2->id, $u2Points);
+
+        call_user_func_array(
+            [$this->redis, 'hincrby'],
+            $hash
+        );
+
+        $this->pubSub->trigger(
+            $game->id,
+            Event::GAME_SHOW_ACTION,
+            $payload
+        );
+
+        return [true, $payload];
     }
 }

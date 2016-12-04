@@ -116,18 +116,20 @@ class GameController extends BaseController
                                         $this->userId
                                     );
 
-        list($success, $game, $user) = $this->gameService
-                                            ->show(
-                                                $game,
-                                                $user,
-                                                $cardType,
-                                                $cardRange
-                                            );
+        list($success, $payload1, $payload2) = $this->gameService
+                                                    ->show(
+                                                        $game,
+                                                        $user,
+                                                        $cardType,
+                                                        $cardRange
+                                                    );
 
         $res = [
-            "success" => $success,
-            "game"    => $game->toArray(),
-            "user"    => $user->toArray(),
+            'success'  => $success,
+            'game'     => $game->toArray(),
+            'user'     => $user->toArray(),
+            'payload1' => $payload1,
+            'payload2' => $payload2
         ];
 
         return new Response\Ok($res);
