@@ -5,9 +5,11 @@ namespace Tests\AppBundle\Service;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 use AppBundle\Service;
+use AppBundle\Model\Redis\Game;
 use AppBundle\Constant\Game\Game as GameK;
 use AppBundle\Constant\Game\Status;
 use AppBundle\Constant\Game\Card;
+
 use Tests\AppBundle\Model\Redis\GameTestData;
 use Tests\AppBundle\Model\Redis\UserTestData;
 
@@ -206,4 +208,82 @@ class GameTest extends KernelTestCase
 
         list($game, $user) = $this->service->join($id, GameK::U4, 'uid4');
     }
+
+        // Mock required in move endpoint (At most):
+        // - smembers: 2
+        // - smove:    1
+        // - hmset:    1
+
+        // - Pusher.trigger
+
+    /**
+     * @expectedException        \AppBundle\Exception\BadRequestException
+     * @expectedExceptionMessage Game is not active
+     *
+     */
+    public function testMoveInactiveGame()
+    {
+        $id   = GameTestData::id();
+        $hash = GameTestData::hash();
+        $game = new Game($id, $hash);
+
+        $card = Card::CLUB_4;
+
+        $toUserId    = UserTestData::id();
+        $toUserSet   = UserTestData::set();
+
+        $fromUserId  = UserTestData::id('uid2');
+        $fromUserSet = UserTestData::set([Card::CLUB_4, Card::CLUB_5], true);
+
+        $consecutiveReturns = $this->onConsecutiveCalls(
+                                        $toUserSet,
+                                        $fromUserSet
+                                    );
+        $this->redis->method('smembers')->will($consecutiveReturns);
+
+        list($success, $game, $toUser) = $this->service
+                                              ->moveCard(
+                                                    $game,
+                                                    $card,
+                                                    $fromUserId,
+                                                    $toUserId
+                                                );
+    }
+
+    public function testMoveInvalidCard()
+    {
+    }
+
+    public function testMoveInvalidFromUser()
+    {
+    }
+
+    public function testMoveInvalidTurn()
+    {
+    }
+
+    public function testMoveBadFromUser()
+    {
+        // From and To users are team
+    }
+
+    public function testMoveBadCard()
+    {
+        // You already have that card
+    }
+
+    public function testMoveBadCardAgain()
+    {
+        // You dont' have cards of that type and range
+    }
+
+    public function testMoveSuccess()
+    {
+    }
+
+    public function testMoveFail()
+    {
+    }
+
+
 }

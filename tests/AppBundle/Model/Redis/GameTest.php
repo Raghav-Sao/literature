@@ -9,7 +9,7 @@ class GameTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstruct()
     {
-        $id = GameTestData::id();
+        $id   = GameTestData::id();
         $hash = GameTestData::hash();
 
         $game = new Game($id, $hash);
@@ -94,7 +94,7 @@ class GameTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsSNVacantWithBadInput()
     {
-        $id = GameTestData::id();
+        $id   = GameTestData::id();
         $hash = GameTestData::hash();
 
         $game = new Game($id, $hash);
