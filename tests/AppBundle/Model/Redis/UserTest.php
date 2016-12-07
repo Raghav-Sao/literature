@@ -17,9 +17,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
         // Assert $game's properties
 
         $this->assertEquals($id, $user->id);
-
-        // TODO:
-        // - Assert other fields too..
+        $this->assertCount(12, $user->cards);
     }
 
     public function testHasCard()
