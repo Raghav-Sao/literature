@@ -52,4 +52,17 @@ class GameTestData
     {
         return array_merge(self::$hash, $overrideWith);
     }
+
+    public static function activeHash(
+        array $overrideWith = []
+    )
+    {
+        $hash = self::$hash;
+
+        $hash['u4_cards'] = 'c11,c12,c13,s11,s12,s13,d11,d12,d13,h11,h12,h13';
+        $hash['u4']       = 'uid4';
+        $hash['status']   = Status::ACTIVE;
+
+        return array_merge($hash, $overrideWith);
+    }
 }

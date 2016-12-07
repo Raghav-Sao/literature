@@ -202,6 +202,9 @@ class GameService extends BaseService
 
         $success = true;
 
+        $game->prevTurn     = $game->nextTurn;
+        $game->prevTurnTime = time();
+
         if ($fromUser->hasCard($card))
         {
             $this->redis->smove($fromUser->id, $toUser->id, $card);
@@ -213,9 +216,7 @@ class GameService extends BaseService
         }
         else
         {
-            // Else, update turns in the game
-
-            $game->prevTurn = $game->nextTurn;
+            // Else, update nextTurn
 
             $fromUserSN     = $game->getSNByUserId($fromUser->id);
             $game->nextTurn = $fromUserSN;
@@ -223,7 +224,7 @@ class GameService extends BaseService
             $success = false;
         }
 
-        // Update game has with nextTurn, prevTurn, prevTurnTime
+        // Update game hash with nextTurn, prevTurn, prevTurnTime
 
         // TODO:
         // - Proper assignment of nextTurn
@@ -238,7 +239,7 @@ class GameService extends BaseService
             $game->prevTurn,
 
             GameK::PREV_TURN_TIMESTAMP,
-            time(),
+            $game->prevTurnTime,
 
             GameK::NEXT_TURN,
             $game->nextTurn
