@@ -486,6 +486,9 @@ class GameService extends BaseService
             return [false, $payload];
         }
 
+        // Points will always be integer and equals to number of matching
+        // cards with each user.
+
         $u1Points = 0;
         $u2Points = 0;
 
@@ -497,7 +500,7 @@ class GameService extends BaseService
             );
             $user1->removeCards($u1Cards);
 
-            $u1Points = $u1CardsCount / (float) Card::MAX_PER_TYPE_RANGE;
+            $u1Points = $u1CardsCount;
         }
 
         if ($u2CardsCount > 0)
@@ -508,7 +511,7 @@ class GameService extends BaseService
             );
             $user2->removeCards($u1Cards);
 
-            $u1Points = $u2CardsCount / (float) Card::MAX_PER_TYPE_RANGE;
+            $u1Points = $u2CardsCount;
         }
 
         $hash = [

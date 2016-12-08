@@ -222,10 +222,10 @@ class Game
 
     public function incrPoint(
         string $userId,
-        float  $point
+        int    $point
     )
     {
-        // Increments points by given amount for given user
+        // Increments points by given value for given user
 
         $property = $this->getSNByUserId($userId) . "Points";
 

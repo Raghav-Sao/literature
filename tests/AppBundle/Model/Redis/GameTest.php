@@ -82,10 +82,10 @@ class GameTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(GameK::TEAM_2, $game->getOppTeam('uid3'));
         $this->assertEquals(GameK::TEAM_1, $game->getOppTeam('uid4'));
 
-        $game->incrPoint('uid1', 0.5);
-        $this->assertEquals(0.5, $game->u1Points);
-        $game->incrPoint('uid1', 0.8);
-        $this->assertEquals(1.3, $game->u1Points);
+        $game->incrPoint('uid1', 1);
+        $this->assertEquals(1, $game->u1Points);
+        $game->incrPoint('uid1', 2);
+        $this->assertEquals(3, $game->u1Points);
 
         $this->assertEquals(0, $game->u2Points);
     }
