@@ -6,6 +6,9 @@ use \Pusher as PusherClient;
 use AppBundle\Service\BaseService;
 use AppBundle\Service\Mock\PubSub\Pusher as PusherMock;
 
+/**
+ * @codeCoverageIgnore
+ */
 class Pusher extends BaseService implements PubSubInterface
 {
     protected $pusher;

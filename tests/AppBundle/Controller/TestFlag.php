@@ -3,7 +3,6 @@
 namespace Tests\AppBundle\Controller;
 
 /**
- * TODO:
  * - This is extensible and if required will have
  *   very awesome features. But for now it's okay.
  */

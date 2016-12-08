@@ -64,8 +64,7 @@ class AbstractControllerTest extends WebTestCase
             {
                 if (is_string($value) && TestFlag::isDefined($value))
                 {
-                    // TODO: Implement this
-                    // - For now it's okay
+                    //
                 }
                 else
                 {

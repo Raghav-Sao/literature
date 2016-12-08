@@ -29,9 +29,15 @@ game_join:
 
 game_move_card:
     path:     /game/move/{card}/from/{fromUserId}
-    methods:  [PATCH]
+    methods:  [POST]
     defaults:
         _controller: AppBundle:Game:moveFrom
+
+game_show:
+    path:     /game/show/{cardType}/{cardRange}
+    methods:  [POST]
+    defaults:
+        _controller: AppBundle:Game:show
 
 game_delete:
     path:     /game/delete

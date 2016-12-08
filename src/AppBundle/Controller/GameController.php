@@ -9,16 +9,11 @@ use AppBundle\Controller\Response;
 
 class GameController extends BaseController
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function startAction()
     {
         $this->init();
 
-        $this->checkIfUserActiveInAGame();
+        $this->throwIfUserActiveInAnotherGame();
 
         list($game, $user) = $this->gameService->init($this->userId);
 
@@ -53,11 +48,12 @@ class GameController extends BaseController
     public function joinAction(
         string $gameId,
         string $atSN
-    ) {
+    )
+    {
 
         $this->init();
 
-        $this->checkIfUserActiveInAGame();
+        $this->throwIfUserActiveInAnotherGame();
 
         list($game, $user) = $this->gameService
                                   ->join(
@@ -79,7 +75,8 @@ class GameController extends BaseController
     public function moveFromAction(
         string $card,
         string $fromUserId
-    ) {
+    )
+    {
 
         $this->init();
 
@@ -101,6 +98,38 @@ class GameController extends BaseController
             'success' => $success,
             'game'    => $game->toArray(),
             'user'    => $user->toArray(),
+        ];
+
+        return new Response\Ok($res);
+    }
+
+    public function showAction(
+      string $cardType,
+      string $cardRange
+    )
+    {
+        $this->init();
+
+        list($game, $user) = $this->gameService
+                                  ->getAndValidate(
+                                        $this->gameId,
+                                        $this->userId
+                                    );
+
+        list($success, $payload1, $payload2) = $this->gameService
+                                                    ->show(
+                                                        $game,
+                                                        $user,
+                                                        $cardType,
+                                                        $cardRange
+                                                    );
+
+        $res = [
+            'success'  => $success,
+            'game'     => $game->toArray(),
+            'user'     => $user->toArray(),
+            'payload1' => $payload1,
+            'payload2' => $payload2
         ];
 
         return new Response\Ok($res);

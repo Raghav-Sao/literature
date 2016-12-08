@@ -6,16 +6,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DefaultController extends BaseController
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function indexAction()
     {
         $this->init();
 
-        $this->checkIfUserActiveInAGame();
+        $this->throwIfUserActiveInAnotherGame();
 
         $content = $this->render('AppBundle:Default:index.html.twig')
                         ->getContent();

@@ -82,4 +82,16 @@ class User
 
         return $this;
     }
+
+    public function removeCards(
+        array $cards
+    )
+    {
+        foreach ($cards as $card)
+        {
+            $this->removeCard($card);
+        }
+
+        return $this;
+    }
 }

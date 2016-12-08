@@ -24,10 +24,6 @@ class BaseController extends Controller
     protected $userId;
     protected $gameId;
 
-    public function __construct()
-    {
-    }
-
     // ----- Protected methods -----
 
     protected function init()
@@ -53,27 +49,17 @@ class BaseController extends Controller
         }
     }
 
-    protected function checkIfUserActiveInAGame()
+    protected function throwIfUserActiveInAnotherGame()
     {
         if ($this->gameId === false)
         {
             return;
         }
 
-        $game = $this->gameService->get($this->gameId);
+        $error = 'You appear to be active in a game';
+        $extra = ['id' => $this->gameId];
 
-        if ($game && $game->isNotExpired() && $game->hasUser($this->userId))
-        {
-            throw new BadRequestException(
-                'You are already in an active game',
-                ['gameId' => $this->gameId]
-            );
-        }
-
-        if ($game && $game->isExpired())
-        {
-            $this->gameService->delete($game);
-        }
+        throw new BadRequestException($error, $extra);
     }
 
     protected function setContext(

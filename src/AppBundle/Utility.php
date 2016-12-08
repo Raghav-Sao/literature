@@ -107,10 +107,30 @@ class Utility
         return array_chunk($cards, 12);
     }
 
-    public static function getRandomCard(
-        array & $cards
+    // public static function getRandomCard(
+    //     array & $cards
+    // )
+    // {
+    //     return $cards[array_rand($cards, 1)];
+    // }
+
+    public static function filterCardsByTypeAndRange(
+        array $cards,
+        string $cardType,
+        string $cardRange
     )
     {
-        return $cards[array_rand($cards, 1)];
+
+        return array_filter(
+            $cards,
+            function ($card) use ($cardType, $cardRange)
+            {
+
+                $isCardTypeSame  = ($cardType === self::getCardType($card));
+                $isCardRangeSame = ($cardRange === self::getCardRange($card));
+
+                return ($isCardTypeSame && $isCardRangeSame);
+            }
+        );
     }
 }

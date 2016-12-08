@@ -6,16 +6,12 @@ use AppBundle\Exception;
 
 class ChatControllerTest extends AbstractControllerTest
 {
-    public function testPostAction()
+    public function testPostActionWithoutGame()
     {
-        // TODO:
-        // - Fix this: Content-Type is not going as application/json
-
-        $this->markTestSkipped();
-
         $client = static::createClient();
 
         $client->request('POST', '/chat');
+
         $res = $client->getResponse();
 
         $expected = [
@@ -26,21 +22,25 @@ class ChatControllerTest extends AbstractControllerTest
         ];
 
         $resBody = $this->makeFirstAssertions($res, 404, $expected);
+    }
 
-        // Now start a game first and then post a chat message
+    public function testPostActionWithMessage()
+    {
+        $client = static::createClient();
+
         $client->request('GET', '/game/start');
 
-        //     With a message
         $client->request(
             'POST',
             '/chat',
             [],
             [],
             [
-                'Content-Type' => 'application/json',
+                'CONTENT_TYPE' => 'application/json',
             ],
-            "{'message': 'A sample message..'}"
+            '{"message": "A sample message.."}'
         );
+
         $res = $client->getResponse();
 
         $expected = [
@@ -49,9 +49,16 @@ class ChatControllerTest extends AbstractControllerTest
         ];
 
         $resBody = $this->makeFirstAssertions($res, 200, $expected);
+    }
 
-        //     Without message or empty message
+    public function testPostActionWithoutMessage()
+    {
+        $client = static::createClient();
+
+        $client->request('GET', '/game/start');
+
         $client->request('POST', '/chat');
+
         $res = $client->getResponse();
 
         $expected = [
@@ -62,6 +69,13 @@ class ChatControllerTest extends AbstractControllerTest
         ];
 
         $resBody = $this->makeFirstAssertions($res, 400, $expected);
+    }
+
+    public function testPostActionWithEmptyMessage()
+    {
+        $client = static::createClient();
+
+        $client->request('GET', '/game/start');
 
         $client->request(
             'POST',
@@ -69,10 +83,11 @@ class ChatControllerTest extends AbstractControllerTest
             [],
             [],
             [
-                'Content-Type' => 'application/json',
+                'CONTENT_TYPE' => 'application/json',
             ],
-            "{'message': ''}"
+            '{"message": ""}'
         );
+
         $res = $client->getResponse();
 
         $expected = [

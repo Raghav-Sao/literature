@@ -3,142 +3,105 @@
 namespace Tests\AppBundle\Model\Redis;
 
 use AppBundle\Model\Redis\Game;
-use AppBundle\Constant;
+use AppBundle\Constant\Game\Game as GameK;
 
 class GameTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        $this->id   = GameTestData::getId();
-        $this->hash = GameTestData::getGameHash();
-
-        $this->game = new Game($this->id, $this->hash);
-    }
-
     public function testConstruct()
     {
+        $id   = GameTestData::id();
+        $hash = GameTestData::hash();
+
+        $game = new Game($id, $hash);
+
         // Assert $game's properties
 
-        $this->assertEquals($this->id, $this->game->id);
-        $this->assertEquals($this->hash['created_at'], $this->game->createdAt);
-        $this->assertEquals($this->hash['status'], $this->game->status);
-        $this->assertEquals($this->hash['next_turn'], $this->game->nextTurn);
+        $this->assertEquals($id, $game->id);
+        $this->assertEquals($hash['created_at'], $game->createdAt);
+        $this->assertEquals($hash['status'], $game->status);
+        $this->assertEquals($hash['next_turn'], $game->nextTurn);
 
-        $this->assertEquals($this->hash['u1'], $this->game->u1);
-        $this->assertEquals($this->hash['u2'], $this->game->u2);
-        $this->assertEquals($this->hash['u3'], $this->game->u3);
-        $this->assertEquals($this->hash['u4'], $this->game->u4);
+        $this->assertEquals($hash['u1'], $game->u1);
+        $this->assertEquals($hash['u2'], $game->u2);
+        $this->assertEquals($hash['u3'], $game->u3);
+        $this->assertEquals($hash['u4'], $game->u4);
 
-        $this->assertEquals($this->hash['u1_cards'], $this->game->u1Cards);
-        $this->assertEquals($this->hash['u2_cards'], $this->game->u2Cards);
-        $this->assertEquals($this->hash['u3_cards'], $this->game->u3Cards);
-        $this->assertEquals($this->hash['u4_cards'], $this->game->u4Cards);
+        $this->assertEquals($hash['u1_cards'], $game->u1Cards);
+        $this->assertEquals($hash['u2_cards'], $game->u2Cards);
+        $this->assertEquals($hash['u3_cards'], $game->u3Cards);
+        $this->assertEquals($hash['u4_cards'], $game->u4Cards);
+
+        $teams = ['t1' => ['uid1', 'uid3'], 't2' => ['uid2', null]];
+        $this->assertEquals($teams, $game->teams);
+
+        $index = ['uid1' => 'u1', 'uid2' => 'u2', 'uid3' => 'u3', null => 'u4'];
+        $this->assertEquals($index, $game->index);
     }
 
-    public function testIsExpired()
+    public function testGetters()
     {
-        $this->assertFalse($this->game->isExpired());
-
-        $id   = GameTestData::getId();
-        $hash = GameTestData::getGameHash(['status' => 'expired']);
+        $id = GameTestData::id();
+        $hash = GameTestData::hash();
 
         $game = new Game($id, $hash);
 
-        $this->assertTrue($game->isExpired());
+        $this->assertFalse($game->isActive());
+
+        $this->assertFalse($game->isExpired());
+
+        $this->assertTrue($game->isNotExpired());
+
+        $this->assertFalse($game->isSNVacant(GameK::U1));
+        $this->assertTrue($game->isSNVacant(GameK::U4));
+
+        $this->assertTrue($game->isAnySNVacant());
+
+        $this->assertTrue($game->hasUser('uid1'));
+        $this->assertFalse($game->hasUser('uid4'));
+
+        $this->assertFalse($game->areTeam('uid1', 'uid2'));
+        $this->assertTrue($game->areTeam('uid1', 'uid3'));
+
+        $this->assertEquals('u1', $game->getSNByUserId($game->u1));
+
+        $this->assertEquals('uid1', $game->getNextTurnUserId());
+
+        $this->assertCount(12, $game->getInitCardsBySN('u1'));
+        $this->assertCount(0, $game->getInitCardsBySN('u4'));
+        // Invalid id
+        $this->assertCount(0, $game->getInitCardsBySN('u5'));
+
+        $teamUsers = $game->getTeamUsers(GameK::TEAM_1);
+        $this->assertCount(2, $teamUsers);
+        $this->assertContains('uid1', $teamUsers);
+        $this->assertContains('uid3', $teamUsers);
+
+        $this->assertEquals(GameK::TEAM_1, $game->getTeam('uid1'));
+        $this->assertEquals(GameK::TEAM_2, $game->getTeam('uid2'));
+
+        $this->assertEquals(GameK::TEAM_2, $game->getOppTeam('uid3'));
+        $this->assertEquals(GameK::TEAM_1, $game->getOppTeam('uid4'));
+
+        $game->incrPoint('uid1', 0.5);
+        $this->assertEquals(0.5, $game->u1Points);
+        $game->incrPoint('uid1', 0.8);
+        $this->assertEquals(1.3, $game->u1Points);
+
+        $this->assertEquals(0, $game->u2Points);
     }
 
-    public function testIsSNVacant()
+
+    /**
+     * @expectedException        \AppBundle\Exception\BadRequestException
+     * @expectedExceptionMessage Invalid user serial number
+     */
+    public function testIsSNVacantWithBadInput()
     {
-        $this->assertFalse($this->game->isSNVacant('u1'));
-
-        $this->assertTrue($this->game->isSNVacant('u2'));
-        $this->assertTrue($this->game->isSNVacant('u3'));
-        $this->assertTrue($this->game->isSNVacant('u4'));
-    }
-
-    public function testIsSNVacantError()
-    {
-        $this->expectException(\AppBundle\Exception\BadRequestException::class);
-
-        $this->game->isSNVacant('u7');
-    }
-
-    public function testIsAnySNVacant()
-    {
-        $this->assertTrue($this->game->isAnySNVacant());
-
-        $id   = GameTestData::getId();
-        $hash = GameTestData::getGameHash(
-            [
-                'u2' => 'u_2222222222',
-                'u3' => 'u_3333333333',
-                'u4' => 'u_4444444444'
-            ]
-        );
+        $id   = GameTestData::id();
+        $hash = GameTestData::hash();
 
         $game = new Game($id, $hash);
 
-        $this->assertFalse($game->isAnySNVacant());
-    }
-
-    public function testHasUser()
-    {
-        $this->assertTrue($this->game->hasUser('u_1111111111'));
-        $this->assertFalse($this->game->hasUser('u_0000000000'));
-    }
-
-    public function testAreTeam()
-    {
-
-        $id   = GameTestData::getId();
-        $hash = GameTestData::getGameHash(
-            [
-                'u2' => 'u_2222222222',
-                'u3' => 'u_3333333333',
-                'u4' => 'u_4444444444'
-            ]
-        );
-
-        $game = new Game($id, $hash);
-
-        $this->assertTrue($game->areTeam('u_1111111111', 'u_3333333333'));
-        $this->assertTrue($game->areTeam('u_2222222222', 'u_4444444444'));
-        $this->assertFalse($game->areTeam('u_3333333333', 'u_2222222222'));
-        $this->assertFalse($game->areTeam('u_2222222222', 'u_1111111111'));
-    }
-
-    public function testGetSNByUserId()
-    {
-        $this->assertEquals('u1', $this->game->getSNByUserId('u_1111111111'));
-        $this->assertEquals(null, $this->game->getSNByUserId('u_0000000000'));
-
-        $id   = GameTestData::getId();
-        $hash = GameTestData::getGameHash(
-            [
-                'u2' => 'u_2222222222',
-                'u3' => 'u_3333333333',
-                'u4' => 'u_4444444444'
-            ]
-        );
-
-        $game     = new Game($id, $hash);
-
-        $this->assertEquals('u2', $game->getSNByUserId('u_2222222222'));
-        $this->assertEquals('u3', $game->getSNByUserId('u_3333333333'));
-        $this->assertEquals('u4', $game->getSNByUserId('u_4444444444'));
-    }
-
-    public function testGetNextTurnUserId()
-    {
-        $this->assertEquals('u_1111111111', $this->game->getNextTurnUserId());
-    }
-
-    public function testGetInitCardsBySN()
-    {
-        $this->assertEquals(
-            [Constant\Game\Card::CLUB_1, Constant\Game\Card::CLUB_2],
-            $this->game->getInitCardsBySN('u1')
-        );
-        $this->assertEquals([], $this->game->getInitCardsBySN('u2'));
+        $game->isSNVacant('u5');
     }
 }
