@@ -11,6 +11,7 @@ use AppBundle\Constant\Game\Game as GameK;
 use AppBundle\Constant\Game\Status;
 use AppBundle\Constant\Game\Event;
 use AppBundle\Constant\Game\Card;
+use AppBundle\Service\Result\GameServiceResult as Result;
 
 class GameService extends BaseService
 {
@@ -96,7 +97,7 @@ class GameService extends BaseService
 
         $user = $this->getUser($userId);
 
-        return [$game, $user];
+        return Result::create($game, $user);
     }
 
     public function init(
@@ -123,7 +124,7 @@ class GameService extends BaseService
         $game = $this->get($id);
         $user = $this->getUser($userId);
 
-        return [$game, $user];
+        return Result::create($game, $user);
     }
 
     public function join(
@@ -183,7 +184,7 @@ class GameService extends BaseService
 
         $user = $this->getUser($userId);
 
-        return [$game, $user];
+        return Result::create($game, $user);
     }
 
     public function moveCard(
@@ -253,7 +254,9 @@ class GameService extends BaseService
         ];
         $this->pubSub->trigger($game->id, Event::GAME_MOVE_ACTION, $payload);
 
-        return [$success, $game, $toUser];
+        $params = ['success' => $success];
+
+        return Result::create($game, $toUser, $params);
     }
 
     public function show(

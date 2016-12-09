@@ -163,7 +163,7 @@ class GameTest extends KernelTestCase
                         'h6'
                     ]);
 
-        list($game, $user) = $this->service->join($id, GameK::U2, 'uid2');
+        $this->service->join($id, GameK::U2, 'uid2');
     }
 
     public function testJoinAllAndValidateHash()
@@ -207,7 +207,7 @@ class GameTest extends KernelTestCase
                         'c13'
                     ]);
 
-        list($game, $user) = $this->service->join($id, GameK::U4, 'uid4');
+        $this->service->join($id, GameK::U4, 'uid4');
     }
 
         // Mock required in move endpoint (At most):
@@ -242,13 +242,13 @@ class GameTest extends KernelTestCase
                                     );
         $this->redis->method('smembers')->will($consecutiveReturns);
 
-        list($success, $game, $toUser) = $this->service
-                                              ->moveCard(
-                                                    $game,
-                                                    $card,
-                                                    $fromUserId,
-                                                    $toUserId
-                                                );
+        $this->service
+             ->moveCard(
+                    $game,
+                    $card,
+                    $fromUserId,
+                    $toUserId
+                );
     }
 
     /**
@@ -276,13 +276,13 @@ class GameTest extends KernelTestCase
                                     );
         $this->redis->method('smembers')->will($consecutiveReturns);
 
-        list($success, $game, $toUser) = $this->service
-                                              ->moveCard(
-                                                    $game,
-                                                    $card,
-                                                    $fromUserId,
-                                                    $toUserId
-                                                );
+        $this->service
+             ->moveCard(
+                    $game,
+                    $card,
+                    $fromUserId,
+                    $toUserId
+                );
     }
 
     /**
@@ -310,13 +310,13 @@ class GameTest extends KernelTestCase
                                     );
         $this->redis->method('smembers')->will($consecutiveReturns);
 
-        list($success, $game, $toUser) = $this->service
-                                              ->moveCard(
-                                                    $game,
-                                                    $card,
-                                                    'uid5',
-                                                    $toUserId
-                                                );
+        $this->service
+             ->moveCard(
+                    $game,
+                    $card,
+                    'uid5',
+                    $toUserId
+                );
     }
 
     /**
@@ -346,13 +346,13 @@ class GameTest extends KernelTestCase
                                     );
         $this->redis->method('smembers')->will($consecutiveReturns);
 
-        list($success, $game, $toUser) = $this->service
-                                              ->moveCard(
-                                                    $game,
-                                                    $card,
-                                                    $fromUserId,
-                                                    $toUserId
-                                                );
+        $this->service
+             ->moveCard(
+                    $game,
+                    $card,
+                    $fromUserId,
+                    $toUserId
+                );
     }
 
     /**
@@ -382,13 +382,13 @@ class GameTest extends KernelTestCase
                                     );
         $this->redis->method('smembers')->will($consecutiveReturns);
 
-        list($success, $game, $toUser) = $this->service
-                                              ->moveCard(
-                                                    $game,
-                                                    $card,
-                                                    $fromUserId,
-                                                    $toUserId
-                                                );
+        $this->service
+             ->moveCard(
+                    $game,
+                    $card,
+                    $fromUserId,
+                    $toUserId
+                );
     }
 
     /**
@@ -418,13 +418,13 @@ class GameTest extends KernelTestCase
                                     );
         $this->redis->method('smembers')->will($consecutiveReturns);
 
-        list($success, $game, $toUser) = $this->service
-                                              ->moveCard(
-                                                    $game,
-                                                    $card,
-                                                    $fromUserId,
-                                                    $toUserId
-                                                );
+        $this->service
+             ->moveCard(
+                    $game,
+                    $card,
+                    $fromUserId,
+                    $toUserId
+                );
     }
 
     /**
@@ -454,13 +454,13 @@ class GameTest extends KernelTestCase
                                     );
         $this->redis->method('smembers')->will($consecutiveReturns);
 
-        list($success, $game, $toUser) = $this->service
-                                              ->moveCard(
-                                                    $game,
-                                                    $card,
-                                                    $fromUserId,
-                                                    $toUserId
-                                                );
+        $this->service
+             ->moveCard(
+                    $game,
+                    $card,
+                    $fromUserId,
+                    $toUserId
+                );
     }
 
     public function testMoveSuccess()
@@ -522,13 +522,17 @@ class GameTest extends KernelTestCase
 
         $now = microtime(true);
 
-        list($success, $game, $toUser) = $this->service
-                                              ->moveCard(
-                                                    $game,
-                                                    $card,
-                                                    $fromUserId,
-                                                    $toUserId
-                                                );
+        $result = $this->service
+                       ->moveCard(
+                            $game,
+                            $card,
+                            $fromUserId,
+                            $toUserId
+                        );
+
+        $success = $result->success;
+        $game    = $result->game;
+        $toUser  = $result->user;
 
         $this->assertTrue($success);
 
@@ -594,13 +598,17 @@ class GameTest extends KernelTestCase
 
         $now = microtime(true);
 
-        list($success, $game, $toUser) = $this->service
-                                              ->moveCard(
-                                                    $game,
-                                                    $card,
-                                                    $fromUserId,
-                                                    $toUserId
-                                                );
+        $result = $this->service
+                       ->moveCard(
+                            $game,
+                            $card,
+                            $fromUserId,
+                            $toUserId
+                        );
+
+        $success = $result->success;
+        $game    = $result->game;
+        $toUser  = $result->user;
 
         $this->assertFalse($success);
 

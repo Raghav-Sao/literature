@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Constant\Service;
 use AppBundle\Constant\ContextKey;
+use AppBundle\Constant\SerializeGroup as Group;
 use AppBundle\Utility;
 use AppBundle\Controller\Response;
 
@@ -15,34 +16,24 @@ class GameController extends BaseController
 
         $this->throwIfUserActiveInAnotherGame();
 
-        list($game, $user) = $this->gameService->init($this->userId);
+        $result = $this->gameService->init($this->userId);
 
-        $this->setContext(ContextKey::GAME_ID, $game->id);
+        $this->setContext(ContextKey::GAME_ID, $result->game->id);
 
-        $res = [
-            'game' => $game->toArray(),
-            'user' => $user->toArray(),            
-        ];
-
-        return new Response\Ok($res);
+        return new Response\Ok($result->serialize());
     }
 
     public function indexAction()
     {
         $this->init();
 
-        list($game, $user) = $this->gameService
-                                  ->getAndValidate(
-                                        $this->gameId,
-                                        $this->userId
-                                    );
+        $result = $this->gameService
+                       ->getAndValidate(
+                            $this->gameId,
+                            $this->userId
+                        );
 
-        $res = [
-            'game' => $game->toArray(),
-            'user' => $user->toArray(),
-        ];
-
-        return new Response\Ok($res);
+        return new Response\Ok($result->serialize());
     }
 
     public function joinAction(
@@ -55,21 +46,16 @@ class GameController extends BaseController
 
         $this->throwIfUserActiveInAnotherGame();
 
-        list($game, $user) = $this->gameService
-                                  ->join(
-                                        $gameId,
-                                        $atSN,
-                                        $this->userId
-                                    );
+        $result = $this->gameService
+                       ->join(
+                            $gameId,
+                            $atSN,
+                            $this->userId
+                        );
 
         $this->setContext(ContextKey::GAME_ID, $game->id);
 
-        $res = [
-            'game' => $game->toArray(),
-            'user' => $user->toArray(),
-        ];
-
-        return new Response\Ok($res);
+        return new Response\Ok($result->serialize());
     }
 
     public function moveFromAction(
@@ -80,27 +66,21 @@ class GameController extends BaseController
 
         $this->init();
 
-        list($game, $user) = $this->gameService
-                                  ->getAndValidate(
-                                        $this->gameId,
-                                        $this->userId
-                                    );
+        $result = $this->gameService
+                       ->getAndValidate(
+                            $this->gameId,
+                            $this->userId
+                        );
 
-        list($success, $game, $user) = $this->gameService
-                                            ->moveCard(
-                                                $game,
-                                                $card,
-                                                $fromUserId,
-                                                $this->userId
-                                            );
+        $moveResult = $this->gameService
+                           ->moveCard(
+                                $result->game,
+                                $card,
+                                $fromUserId,
+                                $this->userId
+                            );
 
-        $res = [
-            'success' => $success,
-            'game'    => $game->toArray(),
-            'user'    => $user->toArray(),
-        ];
-
-        return new Response\Ok($res);
+        return new Response\Ok($moveResult->serialize(Group::MOVE));
     }
 
     public function showAction(
@@ -110,16 +90,16 @@ class GameController extends BaseController
     {
         $this->init();
 
-        list($game, $user) = $this->gameService
-                                  ->getAndValidate(
-                                        $this->gameId,
-                                        $this->userId
-                                    );
+        $result = $this->gameService
+                       ->getAndValidate(
+                            $this->gameId,
+                            $this->userId
+                        );
 
         list($success, $payload1, $payload2) = $this->gameService
                                                     ->show(
-                                                        $game,
-                                                        $user,
+                                                        $result->game,
+                                                        $result->user,
                                                         $cardType,
                                                         $cardRange
                                                     );
@@ -139,13 +119,13 @@ class GameController extends BaseController
     {
         $this->init();
 
-        list($game, $user) = $this->gameService
-                                  ->getAndValidate(
-                                        $this->gameId,
-                                        $this->userId
-                                    );
+        $result = $this->gameService
+                       ->getAndValidate(
+                            $this->gameId,
+                            $this->userId
+                        );
 
-        $this->gameService->delete($game);
+        $this->gameService->delete($result->game);
 
         $this->resetContext();
 
