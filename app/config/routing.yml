@@ -2,7 +2,8 @@
 # AppBundle > DefaultController
 
 default_index:
-    path:     /
+    path:            /
+    methods:         [GET]
     defaults:
         _controller: AppBundle:Default:index
 
@@ -10,38 +11,38 @@ default_index:
 # AppBundle > GameController
 
 game_start:
-    path:     /game/start
-    methods:  [GET]
+    path:            /game/start
+    methods:         [GET]
     defaults:
         _controller: AppBundle:Game:start
 
 game_index:
-    path:     /game
-    methods:  [GET]
+    path:            /game
+    methods:         [GET]
     defaults:
         _controller: AppBundle:Game:index
 
 game_join:
-    path:     /game/{gameId}/join/{atSN}
-    methods:  [POST]
+    path:            /game/{gameId}/join/{atSN}
+    methods:         [POST]
     defaults:
         _controller: AppBundle:Game:join
 
 game_move_card:
-    path:     /game/move/{card}/from/{fromUserId}
-    methods:  [POST]
+    path:            /game/move/{card}/from/{fromUserId}
+    methods:         [POST]
     defaults:
         _controller: AppBundle:Game:moveFrom
 
 game_show:
-    path:     /game/show/{cardType}/{cardRange}
-    methods:  [POST]
+    path:            /game/show/{cardType}/{cardRange}
+    methods:         [POST]
     defaults:
         _controller: AppBundle:Game:show
 
 game_delete:
-    path:     /game/delete
-    methods:  [DELETE]
+    path:            /game/delete
+    methods:         [DELETE]
     defaults:
         _controller: AppBundle:Game:delete
 
@@ -49,7 +50,7 @@ game_delete:
 # AppBundle > ChatController
 
 chat_post:
-    path:     /chat
-    methods:  [POST]
+    path:            /chat
+    methods:         [POST]
     defaults:
         _controller: AppBundle:Chat:post
