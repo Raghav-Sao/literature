@@ -270,32 +270,48 @@ class GameService extends BaseService
 
         // - Attemps consume for team of given user
 
-        list($success, $payload1) = $this->showAndConsumeCardsByTeam(
+        list($success, $result1) = $this->showAndConsumeCardsByTeam(
             $game,
             $game->getTeam($user->id),
             $cardType,
             $cardRange
         );
 
-        if ($success)
-        {
-            return [$success, $payload1, []];
-        }
+        $result2 = [];
 
         // - Else, consumes for opposite team of given user
 
-        list($success, $payload2) = $this->showAndConsumeCardsByTeam(
-            $game,
-            $game->getOppTeam($user->id),
-            $cardType,
-            $cardRange,
-            true
+        if ($success === false)
+        {
+
+            list($temp, $result2) = $this->showAndConsumeCardsByTeam(
+                $game,
+                $game->getOppTeam($user->id),
+                $cardType,
+                $cardRange,
+                true
+            );
+        }
+
+        // Refresh user model
+
+        $user = $this->getUser($user->id);
+
+        $result = array_merge(['success' => $success], $result1, $result2);
+
+        // Publish event
+
+        $this->pubSub->trigger(
+            $game->id,
+            Event::GAME_SHOW_ACTION,
+            $result
         );
 
-        // TODO:
-        // - Check game completion: Complete game and publish the action
+        // Check if game is complete
 
-        return [false, $payload1, $payload2];
+        $game = $this->checkAndProcessGameCompletion($game);
+
+        return Result::create($game, $user, $result);
     }
 
     public function delete(
@@ -440,60 +456,56 @@ class GameService extends BaseService
         bool   $partial = false
     )
     {
-        // Flow:
-
-        // - Gets team users
-        // - Gets cards of given type and range for both users
-        // - Assign scores to the users based in ratio
-
-        // - If partial is set to false:
-        //   - If total filtered cards count is not complete, return and dont' give
-        //     any score
-        // - If partial is set to true:
-        //   - Even if total filtered cards count is not complete, assign scores in
-        //     ration (Case: opposite team has the missing cards)
-
-        // - Publishes the action with pre-defined payload
+        //
+        // Get both users of the given team
+        // Create default result array with cards shown and points made
+        //
 
         $userIds      = $game->getTeamUsers($team);
 
         $user1        = $this->getUser($userIds[0]);
-        $u1Cards      = Utility::filterCardsByTypeAndRange($cardType, $cardRange);
+        $user1SN      = $game->getSNByUserId($user1->id);
+        $u1Cards      = Utility::filterCardsByTypeAndRange($user1->cards, $cardType, $cardRange);
         $u1CardsCount = count($u1Cards);
 
-        $u2Cards      = [];
-        $u2CardsCount = 0;
-
-        if ($u1CardsCount < Card::MAX_PER_TYPE_RANGE)
-        {
-            $user2        = $this->getUser($userIds[1]);
-            $u2Cards      = Utility::filterCardsByTypeAndRange($cardType, $cardRange);
-            $u2CardsCount = count($u2Cards);
-        }
-
-        $payload = [
-            'game' => $game->toArray(),
-            'u1'   => [
-                'id'    => $user1->id,
-                'cards' => $u1Cards,
-            ],
-            'u2'   => [
-                'id'    => $user2->id,
-                'cards' => $u2Cards,
-            ],
+        $user1Result  = [
+            'id'         => $user1->id,
+            'cardsShown' => $u1Cards,
+            'points'     => $u1CardsCount,
         ];
+
+        $user2        = $this->getUser($userIds[1]);
+        $user2SN      = $game->getSNByUserId($user2->id);
+        $u2Cards      = Utility::filterCardsByTypeAndRange($user2->cards, $cardType, $cardRange);
+        $u2CardsCount = count($u2Cards);
+
+        $user2Result = [
+            'id'         => $user2->id,
+            'cardsShown' => $u2Cards,
+            'points'     => $u2CardsCount,
+        ];
+
+        $result = [
+            $user1SN  => $user1Result,
+            $user2SN  => $user2Result,
+        ];
+
+        //
+        // If both user combined couldn't make the full set, then proceed ahead
+        // if 'partial' is set to true (will be the case when this flow gets
+        // called for oposite team)
+        //
 
         if ($u1CardsCount + $u2CardsCount < Card::MAX_PER_TYPE_RANGE &&
             $partial === false)
         {
-            return [false, $payload];
+            return [false, $result];
         }
 
-        // Points will always be integer and equals to number of matching
-        // cards with each user.
-
-        $u1Points = 0;
-        $u2Points = 0;
+        //
+        // Assigns points(equals to filtered cards count) to users and updates
+        // redis keys and model
+        //
 
         if ($u1CardsCount > 0)
         {
@@ -502,45 +514,61 @@ class GameService extends BaseService
                 array_merge([$user1->id], $u1Cards)
             );
             $user1->removeCards($u1Cards);
-
-            $u1Points = $u1CardsCount;
         }
 
         if ($u2CardsCount > 0)
         {
             call_user_func_array(
                 [$this->redis, 'srem'],
-                array_merge([$user2->id], $u1Cards)
+                array_merge([$user2->id], $u2Cards)
             );
-            $user2->removeCards($u1Cards);
-
-            $u1Points = $u2CardsCount;
+            $user2->removeCards($u2Cards);
         }
+
+        $this->redis->hincrby($game->id, GameK::U1_POINTS, $u1CardsCount);
+        $this->redis->hincrby($game->id, GameK::U2_POINTS, $u2CardsCount);
+
+        $game->incrPoint($user1->id, $u1CardsCount);
+        $game->incrPoint($user2->id, $u1CardsCount);
+
+        return [true, $result];
+    }
+
+    protected function checkAndProcessGameCompletion(
+        Game $game
+    )
+    {
+        //
+        // If all points in game are made, mark the game's status as OVER.
+        // Publish the same message in proper format.
+        //
+
+        if ($game->allPointsMade() === false)
+        {
+            return $game;
+        }
+
+        //
+        // Sets game status to OVER
+        //
+
+        $game->status = Status::OVER;
 
         $hash = [
             $game->id,
 
-            GameK::U1_POINTS,
-            $u1Points,
-
-            GameK::U2_POINTS,
-            $u2Points,
+            GameK::STATUS,
+            $game->status,
         ];
 
-        $game->incrPoint($user1->id, $u1Points);
-        $game->incrPoint($user2->id, $u2Points);
-
-        call_user_func_array(
-            [$this->redis, 'hincrby'],
-            $hash
-        );
+        call_user_func_array([$this->redis, 'hmset'], $hash);
 
         $this->pubSub->trigger(
             $game->id,
-            Event::GAME_SHOW_ACTION,
-            $payload
+            Event::GAME_OVER_ACTION,
+            $game->toArray()
         );
 
-        return [true, $payload];
+        return $game;
     }
 }

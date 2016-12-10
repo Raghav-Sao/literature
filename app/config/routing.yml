@@ -24,25 +24,25 @@ game_index:
 
 game_join:
     path:            /game/{gameId}/join/{atSN}
-    methods:         [POST]
+    methods:         [POST, GET]
     defaults:
         _controller: AppBundle:Game:join
 
 game_move_card:
     path:            /game/move/{card}/from/{fromUserId}
-    methods:         [POST]
+    methods:         [POST, GET]
     defaults:
         _controller: AppBundle:Game:moveFrom
 
 game_show:
     path:            /game/show/{cardType}/{cardRange}
-    methods:         [POST]
+    methods:         [POST, GET]
     defaults:
         _controller: AppBundle:Game:show
 
 game_delete:
     path:            /game/delete
-    methods:         [DELETE]
+    methods:         [DELETE, GET]
     defaults:
         _controller: AppBundle:Game:delete
 
@@ -51,6 +51,6 @@ game_delete:
 
 chat_post:
     path:            /chat
-    methods:         [POST]
+    methods:         [POST, GET]
     defaults:
         _controller: AppBundle:Chat:post

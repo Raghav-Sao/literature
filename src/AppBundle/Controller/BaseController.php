@@ -56,6 +56,21 @@ class BaseController extends Controller
             return;
         }
 
+        //
+        // Check if game exists in redis if not unset the session and return
+        //
+
+        try
+        {
+            $game = $this->gameService->get($this->gameId);
+        }
+        catch (NotFoundException $e)
+        {
+            $this->setContext(ContextKey::GAME_ID, false);
+
+            return;
+        }
+
         $error = 'You appear to be active in a game';
         $extra = ['id' => $this->gameId];
 

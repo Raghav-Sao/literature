@@ -15,17 +15,28 @@ class BaseServiceResult
 
     //
     // Group names to be used while serializing service results
+    // Also, this cannot be overridden, so for now will contain
+    // groups of all classes extending this class too.
     //
     private $groups = [
-        SerializeGroup::DEFAULT => [
+        SerializeGroup::DEFAULT   => [
                                         'game',
                                         'user'
-                                    ],
-        SerializeGroup::MOVE    => [
+                                     ],
+        SerializeGroup::GAME_MOVE => [
                                         'success',
                                         'game',
                                         'user',
-                                    ],
+                                     ],
+        SerializeGroup::GAME_SHOW => [
+                                        'success',
+                                        'game',
+                                        'user',
+                                        'u1',
+                                        'u2',
+                                        'u3',
+                                        'u4'
+                                     ]
     ];
 
     //

@@ -4,6 +4,7 @@ namespace AppBundle\Model\Redis;
 
 use AppBundle\Utility;
 use AppBundle\Constant\Game\Status;
+use AppBundle\Constant\Game\Card;
 use AppBundle\Constant\Game\Game as GameK;
 use AppBundle\Exception\BadRequestException;
 
@@ -67,6 +68,7 @@ class Game
             $this->u3 => GameK::U3,
             $this->u4 => GameK::U4,
         ];
+        $this->refreshAndCleanIndex();
     }
 
     //
@@ -202,18 +204,56 @@ class Game
         }
     }
 
+    public function allPointsMade()
+    {
+        //
+        // Returns true if all points has been made in this game
+        //
+
+        $sum = $this->u1Points +
+               $this->u2Points +
+               $this->u3Points +
+               $this->u4Points;
+
+        return ($sum === Card::MAX_IN_GAME);
+    }
+
+    public function refreshAndCleanIndex()
+    {
+        $this->index = array_filter(
+            $this->index,
+            function($key) {
+                return (empty($key) === false);
+            },
+            ARRAY_FILTER_USE_KEY
+        );
+
+        return $this->index;
+    }
+
     public function toArray()
     {
 
         return [
-            'id'        => $this->id,
-            'createdAt' => $this->createdAt,
-            'status'    => $this->status,
+            'id'           => $this->id,
+            'createdAt'    => $this->createdAt,
+            'status'       => $this->status,
+            'prevTurn'     => $this->prevTurn,
+            'prevTurnTime' => $this->prevTurnTime,
+            'nextTurn'     => $this->nextTurn,
 
-            'u1'        => $this->u1,
-            'u2'        => $this->u2,
-            'u3'        => $this->u3,
-            'u4'        => $this->u4,
+            'u1'           => $this->u1,
+            'u2'           => $this->u2,
+            'u3'           => $this->u3,
+            'u4'           => $this->u4,
+
+            'u1Points'     => intval($this->u1Points),
+            'u2Points'     => intval($this->u2Points),
+            'u3Points'     => intval($this->u3Points),
+            'u4Points'     => intval($this->u4Points),
+
+            'teams'        => $this->teams,
+            'index'        => $this->refreshAndCleanIndex(),
         ];
     }
 
@@ -233,5 +273,4 @@ class Game
 
         return $this;
     }
-
 }

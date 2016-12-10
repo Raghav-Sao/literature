@@ -53,7 +53,7 @@ class GameController extends BaseController
                             $this->userId
                         );
 
-        $this->setContext(ContextKey::GAME_ID, $game->id);
+        $this->setContext(ContextKey::GAME_ID, $result->game->id);
 
         return new Response\Ok($result->serialize());
     }
@@ -80,7 +80,7 @@ class GameController extends BaseController
                                 $this->userId
                             );
 
-        return new Response\Ok($moveResult->serialize(Group::MOVE));
+        return new Response\Ok($moveResult->serialize(Group::GAME_MOVE));
     }
 
     public function showAction(
@@ -96,23 +96,19 @@ class GameController extends BaseController
                             $this->userId
                         );
 
-        list($success, $payload1, $payload2) = $this->gameService
-                                                    ->show(
-                                                        $result->game,
-                                                        $result->user,
-                                                        $cardType,
-                                                        $cardRange
-                                                    );
+        $game = $result->game;
+        $user = $result->user;
 
-        $res = [
-            'success'  => $success,
-            'game'     => $game->toArray(),
-            'user'     => $user->toArray(),
-            'payload1' => $payload1,
-            'payload2' => $payload2
-        ];
+        $showResult = $this->gameService
+                            ->show(
+                                $game,
+                                $user,
+                                $cardType,
+                                $cardRange
+                            );
 
-        return new Response\Ok($res);
+
+        return new Response\Ok($showResult->serialize(Group::GAME_SHOW));
     }
 
     public function deleteAction()
