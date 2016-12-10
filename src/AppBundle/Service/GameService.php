@@ -163,7 +163,7 @@ class GameService extends BaseService
             GameK::STATUS,
             $game->status,
 
-            GameK::PREV_TURN_TIMESTAMP,
+            GameK::PREV_TURN_TIME,
             $game->prevTurnTime
         );
 
@@ -239,7 +239,7 @@ class GameService extends BaseService
             GameK::PREV_TURN,
             $game->prevTurn,
 
-            GameK::PREV_TURN_TIMESTAMP,
+            GameK::PREV_TURN_TIME,
             $game->prevTurnTime,
 
             GameK::NEXT_TURN,
@@ -525,11 +525,11 @@ class GameService extends BaseService
             $user2->removeCards($u2Cards);
         }
 
-        $this->redis->hincrby($game->id, GameK::U1_POINTS, $u1CardsCount);
-        $this->redis->hincrby($game->id, GameK::U2_POINTS, $u2CardsCount);
+        $this->redis->hincrby($game->id, $user1SN . '_points', $u1CardsCount);
+        $this->redis->hincrby($game->id, $user2SN . '_points', $u2CardsCount);
 
         $game->incrPoint($user1->id, $u1CardsCount);
-        $game->incrPoint($user2->id, $u1CardsCount);
+        $game->incrPoint($user2->id, $u2CardsCount);
 
         return [true, $result];
     }

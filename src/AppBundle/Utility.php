@@ -75,7 +75,7 @@ class Utility
         string $card
     )
     {
-        return substr($card, 1);
+        return (int) substr($card, 1);
     }
 
     public static function getCardRange(
@@ -114,7 +114,7 @@ class Utility
     )
     {
 
-        return array_filter(
+        $filteredCards = array_filter(
             $cards,
             function ($card) use ($cardType, $cardRange)
             {
@@ -125,5 +125,32 @@ class Utility
                 return ($isCardTypeSame && $isCardRangeSame);
             }
         );
+
+        return array_values($filteredCards);
+    }
+
+    public static function sortCards(
+        array $cards
+    )
+    {
+        usort(
+            $cards,
+            function($x, $y)
+            {
+
+                $bool1 = strcmp(self::getCardType($x), self::getCardType($y));
+
+                if ($bool1 === 0)
+                {
+                    $bool2 = (self::getCardValue($x) < self::getCardValue($y));
+
+                    return $bool2 ? -1 : 1;
+                }
+
+                return $bool1;
+            }
+        );
+
+        return $cards;
     }
 }

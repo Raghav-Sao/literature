@@ -236,10 +236,10 @@ class Game
 
         return [
             'id'           => $this->id,
-            'createdAt'    => $this->createdAt,
+            'createdAt'    => (int) $this->createdAt,
             'status'       => $this->status,
             'prevTurn'     => $this->prevTurn,
-            'prevTurnTime' => $this->prevTurnTime,
+            'prevTurnTime' => (int) $this->prevTurnTime,
             'nextTurn'     => $this->nextTurn,
 
             'u1'           => $this->u1,
@@ -247,10 +247,10 @@ class Game
             'u3'           => $this->u3,
             'u4'           => $this->u4,
 
-            'u1Points'     => intval($this->u1Points),
-            'u2Points'     => intval($this->u2Points),
-            'u3Points'     => intval($this->u3Points),
-            'u4Points'     => intval($this->u4Points),
+            'u1Points'     => (int) $this->u1Points,
+            'u2Points'     => (int) $this->u2Points,
+            'u3Points'     => (int) $this->u3Points,
+            'u4Points'     => (int) $this->u4Points,
 
             'teams'        => $this->teams,
             'index'        => $this->refreshAndCleanIndex(),

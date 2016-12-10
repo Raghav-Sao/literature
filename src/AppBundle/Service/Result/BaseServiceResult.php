@@ -13,6 +13,11 @@ class BaseServiceResult
 
     public $success;
 
+    public $u1;
+    public $u2;
+    public $u3;
+    public $u4;
+
     //
     // Group names to be used while serializing service results
     // Also, this cannot be overridden, so for now will contain

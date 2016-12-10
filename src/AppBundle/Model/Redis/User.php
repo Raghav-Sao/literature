@@ -50,10 +50,11 @@ class User
 
     public function toArray()
     {
+        $cards = Utility::sortCards($this->cards);
 
         return [
             'id'    => $this->id,
-            'cards' => $this->cards,
+            'cards' => $cards,
         ];
     }
 

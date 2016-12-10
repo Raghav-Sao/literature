@@ -34,7 +34,7 @@ class GameTest extends \PHPUnit_Framework_TestCase
         $teams = ['t1' => ['uid1', 'uid3'], 't2' => ['uid2', null]];
         $this->assertEquals($teams, $game->teams);
 
-        $index = ['uid1' => 'u1', 'uid2' => 'u2', 'uid3' => 'u3', null => 'u4'];
+        $index = ['uid1' => 'u1', 'uid2' => 'u2', 'uid3' => 'u3'];
         $this->assertEquals($index, $game->index);
     }
 

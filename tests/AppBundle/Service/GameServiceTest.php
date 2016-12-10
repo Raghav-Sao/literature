@@ -125,7 +125,7 @@ class GameTest extends KernelTestCase
                         GameK::STATUS,
                         Status::INITIALIZED,
 
-                        GameK::PREV_TURN_TIMESTAMP,
+                        GameK::PREV_TURN_TIME,
                         null
                     );
 
@@ -187,7 +187,7 @@ class GameTest extends KernelTestCase
                         GameK::STATUS,
                         Status::ACTIVE,             /* << */
 
-                        GameK::PREV_TURN_TIMESTAMP,
+                        GameK::PREV_TURN_TIME,
                         $this->isType('int')        /* << */
                     );
 
@@ -499,7 +499,7 @@ class GameTest extends KernelTestCase
                         GameK::PREV_TURN,
                         'u1',
 
-                        GameK::PREV_TURN_TIMESTAMP,
+                        GameK::PREV_TURN_TIME,
                         $this->isType('int'),
 
                         GameK::NEXT_TURN,
@@ -575,7 +575,7 @@ class GameTest extends KernelTestCase
                         GameK::PREV_TURN,
                         'u1',
 
-                        GameK::PREV_TURN_TIMESTAMP,
+                        GameK::PREV_TURN_TIME,
                         $this->isType('int'),
 
                         GameK::NEXT_TURN,
