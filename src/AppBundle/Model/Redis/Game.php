@@ -17,28 +17,18 @@ class Game
     public $prevTurnTime;
     public $nextTurn;
 
-    // @codingStandardsIgnoreStart
-    // User serial numbers
-    public $u1;
-    public $u2;
-    public $u3;
-    public $u4;
+    public $usersCount = 0;
+    public $users      = [];
 
-    public $u1Points;
-    public $u2Points;
-    public $u3Points;
-    public $u4Points;
+    public $team0      = [];
+    public $team1      = [];
 
-    // Initial cards of all users
-    public $u1Cards;
-    public $u2Cards;
-    public $u3Cards;
-    public $u4Cards;
-    // @codingStandardsIgnoreStart
+    public $points     = [];
 
-    public $teams;
-
-    public $index;
+    public $cards0     = [];
+    public $cards1     = [];
+    public $cards2     = [];
+    public $cards3     = [];
 
     public function __construct(
         string $id,
@@ -48,27 +38,29 @@ class Game
 
         $this->id = $id;
 
-        // Sets all attributes of the object
         foreach ($params as $key => $value)
         {
-            $property        = Utility::camelizeLcFirst($key);
-            $this->$property = $value;
+            $this->setAttribute($key, $value);
         }
+    }
 
-        // Sets teams
-        $this->teams = [
-            GameK::TEAM_1 => [$this->u1, $this->u3],
-            GameK::TEAM_2 => [$this->u2, $this->u4],
-        ];
-
-        // Sets index
-        $this->index = [
-            $this->u1 => GameK::U1,
-            $this->u2 => GameK::U2,
-            $this->u3 => GameK::U3,
-            $this->u4 => GameK::U4,
-        ];
-        $this->refreshAndCleanIndex();
+    protected function setAttribute(
+        string $key,
+        string $value
+    )
+    {
+        if (in_array($key, GameK::$noOpKeys, true))
+        {
+            $this->$key = $value;
+        }
+        else if (in_array($key, GameK::$explodeOpKeys, true))
+        {
+            $this->$key = explode(',', $value);
+        }
+        else if (preg_match('/(points_)(?P<userId>.*)/', $key, $matches))
+        {
+            $this->points[$matches['userId']] = (int) $value;
+        }
     }
 
     //
@@ -117,7 +109,7 @@ class Game
         string $userId
     )
     {
-        return in_array($userId, array_keys($this->index), true);
+        return in_array($userId, $this->users, true);
     }
 
     public function areTeam(
@@ -235,25 +227,20 @@ class Game
     {
 
         return [
-            'id'           => $this->id,
-            'createdAt'    => (int) $this->createdAt,
-            'status'       => $this->status,
-            'prevTurn'     => $this->prevTurn,
-            'prevTurnTime' => (int) $this->prevTurnTime,
-            'nextTurn'     => $this->nextTurn,
-
-            'u1'           => $this->u1,
-            'u2'           => $this->u2,
-            'u3'           => $this->u3,
-            'u4'           => $this->u4,
-
-            'u1Points'     => (int) $this->u1Points,
-            'u2Points'     => (int) $this->u2Points,
-            'u3Points'     => (int) $this->u3Points,
-            'u4Points'     => (int) $this->u4Points,
-
-            'teams'        => $this->teams,
-            'index'        => $this->refreshAndCleanIndex(),
+            GameK::ID             => $this->id,
+            GameK::CREATED_AT     => (int) $this->createdAt,
+            GameK::STATUS         => $this->status,
+            GameK::PREV_TURN      => $this->prevTurn,
+            GameK::PREV_TURN_TIME => (int) $this->prevTurnTime,
+            GameK::NEXT_TURN      => $this->nextTurn,
+            
+            GameK::USERS_COUNT    => $this->usersCount,
+            GameK::USERS          => $this->users,
+            
+            GameK::TEAM0          => $this->team0,
+            GameK::TEAM1          => $this->team1,
+            
+            GameK::POINTS         => $this->points,
         ];
     }
 

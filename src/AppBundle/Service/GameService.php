@@ -79,15 +79,6 @@ class GameService extends BaseService
 
         $game = $this->get($id);
 
-        if ($game->isExpired())
-        {
-            $this->delete($game);
-
-            $error = 'Game with given id is no longer active';
-
-            throw new BadRequestException($error);
-        }
-
         if ($userId && $game->hasUser($userId) === false)
         {
             $error = 'You do not belong to game with given id';
@@ -354,35 +345,32 @@ class GameService extends BaseService
             // prevTurn, prevTurnTime null at this point
 
             GameK::NEXT_TURN,
-            GameK::U1,
-
-            GameK::U1,
             $userId,
 
-            // u2, u3 & u4 null at this point
+            GameK::USERS_COUNT,
+            1,
 
-            GameK::U1_POINTS,
+            GameK::USERS,
+            $userId,
+
+            GameK::TEAM0,
+            $userId,
+
+            // team1 null at this point
+
+            'points_' . $userId,
             0,
 
-            GameK::U2_POINTS,
-            0,
-
-            GameK::U3_POINTS,
-            0,
-
-            GameK::U4_POINTS,
-            0,
-
-            GameK::U1_CARDS,
+            GameK::CARDS0,
             implode(',', $cards[0]),
 
-            GameK::U2_CARDS,
+            GameK::CARDS1,
             implode(',', $cards[1]),
 
-            GameK::U3_CARDS,
+            GameK::CARDS2,
             implode(',', $cards[2]),
 
-            GameK::U4_CARDS,
+            GameK::CARDS3,
             implode(',', $cards[3]),
         ];
 

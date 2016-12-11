@@ -6,27 +6,43 @@ class Game
 {
     const GAME_ID_PREFIX = 'g_';
 
-    const CREATED_AT     = 'created_at';
+    const ID             = 'id';
+    const CREATED_AT     = 'createdAt';
     const STATUS         = 'status';
-    const PREV_TURN      = 'prev_turn';
-    const PREV_TURN_TIME = 'prev_turn_time';
-    const NEXT_TURN      = 'next_turn';
+    const PREV_TURN      = 'prevTurn';
+    const PREV_TURN_TIME = 'prevTurnTime';
+    const NEXT_TURN      = 'nextTurn';
 
-    const U1             = 'u1';
-    const U2             = 'u2';
-    const U3             = 'u3';
-    const U4             = 'u4';
+    const USERS_COUNT    = 'usersCount';
+    const USERS          = 'users';
 
-    const U1_POINTS      = 'u1_points';
-    const U2_POINTS      = 'u2_points';
-    const U3_POINTS      = 'u3_points';
-    const U4_POINTS      = 'u4_points';
+    const TEAM0          = 'team0';
+    const TEAM1          = 'team1';
 
-    const U1_CARDS       = 'u1_cards';
-    const U2_CARDS       = 'u2_cards';
-    const U3_CARDS       = 'u3_cards';
-    const U4_CARDS       = 'u4_cards';
+    const POINTS         = 'points';
 
-    const TEAM_1         = 't1';
-    const TEAM_2         = 't2';
+    const CARDS0         = 'cards0';
+    const CARDS1         = 'cards1';
+    const CARDS2         = 'cards2';
+    const CARDS3         = 'cards3';
+
+    public static $noOpKeys = [
+        self::ID,
+        self::CREATED_AT,
+        self::STATUS,
+        self::PREV_TURN,
+        self::PREV_TURN_TIME,
+        self::NEXT_TURN,
+        self::USERS_COUNT,
+    ];
+
+    public static $explodeOpKeys = [
+        self::USERS,
+        self::TEAM0,
+        self::TEAM1,
+        self::CARDS0,
+        self::CARDS1,
+        self::CARDS2,
+        self::CARDS3,
+    ];
 }
