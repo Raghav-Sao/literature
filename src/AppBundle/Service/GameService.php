@@ -120,7 +120,7 @@ class GameService extends BaseService
 
     public function join(
         string $gameId,
-        string $atSN,
+        string $team,
         string $userId
     )
     {
@@ -128,16 +128,17 @@ class GameService extends BaseService
 
         $game = $this->get($gameId);
 
-        if ($game->isSNVacant($atSN) === false)
-        {
-            throw new BadRequestException('Invalid position to join as member');
-        }
+        $game->canJoin($team, $userId);
 
-        $game->$atSN = $userId;
+        $game->users[]         = $userId;
+        $game->$team[]         = $userId;
+        $game->points[$userId] = 0;
+
+        $game->usersCount++;
 
         // If all 4 users joined then update game hash with required info
 
-        if ($game->isAnySNVacant() === false)
+        if ($game->usersCount === 4)
         {
             $game->status            = Status::ACTIVE;
             $game->prevTurnTime = time();
@@ -148,8 +149,17 @@ class GameService extends BaseService
         $this->redis->hmset(
             $game->id,
 
-            $atSN,
-            $userId,
+            GameK::USERS_COUNT,
+            $game->usersCount,
+
+            GameK::USERS,
+            implode(',', $game->users),
+
+            $team,
+            implode(',', $game->$team),
+
+            'points_' . $userId,
+            0,
 
             GameK::STATUS,
             $game->status,
@@ -160,18 +170,18 @@ class GameService extends BaseService
 
         // Creates init cards set for new users who joined
 
-        $cards = $game->getInitCardsBySN($atSN);
+        $cards = $game->getInitCards();
         $arg   = array_merge([$userId], $cards);
 
         call_user_func_array([$this->redis, 'sadd'], $arg);
 
         // Publish this action
 
-        $payload = [
-            'atSN' => $atSN,
-            'game' => $game->toArray(),
-        ];
-        $this->pubSub->trigger($game->id, Event::GAME_JOIN_ACTION, $payload);
+        // $payload = [
+        //     'atSN' => $atSN,
+        //     'game' => $game->toArray(),
+        // ];
+        // $this->pubSub->trigger($game->id, Event::GAME_JOIN_ACTION, $payload);
 
         $user = $this->getUser($userId);
 

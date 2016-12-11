@@ -38,7 +38,7 @@ class GameController extends BaseController
 
     public function joinAction(
         string $gameId,
-        string $atSN
+        string $team       // TODO validate team0|team1
     )
     {
 
@@ -49,7 +49,7 @@ class GameController extends BaseController
         $result = $this->gameService
                        ->join(
                             $gameId,
-                            $atSN,
+                            $team,
                             $this->userId
                         );
 

@@ -23,7 +23,7 @@ game_index:
         _controller: AppBundle:Game:index
 
 game_join:
-    path:            /game/{gameId}/join/{atSN}
+    path:            /game/{gameId}/join/{team}
     methods:         [POST, GET]
     defaults:
         _controller: AppBundle:Game:join

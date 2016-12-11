@@ -112,6 +112,21 @@ class Game
         return in_array($userId, $this->users, true);
     }
 
+    public function canJoin(
+        string $team
+    )
+    {
+        if (in_array($team, [GameK::TEAM0, GameK::TEAM1], true) === false)
+        {
+            throw new BadRequestException();
+        }
+
+        if (count($this->$team) === 2)
+        {
+            throw new BadRequestException();
+        }
+    }
+
     public function areTeam(
         string $userId1,
         string $userId2
@@ -140,21 +155,11 @@ class Game
         return $this->$nextTurnSN;
     }
 
-    public function getInitCardsBySN(
-        string $userSN
-    )
+    public function getInitCards()
     {
+        $key = 'cards' . ($this->usersCount - 1);
 
-        $attribute = $userSN . 'Cards';
-
-        if (empty($this->$attribute))
-        {
-            return [];
-        }
-        else
-        {
-            return explode(',', $this->$attribute);
-        }
+        return $this->$key;
     }
 
     public function getTeamUsers(
@@ -234,7 +239,7 @@ class Game
             GameK::PREV_TURN_TIME => (int) $this->prevTurnTime,
             GameK::NEXT_TURN      => $this->nextTurn,
             
-            GameK::USERS_COUNT    => $this->usersCount,
+            GameK::USERS_COUNT    => (int) $this->usersCount,
             GameK::USERS          => $this->users,
             
             GameK::TEAM0          => $this->team0,
