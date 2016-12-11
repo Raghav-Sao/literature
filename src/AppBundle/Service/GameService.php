@@ -34,56 +34,50 @@ class GameService extends BaseService
         $this->knowledge = $knowledge;
     }
 
-    public function get(
-        string $id
-    )
+    public function get(string $id)
     {
+        //
         // Gets game model by id
+        //
 
         $hash = $this->redis->hgetall($id);
 
         if (empty($hash))
         {
-            throw new NotFoundException('Game not found');
+            throw new NotFoundException('Game not found.');
         }
 
         return new Game($id, $hash);
     }
 
-    public function getUser(
-        string $id
-    )
+    public function getUser(string $id)
     {
+        //
         // Gets user model by id
+        //
 
         $set = $this->redis->smembers($id);
 
         if (empty($set))
         {
-            $error = 'Cards not found for given user';
-            $extra   = ['id' => $id];
-
-            throw new NotFoundException($error, $extra);
+            throw new NotFoundException('User\'s card set not found.');
         }
 
         return new User($id, $set);
     }
 
-    public function getAndValidate(
-        string $id,
-        string $userId
-    )
+    public function getAndValidate(string $id, string $userId)
     {
+        //
         // Gets game model by given id and validates
         // if given userId belongs to the game.
+        //
 
         $game = $this->get($id);
 
         if ($userId && $game->hasUser($userId) === false)
         {
-            $error = 'You do not belong to game with given id';
-
-            throw new BadRequestException($error);
+            throw new BadRequestException('You do not belong to game.');
         }
 
         $user = $this->getUser($userId);
@@ -91,11 +85,11 @@ class GameService extends BaseService
         return Result::create($game, $user);
     }
 
-    public function init(
-        string $userId
-    )
+    public function init(string $userId)
     {
+        //
         // Initializes a game with given userId as first member
+        //
 
         // - Creates game hash
 
@@ -118,13 +112,11 @@ class GameService extends BaseService
         return Result::create($game, $user);
     }
 
-    public function join(
-        string $gameId,
-        string $team,
-        string $userId
-    )
+    public function join(string $gameId, string $team, string $userId)
     {
+        //
         // Given user id joins the game in given team
+        //
 
         $game = $this->get($gameId);
 
@@ -195,7 +187,9 @@ class GameService extends BaseService
         string $toUserId
     )
     {
+        //
         // Attempts moving given card between given users of game
+        //
 
         $toUser   = $this->getUser($toUserId);
         $fromUser = $this->getUser($fromUserId);
@@ -262,7 +256,9 @@ class GameService extends BaseService
         string $cardRange
     )
     {
+        //
         // Consumes cards of given type and range and set points
+        //
 
         // - Attemps consume for team of given user
 
@@ -288,6 +284,8 @@ class GameService extends BaseService
                 true
             );
         }
+
+        // Appends new result to existing one
 
         if ($result2)
         {
@@ -319,11 +317,11 @@ class GameService extends BaseService
         return Result::create($game, $user, $result);
     }
 
-    public function delete(
-        Game $game
-    )
+    public function delete(Game $game)
     {
-        // Deletes all redis keys for given game
+        //
+        // Deletes all redis keys associated with given game
+        //
 
         $keys   = $game->users;
         $keys[] = $game->id;
@@ -333,22 +331,20 @@ class GameService extends BaseService
         return $this;
     }
 
-    // ----------------------------------------------------------------------
+    //
     // Protected methods
 
-    protected function getInitHash(
-        string $id,     // Game id
-        string $userId, // First user in game
-        array  $cards   // 4 Set of cards for all users in game
-    )
+    protected function getInitHash(string $id, string $userId, array $cards)
     {
+        //
         // Returns initial game hash, with userId as firt member
+        //
 
         $hash = [
             $id,
 
             GameK::CREATED_AT,
-            Utility::currentTimeStamp(),
+            time(),
 
             GameK::STATUS,
             Status::INITIALIZED,
@@ -371,6 +367,8 @@ class GameService extends BaseService
 
             'points_' . $userId,
             0,
+
+            // points_ for other users wont' exist at this point
 
             GameK::CARDS0,
             implode(',', $cards[0]),
@@ -395,48 +393,38 @@ class GameService extends BaseService
         User   $toUser
     )
     {
+        //
         // Does necessary validations for move action in a game
+        //
 
         if (Utility::isValidCard($card) === false)
         {
-            $error = 'Not a valid card';
-
-            throw new BadRequestException($error);
+            throw new BadRequestException('Not a valid card.');
         }
 
         if ($game->hasUser($fromUser->id) === false)
         {
-            $error = 'Bad value for fromUserId, Does not exists';
-
-            throw new BadRequestException($error);
+            throw new BadRequestException('Bad value for fromUserId, Does not exists.');
         }
 
         if ($game->nextTurn !== $toUser->id)
         {
-            $error = 'It is not your turn to make a move';
-
-            throw new BadRequestException($error);
+            throw new BadRequestException('It is not your turn to make a move.');
         }
 
         if ($game->areTeam($fromUser->id, $toUser->id))
         {
-            $error = 'Bad value for fromUserId, You are partners';
-
-            throw new BadRequestException($error);
+            throw new BadRequestException('Bad value for fromUserId, You are partners.');
         }
 
         if ($toUser->hasCard($card))
         {
-            $error = 'Bad value for card, You have it already';
-
-            throw new BadRequestException($error);
+            throw new BadRequestException('Bad value for card, You have it already.');
         }
 
         if ($toUser->hasAtLeastOneCardOfType($card) === false)
         {
-            $error = 'You do not have at least one card of that type. Invalid move';
-
-            throw new BadRequestException($error);
+            throw new BadRequestException('You do not have at least one card of that type. Invalid move.');
         }
     }
 

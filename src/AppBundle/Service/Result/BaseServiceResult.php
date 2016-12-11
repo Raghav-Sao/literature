@@ -20,6 +20,7 @@ class BaseServiceResult
     // Also, this cannot be overridden, so for now will contain
     // groups of all classes extending this class too.
     //
+
     private $groups = [
         SerializeGroup::DEFAULT   => [
                                         'game',
@@ -38,15 +39,12 @@ class BaseServiceResult
                                      ]
     ];
 
-    //
-    // Creates instance of the result class, with default param signature
-    //
-    public static function create(
-        Game  $game,
-        User  $user,
-        array $params = []
-    )
+    public static function create(Game $game, User $user, array $params = [])
     {
+        //
+        // Creates instance of the result class, with default param signature
+        //
+
         $instance = new self();
 
         $params['game'] = $game;
@@ -57,19 +55,12 @@ class BaseServiceResult
         return $instance;
     }
 
-    function __construct(
-        array $params = []
-    )
+    function __construct(array $params = [])
     {
         $this->fill($params);
     }
 
-    //
-    // Serialize the result on given group name
-    //
-    public function serialize(
-        string $group = SerializeGroup::DEFAULT
-    )
+    public function serialize(string $group = SerializeGroup::DEFAULT)
     {
         $fields = $this->groups[$group];
 
@@ -91,14 +82,13 @@ class BaseServiceResult
         return $result;
     }
 
-    //
-    // Takes associative array as arg, and fills array keys as property name
-    // with array values as their value.
-    //
-    protected function fill(
-        array $params
-    )
+    protected function fill(array $params)
     {
+        //
+        // Takes associative array as arg, and fills array keys as property name
+        // with array values as their value.
+        //
+
         foreach ($params as $key => $value)
         {
             $this->$key = $value;

@@ -22,6 +22,9 @@ game_index:
     defaults:
         _controller: AppBundle:Game:index
 
+# TODO:
+# - Remove get from following routes, once dev complete
+
 game_join:
     path:            /game/{gameId}/join/{team}
     methods:         [POST, GET]

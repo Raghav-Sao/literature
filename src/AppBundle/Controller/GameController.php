@@ -36,10 +36,7 @@ class GameController extends BaseController
         return new Response\Ok($result->serialize());
     }
 
-    public function joinAction(
-        string $gameId,
-        string $team
-    )
+    public function joinAction(string $gameId, string $team)
     {
 
         $this->init();
@@ -58,10 +55,7 @@ class GameController extends BaseController
         return new Response\Ok($result->serialize());
     }
 
-    public function moveFromAction(
-        string $card,
-        string $fromUserId
-    )
+    public function moveFromAction(string $card, string $fromUserId)
     {
 
         $this->init();
@@ -83,10 +77,7 @@ class GameController extends BaseController
         return new Response\Ok($moveResult->serialize(Group::GAME_MOVE));
     }
 
-    public function showAction(
-      string $cardType,
-      string $cardRange
-    )
+    public function showAction(string $cardType, string $cardRange)
     {
         $this->init();
 

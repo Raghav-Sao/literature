@@ -77,10 +77,7 @@ class BaseController extends Controller
         throw new BadRequestException($error, $extra);
     }
 
-    protected function setContext(
-        string $key,
-        string $value
-    )
+    protected function setContext(string $key, string $value)
     {
         $this->session->set($key, $value);
     }

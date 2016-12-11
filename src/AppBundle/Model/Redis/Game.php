@@ -30,10 +30,7 @@ class Game
     public $cards2     = [];
     public $cards3     = [];
 
-    public function __construct(
-        string $id,
-        array  $params
-    )
+    public function __construct(string $id, array $params)
     {
 
         $this->id = $id;
@@ -52,42 +49,31 @@ class Game
         return ($this->status === Status::ACTIVE);
     }
 
-    public function hasUser(
-        string $userId
-    )
+    public function hasUser(string $userId)
     {
         return in_array($userId, $this->users, true);
     }
 
-    //
-    // Checks if a team can be joined by any user.
-    // - Is valid team name?
-    // - Is vacant?
-    //
-
-    public function canJoin(
-        string $team
-    )
+    public function canJoin(string $team)
     {
+        //
+        // Checks if a team can be joined by any user.
+        // - Is valid team name?
+        // - Is vacant?
+        //
+
         if (in_array($team, [GameK::TEAM0, GameK::TEAM1], true) === false)
         {
-            throw new BadRequestException(
-                'Invalid team name: ' . $team . '.'
-            );
+            throw new BadRequestException('Invalid team name.');
         }
 
         if (count($this->$team) === 2)
         {
-            throw new BadRequestException(
-                'Cannot join ' . $team . ' as it is not vacant.'
-            );
+            throw new BadRequestException('Team not vacant.');
         }
     }
 
-    public function areTeam(
-        string $userId1,
-        string $userId2
-    )
+    public function areTeam(string $userId1, string $userId2)
     {
         $x = in_array($userId1, $this->team0, true);
         $y = in_array($userId2, $this->team0, true);
@@ -95,24 +81,18 @@ class Game
         return ($x === $y);
     }
 
-    //
-    // Returns initial set of cards for new user joining
-    //
-
     public function getInitCards()
     {
+        //
+        // Returns initial set of cards for new user joining
+        //
+
         $key = 'cards' . ($this->usersCount - 1);
 
         return $this->$key;
     }
 
-    //
-    // Methods to return team(or opp. team) name for given user id
-    //
-
-    public function getTeam(
-        string $userId
-    )
+    public function getTeam(string $userId)
     {
         if (in_array($userId, $this->team0))
         {
@@ -124,9 +104,7 @@ class Game
         }
     }
 
-    public function getOppTeam(
-        string $userId
-    )
+    public function getOppTeam(string $userId)
     {
         if ($this->getTeam($userId) === GameK::TEAM0)
         {
@@ -137,10 +115,6 @@ class Game
             return GameK::TEAM0;
         }
     }
-
-    //
-    // Returns true if all points has been made in this game
-    //
 
     public function allPointsMade()
     {
@@ -171,15 +145,12 @@ class Game
     //
     // Protected methods
 
-    //
-    // Method used to construct this model from redis hash
-    //
-
-    protected function setAttribute(
-        string $key,
-        string $value
-    )
+    protected function setAttribute(string $key, string $value)
     {
+        //
+        // Method used to construct this model from redis hash
+        //
+
         if (in_array($key, GameK::$noOpKeys, true))
         {
             $this->$key = $value;

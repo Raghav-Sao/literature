@@ -8,18 +8,12 @@ use AppBundle\Constant\Game\Card;
 class Utility
 {
 
-    public static function camelize(
-        string $input,
-        string $separator = '_'
-    )
+    public static function camelize(string $input, string $separator = '_')
     {
         return str_replace($separator, '', ucwords($input, $separator));
     }
 
-    public static function camelizeLcFirst(
-        string $input,
-        string $separator = '_'
-    )
+    public static function camelizeLcFirst(string $input, string $separator = '_')
     {
         return lcfirst(self::camelize($input, $separator));
     }
@@ -32,11 +26,6 @@ class Utility
     public static function newGameId()
     {
         return Game::GAME_ID_PREFIX . self::randomString();
-    }
-
-    public static function currentTimeStamp()
-    {
-        return time();
     }
 
     public static function isAssocArray($v)
@@ -57,30 +46,22 @@ class Utility
     //
     // Card related Utility methods
 
-    public static function isValidCard(
-        string $card
-    )
+    public static function isValidCard(string $card)
     {
         return in_array($card, Card::$allInGame, true);
     }
 
-    public static function getCardType(
-        string $card
-    )
+    public static function getCardType(string $card)
     {
         return substr($card, 0, 1);
     }
 
-    public static function getCardValue(
-        string $card
-    )
+    public static function getCardValue(string $card)
     {
         return (int) substr($card, 1);
     }
 
-    public static function getCardRange(
-        string $card
-    )
+    public static function getCardRange(string $card)
     {
         $cardValue = self::getCardValue($card);
 
@@ -129,9 +110,7 @@ class Utility
         return array_values($filteredCards);
     }
 
-    public static function sortCards(
-        array $cards
-    )
+    public static function sortCards(array $cards)
     {
         usort(
             $cards,
