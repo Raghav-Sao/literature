@@ -140,7 +140,7 @@ class GameService extends BaseService
 
         if ($game->usersCount === 4)
         {
-            $game->status            = Status::ACTIVE;
+            $game->status       = Status::ACTIVE;
             $game->prevTurnTime = time();
         }
 
@@ -177,11 +177,11 @@ class GameService extends BaseService
 
         // Publish this action
 
-        // $payload = [
-        //     'atSN' => $atSN,
-        //     'game' => $game->toArray(),
-        // ];
-        // $this->pubSub->trigger($game->id, Event::GAME_JOIN_ACTION, $payload);
+        $payload = [
+            'team'   => $team,
+            'userId' => $userId,
+        ];
+        $this->pubSub->trigger($game->id, Event::GAME_JOIN_ACTION, $payload);
 
         $user = $this->getUser($userId);
 

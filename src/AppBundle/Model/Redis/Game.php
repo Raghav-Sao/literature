@@ -118,12 +118,16 @@ class Game
     {
         if (in_array($team, [GameK::TEAM0, GameK::TEAM1], true) === false)
         {
-            throw new BadRequestException();
+            throw new BadRequestException(
+                'Invalid team name: ' . $team . '.'
+            );
         }
 
         if (count($this->$team) === 2)
         {
-            throw new BadRequestException();
+            throw new BadRequestException(
+                'Cannot join ' . $team . ' as it is not vacant.'
+            );
         }
     }
 
