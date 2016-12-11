@@ -26,6 +26,10 @@ class Game
     const CARDS2         = 'cards2';
     const CARDS3         = 'cards3';
 
+    //
+    // Following keys are stored in model and in redis in same way
+    //
+
     public static $noOpKeys = [
         self::ID,
         self::CREATED_AT,
@@ -35,6 +39,11 @@ class Game
         self::NEXT_TURN,
         self::USERS_COUNT,
     ];
+
+    //
+    // Following keys are array in model but stored as comma separated
+    // string in redis
+    //
 
     public static $explodeOpKeys = [
         self::USERS,

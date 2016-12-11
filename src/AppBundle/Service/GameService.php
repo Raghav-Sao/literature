@@ -124,7 +124,7 @@ class GameService extends BaseService
         string $userId
     )
     {
-        // Given userId joins the game at given position(serial number)
+        // Given user id joins the game in given team
 
         $game = $this->get($gameId);
 
@@ -266,7 +266,7 @@ class GameService extends BaseService
 
         // - Attemps consume for team of given user
 
-        list($success, $result1) = $this->showAndConsumeCardsByTeam(
+        list($success, $result) = $this->showAndConsumeCardsByTeam(
             $game,
             $game->getTeam($user->id),
             $cardType,
@@ -289,11 +289,20 @@ class GameService extends BaseService
             );
         }
 
-        // Refresh user model
+        if ($result2)
+        {
+            foreach ($result2 as $value)
+            {
+                $result[] = $value;
+            }
+        }
 
+        // Refresh models
+
+        $game = $this->get($game->id);
         $user = $this->getUser($user->id);
 
-        $result = array_merge(['success' => $success], $result1, $result2);
+        $result = ['success' => $success, 'showResult' => $result];
 
         // Publish event
 
@@ -453,7 +462,7 @@ class GameService extends BaseService
         $u1Result  = [
             'id'         => $u1->id,
             'cardsShown' => $u1Cards,
-            'points'     => $u1CardsCount,
+            'points'     => 0,        // Points to be added, if win confirmed
         ];
 
         $u2           = $this->getUser($userIds[1]);
@@ -463,13 +472,22 @@ class GameService extends BaseService
         $u2Result = [
             'id'         => $u2->id,
             'cardsShown' => $u2Cards,
-            'points'     => $u2CardsCount,
+            'points'     => 0,
         ];
 
-        $result = [
-            $u1->id  => $u1Result,
-            $u2->id  => $u2Result,
-        ];
+        //
+        // Remove shown cards from user's redis set
+        //
+
+        if ($u1CardsCount > 0)
+        {
+            call_user_func_array([$this->redis, 'srem'], array_merge([$u1->id], $u1Cards));
+        }
+
+        if ($u2CardsCount > 0)
+        {
+            call_user_func_array([$this->redis, 'srem'], array_merge([$u2->id], $u2Cards));
+        }
 
         //
         // If both user combined couldn't make the full set, then proceed ahead
@@ -480,39 +498,21 @@ class GameService extends BaseService
         if ($u1CardsCount + $u2CardsCount < Card::MAX_PER_TYPE_RANGE &&
             $partial === false)
         {
-            return [false, $result];
+            return [false, [$u1Result, $u2Result]];
         }
 
         //
         // Assigns points(equals to filtered cards count) to users and updates
-        // redis keys and model
+        // redis keys
         //
 
-        if ($u1CardsCount > 0)
-        {
-            call_user_func_array(
-                [$this->redis, 'srem'],
-                array_merge([$u1->id], $u1Cards)
-            );
-            $u1->removeCards($u1Cards);
-        }
-
-        if ($u2CardsCount > 0)
-        {
-            call_user_func_array(
-                [$this->redis, 'srem'],
-                array_merge([$u2->id], $u2Cards)
-            );
-            $u2->removeCards($u2Cards);
-        }
+        $u1Result['points'] = $u1CardsCount;
+        $u2Result['points'] = $u2CardsCount;
 
         $this->redis->hincrby($game->id, 'points_' . $u1->id, $u1CardsCount);
         $this->redis->hincrby($game->id, 'points_' . $u2->id, $u2CardsCount);
 
-        $game->incrPoint($u1->id, $u1CardsCount);
-        $game->incrPoint($u2->id, $u2CardsCount);
-
-        return [true, $result];
+        return [true, [$u1Result, $u2Result]];
     }
 
     protected function checkAndProcessGameCompletion(

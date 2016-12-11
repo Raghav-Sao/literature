@@ -17,15 +17,15 @@ class Game
     public $prevTurnTime;
     public $nextTurn;
 
-    public $usersCount = 0;
-    public $users      = [];
+    public $usersCount = 0;  // Count of users joined
+    public $users      = []; // List of user ids
 
-    public $team0      = [];
+    public $team0      = []; // List of ids in team0
     public $team1      = [];
 
-    public $points     = [];
+    public $points     = []; // Associative list, (user id -> points)
 
-    public $cards0     = [];
+    public $cards0     = []; // List of intial cards for first user joined
     public $cards1     = [];
     public $cards2     = [];
     public $cards3     = [];
@@ -44,25 +44,6 @@ class Game
         }
     }
 
-    protected function setAttribute(
-        string $key,
-        string $value
-    )
-    {
-        if (in_array($key, GameK::$noOpKeys, true))
-        {
-            $this->$key = $value;
-        }
-        else if (in_array($key, GameK::$explodeOpKeys, true))
-        {
-            $this->$key = explode(',', $value);
-        }
-        else if (preg_match('/(points_)(?P<userId>.*)/', $key, $matches))
-        {
-            $this->points[$matches['userId']] = (int) $value;
-        }
-    }
-
     //
     // Getters
 
@@ -71,46 +52,18 @@ class Game
         return ($this->status === Status::ACTIVE);
     }
 
-    public function isExpired()
-    {
-        return ($this->status === Status::EXPIRED);
-    }
-
-    public function isNotExpired()
-    {
-        return !($this->isExpired());
-    }
-
-    public function isSNVacant(
-        string $userSN
-    )
-    {
-        // Checks if given serial number is vacant for new users
-
-        if (property_exists($this, $userSN) === false)
-        {
-            throw new BadRequestException('Invalid user serial number');
-        }
-
-        return ($this->$userSN == null);
-    }
-
-    public function isAnySNVacant()
-    {
-        // Checks if any serial number is vacant at all in the game
-
-        return ($this->u1 == null ||
-                $this->u2 == null ||
-                $this->u3 == null ||
-                $this->u4 == null);
-    }
-
     public function hasUser(
         string $userId
     )
     {
         return in_array($userId, $this->users, true);
     }
+
+    //
+    // Checks if a team can be joined by any user.
+    // - Is valid team name?
+    // - Is vacant?
+    //
 
     public function canJoin(
         string $team
@@ -136,28 +89,15 @@ class Game
         string $userId2
     )
     {
-
-        // Checks if given two users are team
-
         $x = in_array($userId1, $this->team0, true);
         $y = in_array($userId2, $this->team0, true);
 
         return ($x === $y);
     }
 
-    public function getSNByUserId(
-        string $userId
-    )
-    {
-        return $this->index[$userId];
-    }
-
-    public function getNextTurnUserId()
-    {
-        $nextTurnSN = $this->nextTurn;
-
-        return $this->$nextTurnSN;
-    }
+    //
+    // Returns initial set of cards for new user joining
+    //
 
     public function getInitCards()
     {
@@ -166,19 +106,14 @@ class Game
         return $this->$key;
     }
 
-    public function getTeamUsers(
-        string $team
-    )
-    {
-        return $this->teams[$team];
-    }
+    //
+    // Methods to return team(or opp. team) name for given user id
+    //
 
     public function getTeam(
         string $userId
     )
     {
-        // Returns team of given user id
-
         if (in_array($userId, $this->team0))
         {
             return GameK::TEAM0;
@@ -193,8 +128,6 @@ class Game
         string $userId
     )
     {
-        // Returns opposite team for given user id
-
         if ($this->getTeam($userId) === GameK::TEAM0)
         {
             return GameK::TEAM1;
@@ -205,26 +138,13 @@ class Game
         }
     }
 
+    //
+    // Returns true if all points has been made in this game
+    //
+
     public function allPointsMade()
     {
-        //
-        // Returns true if all points has been made in this game
-        //
-
         return (array_sum($this->points) === Card::MAX_IN_GAME);
-    }
-
-    public function refreshAndCleanIndex()
-    {
-        $this->index = array_filter(
-            $this->index,
-            function($key) {
-                return (empty($key) === false);
-            },
-            ARRAY_FILTER_USE_KEY
-        );
-
-        return $this->index;
     }
 
     public function toArray()
@@ -249,17 +169,28 @@ class Game
     }
 
     //
-    // Setters
+    // Protected methods
 
-    public function incrPoint(
-        string $userId,
-        int    $point
+    //
+    // Method used to construct this model from redis hash
+    //
+
+    protected function setAttribute(
+        string $key,
+        string $value
     )
     {
-        // Increments points by given value for given user
-
-        $this->points[$userId] += $point;
-
-        return $this;
+        if (in_array($key, GameK::$noOpKeys, true))
+        {
+            $this->$key = $value;
+        }
+        else if (in_array($key, GameK::$explodeOpKeys, true))
+        {
+            $this->$key = explode(',', $value);
+        }
+        else if (preg_match('/(points_)(?P<userId>.*)/', $key, $matches))
+        {
+            $this->points[$matches['userId']] = (int) $value;
+        }
     }
 }

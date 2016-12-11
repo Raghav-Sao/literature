@@ -38,7 +38,7 @@ class GameController extends BaseController
 
     public function joinAction(
         string $gameId,
-        string $team       // TODO validate team0|team1
+        string $team
     )
     {
 

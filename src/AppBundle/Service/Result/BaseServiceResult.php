@@ -13,10 +13,7 @@ class BaseServiceResult
 
     public $success;
 
-    public $u1;
-    public $u2;
-    public $u3;
-    public $u4;
+    public $showResult;
 
     //
     // Group names to be used while serializing service results
@@ -37,10 +34,7 @@ class BaseServiceResult
                                         'success',
                                         'game',
                                         'user',
-                                        'u1',
-                                        'u2',
-                                        'u3',
-                                        'u4'
+                                        'showResult',
                                      ]
     ];
 
