@@ -139,8 +139,8 @@ class Game
 
         // Checks if given two users are team
 
-        $x = in_array($userId1, $this->teams[GameK::TEAM_1], true);
-        $y = in_array($userId2, $this->teams[GameK::TEAM_1], true);
+        $x = in_array($userId1, $this->team0, true);
+        $y = in_array($userId2, $this->team0, true);
 
         return ($x === $y);
     }
@@ -179,13 +179,13 @@ class Game
     {
         // Returns team of given user id
 
-        if (in_array($userId, $this->teams[GameK::TEAM_1]))
+        if (in_array($userId, $this->team0))
         {
-            return GameK::TEAM_1;
+            return GameK::TEAM0;
         }
         else
         {
-            return GameK::TEAM_2;
+            return GameK::TEAM1;
         }
     }
 
@@ -195,13 +195,13 @@ class Game
     {
         // Returns opposite team for given user id
 
-        if (in_array($userId, $this->teams[GameK::TEAM_1]))
+        if ($this->getTeam($userId) === GameK::TEAM0)
         {
-            return GameK::TEAM_2;
+            return GameK::TEAM1;
         }
         else
         {
-            return GameK::TEAM_1;
+            return GameK::TEAM0;
         }
     }
 
@@ -211,12 +211,7 @@ class Game
         // Returns true if all points has been made in this game
         //
 
-        $sum = $this->u1Points +
-               $this->u2Points +
-               $this->u3Points +
-               $this->u4Points;
-
-        return ($sum === Card::MAX_IN_GAME);
+        return (array_sum($this->points) === Card::MAX_IN_GAME);
     }
 
     public function refreshAndCleanIndex()
@@ -263,9 +258,7 @@ class Game
     {
         // Increments points by given value for given user
 
-        $property = $this->getSNByUserId($userId) . "Points";
-
-        $this->$property += $point;
+        $this->points[$userId] += $point;
 
         return $this;
     }

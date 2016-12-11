@@ -220,19 +220,12 @@ class GameService extends BaseService
         {
             // Else, update nextTurn
 
-            $fromUserSN     = $game->getSNByUserId($fromUser->id);
-            $game->nextTurn = $fromUserSN;
+            $game->nextTurn = $fromUserId;
 
             $success = false;
         }
 
         // Update game hash with nextTurn, prevTurn, prevTurnTime
-
-        // TODO:
-        // - Proper assignment of nextTurn
-        //   If the user doesn't have any cards left then do not assign him
-        //   as nextTurn user
-        // - Proper publishing of such action/event
 
         $this->redis->hmset(
             $game->id,
@@ -250,8 +243,10 @@ class GameService extends BaseService
         // Publish this action
 
         $payload = [
-            'success' => $success,
-            'game'    => $game->toArray(),
+            'success'    => $success,
+            'card'       => $card,
+            'fromUserId' => $fromUserId,
+            'toUserId'   => $toUserId,
         ];
         $this->pubSub->trigger($game->id, Event::GAME_MOVE_ACTION, $payload);
 
@@ -321,13 +316,10 @@ class GameService extends BaseService
     {
         // Deletes all redis keys for given game
 
-        $this->redis->del(
-            $game->id,
-            $game->u1,
-            $game->u2,
-            $game->u3,
-            $game->u4
-        );
+        $keys   = $game->users;
+        $keys[] = $game->id;
+
+        call_user_func_array([$this->redis, 'del'], $keys);
 
         return $this;
     }
@@ -396,13 +388,6 @@ class GameService extends BaseService
     {
         // Does necessary validations for move action in a game
 
-        if ($game->isActive() === false)
-        {
-            $error = 'Game is not active';
-
-            throw new BadRequestException($error);
-        }
-
         if (Utility::isValidCard($card) === false)
         {
             $error = 'Not a valid card';
@@ -417,7 +402,7 @@ class GameService extends BaseService
             throw new BadRequestException($error);
         }
 
-        if ($game->getNextTurnUserId() !== $toUser->id)
+        if ($game->nextTurn !== $toUser->id)
         {
             $error = 'It is not your turn to make a move';
 
@@ -459,33 +444,31 @@ class GameService extends BaseService
         // Create default result array with cards shown and points made
         //
 
-        $userIds      = $game->getTeamUsers($team);
+        $userIds      = $game->$team;
 
-        $user1        = $this->getUser($userIds[0]);
-        $user1SN      = $game->getSNByUserId($user1->id);
-        $u1Cards      = Utility::filterCardsByTypeAndRange($user1->cards, $cardType, $cardRange);
+        $u1           = $this->getUser($userIds[0]);
+        $u1Cards      = Utility::filterCardsByTypeAndRange($u1->cards, $cardType, $cardRange);
         $u1CardsCount = count($u1Cards);
 
-        $user1Result  = [
-            'id'         => $user1->id,
+        $u1Result  = [
+            'id'         => $u1->id,
             'cardsShown' => $u1Cards,
             'points'     => $u1CardsCount,
         ];
 
-        $user2        = $this->getUser($userIds[1]);
-        $user2SN      = $game->getSNByUserId($user2->id);
-        $u2Cards      = Utility::filterCardsByTypeAndRange($user2->cards, $cardType, $cardRange);
+        $u2           = $this->getUser($userIds[1]);
+        $u2Cards      = Utility::filterCardsByTypeAndRange($u2->cards, $cardType, $cardRange);
         $u2CardsCount = count($u2Cards);
 
-        $user2Result = [
-            'id'         => $user2->id,
+        $u2Result = [
+            'id'         => $u2->id,
             'cardsShown' => $u2Cards,
             'points'     => $u2CardsCount,
         ];
 
         $result = [
-            $user1SN  => $user1Result,
-            $user2SN  => $user2Result,
+            $u1->id  => $u1Result,
+            $u2->id  => $u2Result,
         ];
 
         //
@@ -509,25 +492,25 @@ class GameService extends BaseService
         {
             call_user_func_array(
                 [$this->redis, 'srem'],
-                array_merge([$user1->id], $u1Cards)
+                array_merge([$u1->id], $u1Cards)
             );
-            $user1->removeCards($u1Cards);
+            $u1->removeCards($u1Cards);
         }
 
         if ($u2CardsCount > 0)
         {
             call_user_func_array(
                 [$this->redis, 'srem'],
-                array_merge([$user2->id], $u2Cards)
+                array_merge([$u2->id], $u2Cards)
             );
-            $user2->removeCards($u2Cards);
+            $u2->removeCards($u2Cards);
         }
 
-        $this->redis->hincrby($game->id, $user1SN . '_points', $u1CardsCount);
-        $this->redis->hincrby($game->id, $user2SN . '_points', $u2CardsCount);
+        $this->redis->hincrby($game->id, 'points_' . $u1->id, $u1CardsCount);
+        $this->redis->hincrby($game->id, 'points_' . $u2->id, $u2CardsCount);
 
-        $game->incrPoint($user1->id, $u1CardsCount);
-        $game->incrPoint($user2->id, $u2CardsCount);
+        $game->incrPoint($u1->id, $u1CardsCount);
+        $game->incrPoint($u2->id, $u2CardsCount);
 
         return [true, $result];
     }
@@ -563,8 +546,7 @@ class GameService extends BaseService
 
         $this->pubSub->trigger(
             $game->id,
-            Event::GAME_OVER_ACTION,
-            $game->toArray()
+            Event::GAME_OVER_ACTION
         );
 
         return $game;
