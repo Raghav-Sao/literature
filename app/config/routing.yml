@@ -10,12 +10,6 @@ default_index:
 
 # AppBundle > GameController
 
-game_start:
-    path:            /game/start
-    methods:         [GET]
-    defaults:
-        _controller: AppBundle:Game:start
-
 game_index:
     path:            /game
     methods:         [GET]
@@ -23,7 +17,13 @@ game_index:
         _controller: AppBundle:Game:index
 
 # TODO:
-# - Remove get from following routes, once dev complete
+#     - Remove GET from following routes after dev complete.
+
+game_start:
+    path:            /game/start
+    methods:         [POST, GET]
+    defaults:
+        _controller: AppBundle:Game:start
 
 game_join:
     path:            /game/{gameId}/join/{team}

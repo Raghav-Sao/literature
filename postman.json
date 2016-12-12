@@ -22,7 +22,7 @@
 			"response": []
 		},
 		{
-			"name": "[Game] Index",
+			"name": "Game Index",
 			"request": {
 				"url": "http://www.literature.dev/game",
 				"method": "GET",
@@ -36,10 +36,10 @@
 			"response": []
 		},
 		{
-			"name": "[Game] Start",
+			"name": "Game start",
 			"request": {
 				"url": "http://www.literature.dev/game/start",
-				"method": "GET",
+				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "formdata",
@@ -50,7 +50,7 @@
 			"response": []
 		},
 		{
-			"name": "[Game] Delete",
+			"name": "Game delete",
 			"request": {
 				"url": "http://www.literature.dev/game/delete",
 				"method": "DELETE",
@@ -64,9 +64,9 @@
 			"response": []
 		},
 		{
-			"name": "[Game] Join at given serial number",
+			"name": "Game Join",
 			"request": {
-				"url": "http://www.literature.dev/game/g_89bcb90655012d20a6366e930645cb14/join/u2",
+				"url": "http://www.literature.dev/game/g_92cb8f18dcbeb7a53c233a85896d834d/join/team0",
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -78,10 +78,10 @@
 			"response": []
 		},
 		{
-			"name": "[Game] Move: request for a card from other user",
+			"name": "Game Move",
 			"request": {
-				"url": "http://www.literature.dev/game/move/c1/from/u2",
-				"method": "PATCH",
+				"url": "http://www.literature.dev/game/move/c1/from/kufma9tfb9jn6kais2d18i7ub0",
+				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "formdata",
@@ -92,7 +92,21 @@
 			"response": []
 		},
 		{
-			"name": "[Chat] Post new message",
+			"name": "Game Show",
+			"request": {
+				"url": "http://www.literature.dev/game/show/c/lower",
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Chat Post New Message",
 			"request": {
 				"url": "http://www.literature.dev/chat",
 				"method": "POST",
