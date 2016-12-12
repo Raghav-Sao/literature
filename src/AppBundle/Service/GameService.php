@@ -222,10 +222,10 @@ class GameService extends BaseService
         // Publish this action
 
         $payload = [
-            'success'    => $success,
+            'fromUserId' => $fromUser->id,
             'toUserId'   => $toUser->id,
             'card'       => $card,
-            'fromUserId' => $fromUser->id,
+            'success'    => $success,
         ];
         $this->pubSub->trigger($game->id, Event::GAME_MOVE_ACTION, $payload);
 
