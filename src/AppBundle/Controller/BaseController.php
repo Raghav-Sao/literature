@@ -90,7 +90,7 @@ class BaseController extends Controller
     {
         if (empty($this->game) === false)
         {
-            throw new BadRequestException('A game exists in session already.');
+            throw new BadRequestException('A game exists in session already.', ['gameId' => $this->game->id]);
         }
     }
 
@@ -103,12 +103,12 @@ class BaseController extends Controller
 
         if (empty($this->user))
         {
-            throw new BadRequestException('No details found for session user.');
+            throw new BadRequestException('No details found for session user.', ['userId' => $this->userId]);
         }
 
         if ($this->game->hasUser($this->user->id) === false)
         {
-            throw new BadRequestException('Session user does not belong the game.');
+            throw new BadRequestException('Session user does not belong the game.', ['gameId' => $this->game->id, 'userId' => $this->user->id]);
         }
     }
 

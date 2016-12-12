@@ -37,9 +37,9 @@ class DefaultControllerTest extends AbstractControllerTest
         $expected = [
             'success'      => false,
             'errorCode'    => Exception\Code::BAD_REQUEST,
-            'errorMessage' => 'You appear to be active in a game',
+            'errorMessage' => 'A game exists in session already.',
             'extra'        => [
-                'id'       => $resBody->response->game->id,
+                'gameId' => TestFlag::SOMETHING,
             ],
         ];
 

@@ -21,12 +21,17 @@ class GameControllerTest extends AbstractControllerTest
             'success'  => true,
             'response' => [
                 'game' => [
-                    'id'     => TestFlag::SOMETHING,
-                    'status' => Status::INITIALIZED,
-                    'u1'     => TestFlag::SOMETHING,
-                    'u2'     => null,
-                    'u3'     => null,
-                    'u4'     => null,
+                    'id'           => TestFlag::SOMETHING,
+                    'createdAt'    => TestFlag::SOMETHING,
+                    'status'       => Status::INITIALIZED,
+                    'prevTurn'     => null,
+                    'prevTurnTime' => TestFlag::SOMETHING,
+                    'nextTurn'     => TestFlag::SOMETHING,
+                    'usersCount'   => 1,
+                    'users'        => TestFlag::SOMETHING,
+                    'team0'        => TestFlag::SOMETHING,
+                    'team1'        => TestFlag::SOMETHING,
+                    'points'       => TestFlag::SOMETHING,
                 ],
                 'user' => [
                     'id'    => TestFlag::SOMETHING,
@@ -37,129 +42,25 @@ class GameControllerTest extends AbstractControllerTest
 
         $resBody = $this->makeFirstAssertions($res, 200, $expected);
 
-        $this->assertCount(12, $resBody->response->user->cards);
+        $game = $resBody->response->game;
+        $user = $resBody->response->user;
 
-        // On reloading the same page,
-        // should throw 400 saying you're already in a game
+        $this->assertCount(12, $user->cards);
+        $this->assertEquals($game->nextTurn, $user->id);
 
-        $client->reload();
-        $res = $client->getResponse();
-
-        $expected = [
-            'success'      => false,
-            'errorCode'    => Exception\Code::BAD_REQUEST,
-            'errorMessage' => 'You appear to be active in a game',
-            'extra'        => [
-                'id'       => $resBody->response->game->id,
-            ],
-        ];
-
-        $resBody = $this->makeFirstAssertions($res, 400, $expected);
+        //
+        // TODO:
+        // - Add more asserts
+        //
     }
 
-    public function testIndexAction()
-    {
-        $client = static::createClient();
-
-        // Without a game already created, should throw 404
-        $client->request('GET', '/game');
-
-        $res = $client->getResponse();
-
-        $expected = [
-            'success'      => false,
-            'errorCode'    => Exception\Code::NOT_FOUND,
-            'errorMessage' => 'Game not found',
-            'extra'        => [],
-        ];
-
-        $resBody = $this->makeFirstAssertions($res, 404, $expected);
-
-        // Now after creating a game
-
-        $client->request('GET', '/game/start');
-
-        $res = $client->getResponse();
-
-        $resBody = $this->makeFirstAssertions($res, 200, []);
-
-        $gameId  = $resBody->response->game->id;
-        $userId  = $resBody->response->user->id;
-
-        $client->request('GET', '/game');
-
-        $res = $client->getResponse();
-
-        $expected = [
-            'success'  => true,
-            'response' => [
-                'game' => [
-                    'id'     => $gameId,
-                    'status' => Status::INITIALIZED,
-                    'u1'     => $userId,
-                    'u2'     => null,
-                    'u3'     => null,
-                    'u4'     => null,
-                ],
-                'user' => [
-                    'id'    => $userId,
-                    'cards' => TestFlag::SOMETHING,
-                ],
-            ],
-        ];
-
-        $resBody = $this->makeFirstAssertions($res, 200, $expected);
-
-        $this->assertCount(12, $resBody->response->user->cards);
-    }
-
-    public function testJoinAction()
+    public function testStartActionWhenSessionGameExists()
     {
     }
 
-    public function testMoveAction()
-    {
-    }
-
-    public function testDeleteAction()
-    {
-        $client = static::createClient();
-
-        // Without a game already created, should throw 404
-
-        $client->request('DELETE', '/game/delete');
-
-        $res = $client->getResponse();
-
-        $expected = [
-            'success'      => false,
-            'errorCode'    => Exception\Code::NOT_FOUND,
-            'errorMessage' => 'Game not found',
-            'extra'        => [],
-        ];
-
-        $resBody = $this->makeFirstAssertions($res, 404, $expected);
-
-        // Now after starting a game
-
-        $client->request('GET', '/game/start');
-
-        $client->request('DELETE', '/game/delete');
-
-        $res = $client->getResponse();
-
-        $expected = [
-            'success' => true,
-            'response' => [
-                'success' => true,
-            ],
-        ];
-
-        $resBody = $this->makeFirstAssertions($res, 200, $expected);
-    }
-
-    // ----------------------------------------------------------------------
-    // Protected methods
-
-
+    //
+    // TODO:
+    // - Add more tests
+    //   Ensure controller changes are covered.
+    //
 }

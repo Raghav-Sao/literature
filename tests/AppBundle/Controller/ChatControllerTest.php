@@ -16,12 +16,12 @@ class ChatControllerTest extends AbstractControllerTest
 
         $expected = [
             'success'      => false,
-            'errorCode'    => Exception\Code::NOT_FOUND,
-            'errorMessage' => 'Game not found',
+            'errorCode'    => Exception\Code::BAD_REQUEST,
+            'errorMessage' => 'No game exists in session.',
             'extra'        => [],
         ];
 
-        $resBody = $this->makeFirstAssertions($res, 404, $expected);
+        $resBody = $this->makeFirstAssertions($res, 400, $expected);
     }
 
     public function testPostActionWithMessage()
@@ -45,7 +45,9 @@ class ChatControllerTest extends AbstractControllerTest
 
         $expected = [
             'success'  => true,
-            'response' => null,
+            'response' => [
+                'message' => 'A sample message..',
+            ],
         ];
 
         $resBody = $this->makeFirstAssertions($res, 200, $expected);

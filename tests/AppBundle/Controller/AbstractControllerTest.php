@@ -7,32 +7,29 @@ use Symfony\Component\HttpFoundation\Response;
 
 use AppBundle\Utility;
 
-/**
- * All function(controller) test should extend this class.
- * It has very basic methods to help in making first few basic assertions:
- * - Like checking response
- * - Response headers
- *
- */
 class AbstractControllerTest extends WebTestCase
 {
-    public function makeFirstAssertions(
-        Response $res,
-        $code,
-        $expected = array()
-    )
-    {
+    //
+    // All function(controller) test should extend this class.
+    // It has very basic methods to help in making first few basic assertions:
+    // - Like checking response
+    // - Response headers
+    //
 
+    public function makeFirstAssertions(Response $res, $code, $expected = array())
+    {
+        //
         // Asserts:
         // - Respons content type
         // - Response status code
         // - Response body
+        //
 
         $isJson = $res->headers->contains('content-type', 'application/json');
-        $this->assertTrue($isJson);
+        $this->assertTrue($isJson, 'Response content type is not json.');
 
         $statusCode = $res->getStatusCode();
-        $this->assertEquals($code, $statusCode);
+        $this->assertEquals($code, $statusCode, 'Response status code mismatch.');
 
         $resBody = json_decode($res->getContent());
         $this->doMakeFirstAssertions($resBody, $expected);
@@ -40,22 +37,19 @@ class AbstractControllerTest extends WebTestCase
         return $resBody;
     }
 
-    /**
-     * Helper method to compare http response object & expected response array
-     *     and makes assertions accordingly.
-     * *Recursive
-     */
-    protected function doMakeFirstAssertions(
-              $resBody,
-        array $expected
-    )
+    protected function doMakeFirstAssertions($resBody, array $expected)
     {
+        //
+        // Helper method to compare http response object & expected response array
+        // and makes assertions accordingly.
+        //
+        // *Recursive
+        //
+
         foreach ($expected as $key => $value)
         {
-            // Asserts if the key exists in res
-            $this->assertTrue(property_exists($resBody, $key));
+            $this->assertTrue(property_exists($resBody, $key), "'$key' key does not exists in response.");
 
-            // Recursively calls same method to resolve nested assertions
             if (Utility::isAssocArray($value))
             {
                 $this->doMakeFirstAssertions($resBody->$key, $value);
@@ -68,7 +62,7 @@ class AbstractControllerTest extends WebTestCase
                 }
                 else
                 {
-                    $this->assertEquals($value, $resBody->$key);
+                    $this->assertEquals($value, $resBody->$key, "Value of '$key' key not matching.");
                 }
             }
         }

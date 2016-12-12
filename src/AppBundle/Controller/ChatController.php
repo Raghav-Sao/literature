@@ -15,7 +15,7 @@ class ChatController extends BaseController
 
         $this->ensureGameAndUser();
 
-        $message = $this->input['message'];
+        $message = ($this->input['message']) ?? null;
 
         if (empty($message))
         {
