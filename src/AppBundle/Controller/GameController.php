@@ -14,7 +14,7 @@ class GameController extends BaseController
     {
         $this->init();
 
-        $this->throwIfUserActiveInAnotherGame();
+        $this->ensureNoGame();
 
         $result = $this->gameService->init($this->userId);
 
@@ -27,11 +27,10 @@ class GameController extends BaseController
     {
         $this->init();
 
-        $result = $this->gameService
-                       ->getAndValidate(
-                            $this->gameId,
-                            $this->userId
-                        );
+        $this->ensureGameAndUser();
+
+        $result = $this->gameService->index($this->game, $this->user);
+
 
         return new Response\Ok($result->serialize());
     }
@@ -41,7 +40,7 @@ class GameController extends BaseController
 
         $this->init();
 
-        $this->throwIfUserActiveInAnotherGame();
+        $this->ensureNoGame();
 
         $result = $this->gameService
                        ->join(
@@ -60,18 +59,14 @@ class GameController extends BaseController
 
         $this->init();
 
-        $result = $this->gameService
-                       ->getAndValidate(
-                            $this->gameId,
-                            $this->userId
-                        );
+        $this->ensureGameAndUser();
 
         $moveResult = $this->gameService
                            ->moveCard(
-                                $result->game,
+                                $this->game,
+                                $this->user,
                                 $card,
-                                $fromUserId,
-                                $this->userId
+                                $fromUserId
                             );
 
         return new Response\Ok($moveResult->serialize(Group::GAME_MOVE));
@@ -81,19 +76,12 @@ class GameController extends BaseController
     {
         $this->init();
 
-        $result = $this->gameService
-                       ->getAndValidate(
-                            $this->gameId,
-                            $this->userId
-                        );
-
-        $game = $result->game;
-        $user = $result->user;
+        $this->ensureGameAndUser();
 
         $showResult = $this->gameService
                             ->show(
-                                $game,
-                                $user,
+                                $this->game,
+                                $this->user,
                                 $cardType,
                                 $cardRange
                             );
@@ -106,13 +94,9 @@ class GameController extends BaseController
     {
         $this->init();
 
-        $result = $this->gameService
-                       ->getAndValidate(
-                            $this->gameId,
-                            $this->userId
-                        );
+        $this->ensureGameAndUser();
 
-        $this->gameService->delete($result->game);
+        $this->gameService->delete($this->game);
 
         $this->resetContext();
 

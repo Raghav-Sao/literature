@@ -21,22 +21,28 @@ class BaseController extends Controller
 
     protected $gameService;
 
-    protected $userId;
-    protected $gameId;
+    protected $gameId = null;
+    protected $userId = null;
+
+    protected $game   = null;
+    protected $user   = null;
 
     // ----- Protected methods -----
 
     protected function init()
     {
-        $this->logger      = $this->container->get('logger');
-        $this->request     = $this->container->get('request_stack')
-                                             ->getCurrentRequest();
-        $this->session     = $this->request->getSession();
+        //
+        // Init services
+        //
 
+        $this->logger      = $this->container->get('logger');
+        $this->request     = $this->container->get('request_stack')->getCurrentRequest();
+        $this->session     = $this->request->getSession();
         $this->gameService = $this->container->get(Service::GAME);
 
-        $this->gameId      = $this->session->get(ContextKey::GAME_ID, false);
-        $this->userId      = $this->session->getId();
+        //
+        // Parses request payload
+        //
 
         $this->input       = [];
 
@@ -47,34 +53,63 @@ class BaseController extends Controller
         {
             $this->input   = json_decode($this->request->getContent(), true);
         }
+
+        //
+        // Gets game and user model
+        //
+
+        $this->gameId = $this->session->get(ContextKey::GAME_ID, false);
+
+        if ($this->gameId)
+        {
+            try
+            {
+                $this->game = $this->gameService->get($this->gameId);
+            }
+            catch (NotFoundException $e)
+            {
+                $this->setContext(ContextKey::GAME_ID, false);
+            }
+        }
+
+        $this->userId = $this->session->getId();
+
+        if ($this->userId)
+        {
+            try
+            {
+                $this->user = $this->gameService->getUser($this->userId);
+            }
+            catch (NotFoundException $e)
+            {
+            }
+        }
     }
 
-    protected function throwIfUserActiveInAnotherGame()
+    protected function ensureNoGame()
     {
-        if ($this->gameId === false)
+        if (empty($this->game) === false)
         {
-            return;
+            throw new BadRequestException('A game exists in session already.');
+        }
+    }
+
+    protected function ensureGameAndUser()
+    {
+        if (empty($this->game))
+        {
+            throw new BadRequestException('No game exists in session.');
         }
 
-        //
-        // Check if game exists in redis if not unset the session and return
-        //
-
-        try
+        if (empty($this->user))
         {
-            $game = $this->gameService->get($this->gameId);
-        }
-        catch (NotFoundException $e)
-        {
-            $this->setContext(ContextKey::GAME_ID, false);
-
-            return;
+            throw new BadRequestException('No details found for session user.');
         }
 
-        $error = 'You appear to be active in a game';
-        $extra = ['id' => $this->gameId];
-
-        throw new BadRequestException($error, $extra);
+        if ($this->game->hasUser($this->user->id) === false)
+        {
+            throw new BadRequestException('Session user does not belong the game.');
+        }
     }
 
     protected function setContext(string $key, string $value)

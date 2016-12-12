@@ -66,22 +66,8 @@ class GameService extends BaseService
         return new User($id, $set);
     }
 
-    public function getAndValidate(string $id, string $userId)
+    public function index(Game $game, User $user)
     {
-        //
-        // Gets game model by given id and validates
-        // if given userId belongs to the game.
-        //
-
-        $game = $this->get($id);
-
-        if ($userId && $game->hasUser($userId) === false)
-        {
-            throw new BadRequestException('You do not belong to game.');
-        }
-
-        $user = $this->getUser($userId);
-
         return Result::create($game, $user);
     }
 
@@ -182,16 +168,15 @@ class GameService extends BaseService
 
     public function moveCard(
         Game   $game,
+        User   $toUser,
         string $card,
-        string $fromUserId,
-        string $toUserId
+        string $fromUserId
     )
     {
         //
         // Attempts moving given card between given users of game
         //
 
-        $toUser   = $this->getUser($toUserId);
         $fromUser = $this->getUser($fromUserId);
 
         $this->validateMove($game, $card, $fromUser, $toUser);
@@ -214,7 +199,7 @@ class GameService extends BaseService
         {
             // Else, update nextTurn
 
-            $game->nextTurn = $fromUserId;
+            $game->nextTurn = $fromUser->id;
 
             $success = false;
         }
@@ -238,9 +223,9 @@ class GameService extends BaseService
 
         $payload = [
             'success'    => $success,
+            'toUserId'   => $toUser->id,
             'card'       => $card,
-            'fromUserId' => $fromUserId,
-            'toUserId'   => $toUserId,
+            'fromUserId' => $fromUser->id,
         ];
         $this->pubSub->trigger($game->id, Event::GAME_MOVE_ACTION, $payload);
 
