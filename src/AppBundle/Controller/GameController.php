@@ -27,7 +27,7 @@ class GameController extends BaseController
     {
         $this->init();
 
-        $this->ensureGameAndUser();
+        $this->ensureGameAndUser(false);
 
         $result = $this->gameService->index($this->game, $this->user);
 
@@ -94,7 +94,7 @@ class GameController extends BaseController
     {
         $this->init();
 
-        $this->ensureGameAndUser();
+        $this->ensureGameAndUser(false);
 
         $this->gameService->delete($this->game);
 

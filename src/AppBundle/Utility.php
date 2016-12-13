@@ -2,7 +2,6 @@
 
 namespace AppBundle;
 
-use AppBundle\Constant\Game\Game;
 use AppBundle\Constant\Game\Card;
 
 class Utility
@@ -25,7 +24,7 @@ class Utility
 
     public static function newGameId()
     {
-        return Game::GAME_ID_PREFIX . self::randomString();
+        return 'g_' . self::randomString();
     }
 
     public static function isAssocArray($v)

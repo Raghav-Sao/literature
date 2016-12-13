@@ -10,7 +10,7 @@ class User
     public $id;
     public $cards;
 
-    public function __construct(string $id, array  $cards)
+    public function __construct(string $id, array $cards)
     {
         $this->id    = $id;
         $this->cards = $cards;

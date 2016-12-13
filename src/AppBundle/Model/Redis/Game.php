@@ -5,7 +5,6 @@ namespace AppBundle\Model\Redis;
 use AppBundle\Utility;
 use AppBundle\Constant\Game\Status;
 use AppBundle\Constant\Game\Card;
-use AppBundle\Constant\Game\Game as GameK;
 use AppBundle\Exception\BadRequestException;
 
 class Game
@@ -17,18 +16,49 @@ class Game
     public $prevTurnTime;
     public $nextTurn;
 
-    public $usersCount = 0;  // Count of users joined
-    public $users      = []; // List of user ids
+    public $usersCount       = 0;  // Count of users joined
+    public $users            = []; // List of user ids
+    public $usersWithNoCards = []; // List of users who have no cards left
 
-    public $team0      = []; // List of ids in team0
-    public $team1      = [];
+    public $team0            = []; // List of ids in team0
+    public $team1            = [];
 
-    public $points     = []; // Associative list, (user id -> points)
+    public $points           = []; // Associative list, (user id -> points)
 
-    public $cards0     = []; // List of intial cards for first user joined
-    public $cards1     = [];
-    public $cards2     = [];
-    public $cards3     = [];
+    public $cards0           = []; // List of intial cards for first user joined
+    public $cards1           = [];
+    public $cards2           = [];
+    public $cards3           = [];
+
+    //
+    // Following keys are stored in model and in redis in same way
+    //
+
+    public static $noOpKeys = [
+        'id',
+        'createdAt',
+        'status',
+        'prevTurn',
+        'prevTurnTime',
+        'nextTurn',
+        'usersCount',
+    ];
+
+    //
+    // Following keys are array in model but stored as comma separated
+    // string in redis
+    //
+
+    public static $explodeOpKeys = [
+        'users',
+        'usersWithNoCards',
+        'team0',
+        'team1',
+        'cards0',
+        'cards1',
+        'cards2',
+        'cards3',
+    ];
 
     public function __construct(string $id, array $params)
     {
@@ -54,6 +84,11 @@ class Game
         return in_array($userId, $this->users, true);
     }
 
+    public function hasCards(string $userId)
+    {
+        return (in_array($userId, $this->usersWithNoCards, true) === false);
+    }
+
     public function canJoin(string $team)
     {
         //
@@ -62,7 +97,7 @@ class Game
         // - Is vacant?
         //
 
-        if (in_array($team, [GameK::TEAM0, GameK::TEAM1], true) === false)
+        if (in_array($team, ['team0', 'team1'], true) === false)
         {
             throw new BadRequestException('Invalid team name.');
         }
@@ -96,24 +131,36 @@ class Game
     {
         if (in_array($userId, $this->team0))
         {
-            return GameK::TEAM0;
+            return 'team0';
         }
         else
         {
-            return GameK::TEAM1;
+            return 'team1';
         }
     }
 
     public function getOppTeam(string $userId)
     {
-        if ($this->getTeam($userId) === GameK::TEAM0)
+        if (in_array($userId, $this->team0))
         {
-            return GameK::TEAM1;
+            return 'team1';
         }
         else
         {
-            return GameK::TEAM0;
+            return 'team0';
         }
+    }
+
+    public function getValidNextTurn()
+    {
+        if ($this->hasCards($this->nextTurn))
+        {
+            return $this->nextTurn;
+        }
+
+        $possibleNextTurn = array_diff($this->users, $this->usersWithNoCards);
+
+        return current($possibleNextTurn);
     }
 
     public function allPointsMade()
@@ -125,21 +172,40 @@ class Game
     {
 
         return [
-            GameK::ID             => $this->id,
-            GameK::CREATED_AT     => (int) $this->createdAt,
-            GameK::STATUS         => $this->status,
-            GameK::PREV_TURN      => $this->prevTurn,
-            GameK::PREV_TURN_TIME => (int) $this->prevTurnTime,
-            GameK::NEXT_TURN      => $this->nextTurn,
-            
-            GameK::USERS_COUNT    => (int) $this->usersCount,
-            GameK::USERS          => $this->users,
-            
-            GameK::TEAM0          => $this->team0,
-            GameK::TEAM1          => $this->team1,
-            
-            GameK::POINTS         => $this->points,
+            'id'               => $this->id,
+            'createdAt'        => (int) $this->createdAt,
+            'status'           => $this->status,
+            'prevTurn'         => $this->prevTurn,
+            'prevTurnTime'     => (int) $this->prevTurnTime,
+            'nextTurn'         => $this->nextTurn,
+
+            'usersCount'       => (int) $this->usersCount,
+            'users'            => $this->users,
+            'usersWithNoCards' => $this->usersWithNoCards,
+
+            'team0'            => $this->team0,
+            'team1'            => $this->team1,
+
+            'points'           => $this->points,
         ];
+    }
+
+    //
+    // Setters
+
+    public function refreshNoCardsList(array $users)
+    {
+        foreach ($users as $user)
+        {
+            if (count($user->cards) === 0)
+            {
+                $this->usersWithNoCards[] = $user->id;
+            }
+        }
+
+        $this->usersWithNoCards = array_unique($this->usersWithNoCards);
+
+        return $this;
     }
 
     //
@@ -151,13 +217,16 @@ class Game
         // Method used to construct this model from redis hash
         //
 
-        if (in_array($key, GameK::$noOpKeys, true))
+        if (in_array($key, self::$noOpKeys, true))
         {
             $this->$key = $value;
         }
-        else if (in_array($key, GameK::$explodeOpKeys, true))
+        else if (in_array($key, self::$explodeOpKeys, true))
         {
-            $this->$key = explode(',', $value);
+            if (empty($value) === false)
+            {
+                $this->$key = explode(',', $value);
+            }
         }
         else if (preg_match('/(points_)(?P<userId>.*)/', $key, $matches))
         {

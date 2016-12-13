@@ -6,7 +6,6 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 use AppBundle\Service;
 use AppBundle\Model\Redis\Game;
-use AppBundle\Constant\Game\Game as GameK;
 use AppBundle\Constant\Game\Status;
 use AppBundle\Constant\Game\Card;
 use AppBundle\Constant\Game\Event;

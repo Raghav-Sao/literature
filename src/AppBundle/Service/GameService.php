@@ -7,7 +7,6 @@ use AppBundle\Model\Redis\User;
 use AppBundle\Exception\NotFoundException;
 use AppBundle\Exception\BadRequestException;
 use AppBundle\Utility;
-use AppBundle\Constant\Game\Game as GameK;
 use AppBundle\Constant\Game\Status;
 use AppBundle\Constant\Game\Event;
 use AppBundle\Constant\Game\Card;
@@ -60,10 +59,22 @@ class GameService extends BaseService
 
         if (empty($set))
         {
-            throw new NotFoundException('User\'s card set not found.');
+            $hash = [];
         }
 
         return new User($id, $set);
+    }
+
+    public function getUsers(Game $game)
+    {
+        $users = [];
+
+        foreach ($game->users as $userId)
+        {
+            $users[] = $this->getUser($userId);
+        }
+
+        return $users;
     }
 
     public function index(Game $game, User $user)
@@ -127,10 +138,10 @@ class GameService extends BaseService
         $this->redis->hmset(
             $game->id,
 
-            GameK::USERS_COUNT,
+            'usersCount',
             $game->usersCount,
 
-            GameK::USERS,
+            'users',
             implode(',', $game->users),
 
             $team,
@@ -139,10 +150,10 @@ class GameService extends BaseService
             'points_' . $userId,
             0,
 
-            GameK::STATUS,
+            'status',
             $game->status,
 
-            GameK::PREV_TURN_TIME,
+            'prevTurnTime',
             $game->prevTurnTime
         );
 
@@ -206,17 +217,22 @@ class GameService extends BaseService
 
         // Update game hash with nextTurn, prevTurn, prevTurnTime
 
+        $game->refreshNoCardsList([$fromUser]);
+
         $this->redis->hmset(
             $game->id,
 
-            GameK::PREV_TURN,
+            'prevTurn',
             $game->prevTurn,
 
-            GameK::PREV_TURN_TIME,
+            'prevTurnTime',
             $game->prevTurnTime,
 
-            GameK::NEXT_TURN,
-            $game->nextTurn
+            'nextTurn',
+            $game->getValidNextTurn(),
+
+            'usersWithNoCards',
+            implode(',', $game->usersWithNoCards)
         );
 
         // Publish this action
@@ -280,6 +296,26 @@ class GameService extends BaseService
             }
         }
 
+        // Update game hash
+
+        $game->refreshNoCardsList($this->getUsers($game));
+
+        $this->redis->hmset(
+            $game->id,
+
+            'prevTurn',
+            $game->nextTurn,
+
+            'prevTurnTime',
+            time(),
+
+            'nextTurn',
+            $game->getValidNextTurn(),
+
+            'usersWithNoCards',
+            implode(',', $game->usersWithNoCards)
+        );
+
         // Refresh models
 
         $game = $this->get($game->id);
@@ -328,24 +364,24 @@ class GameService extends BaseService
         $hash = [
             $id,
 
-            GameK::CREATED_AT,
+            'created_at',
             time(),
 
-            GameK::STATUS,
+            'status',
             Status::INITIALIZED,
 
             // prevTurn, prevTurnTime null at this point
 
-            GameK::NEXT_TURN,
+            'nextTurn',
             $userId,
 
-            GameK::USERS_COUNT,
+            'usersCount',
             1,
 
-            GameK::USERS,
+            'users',
             $userId,
 
-            GameK::TEAM0,
+            'team0',
             $userId,
 
             // team1 null at this point
@@ -355,16 +391,16 @@ class GameService extends BaseService
 
             // points_ for other users wont' exist at this point
 
-            GameK::CARDS0,
+            'cards0',
             implode(',', $cards[0]),
 
-            GameK::CARDS1,
+            'cards1',
             implode(',', $cards[1]),
 
-            GameK::CARDS2,
+            'cards2',
             implode(',', $cards[2]),
 
-            GameK::CARDS3,
+            'cards3',
             implode(',', $cards[3]),
         ];
 
@@ -382,6 +418,11 @@ class GameService extends BaseService
         // Does necessary validations for move action in a game
         //
 
+        if ($game->hasCards($fromUser->id) === false)
+        {
+            throw new BadRequestException('\'From User\' has no cards.');
+        }
+
         if (Utility::isValidCard($card) === false)
         {
             throw new BadRequestException('Not a valid card.');
@@ -389,7 +430,7 @@ class GameService extends BaseService
 
         if ($game->hasUser($fromUser->id) === false)
         {
-            throw new BadRequestException('Bad value for fromUserId, Does not exists.');
+            throw new BadRequestException('\'From User\' does not exist.');
         }
 
         if ($game->nextTurn !== $toUser->id)
@@ -399,12 +440,12 @@ class GameService extends BaseService
 
         if ($game->areTeam($fromUser->id, $toUser->id))
         {
-            throw new BadRequestException('Bad value for fromUserId, You are partners.');
+            throw new BadRequestException('You and \'From User\' are in same team.');
         }
 
         if ($toUser->hasCard($card))
         {
-            throw new BadRequestException('Bad value for card, You have it already.');
+            throw new BadRequestException('You have the requested card already.');
         }
 
         if ($toUser->hasAtLeastOneCardOfType($card) === false)
@@ -511,7 +552,7 @@ class GameService extends BaseService
         $hash = [
             $game->id,
 
-            GameK::STATUS,
+            'status',
             $game->status,
         ];
 

@@ -94,16 +94,16 @@ class BaseController extends Controller
         }
     }
 
-    protected function ensureGameAndUser()
+    protected function ensureGameAndUser(bool $active = true)
     {
         if (empty($this->game))
         {
             throw new BadRequestException('No game exists in session.');
         }
 
-        if (empty($this->user))
+        if ($active && $this->game->isActive() === false)
         {
-            throw new BadRequestException('No details found for session user.', ['userId' => $this->userId]);
+            throw new BadRequestException('Game is not active.', ['gameId' => $this->game->id]);
         }
 
         if ($this->game->hasUser($this->user->id) === false)
