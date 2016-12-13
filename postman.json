@@ -2,25 +2,11 @@
 	"variables": [],
 	"info": {
 		"name": "Literature / https://github.com/Raghav-Sao/literature",
-		"_postman_id": "7e4eee46-a758-20b8-784f-127ea5788651",
+		"_postman_id": "b81a2f80-f2e5-5777-0d13-450265960d64",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
 	"item": [
-		{
-			"name": "Index",
-			"request": {
-				"url": "http://www.literature.dev",
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "formdata",
-					"formdata": []
-				},
-				"description": ""
-			},
-			"response": []
-		},
 		{
 			"name": "Game Index",
 			"request": {
@@ -33,7 +19,148 @@
 				},
 				"description": ""
 			},
-			"response": []
+			"response": [
+				{
+					"id": "6685914e-df03-4b7c-9149-57111b623fbb",
+					"name": "Success",
+					"originalRequest": {
+						"url": "http://www.literature.dev/game",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"_postman_previewtype": "text",
+					"header": [
+						{
+							"name": "Cache-Control",
+							"key": "Cache-Control",
+							"value": "no-cache",
+							"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+						},
+						{
+							"name": "Connection",
+							"key": "Connection",
+							"value": "keep-alive",
+							"description": "Options that are desired for the connection"
+						},
+						{
+							"name": "Content-Type",
+							"key": "Content-Type",
+							"value": "application/json",
+							"description": "The mime type of this content"
+						},
+						{
+							"name": "Date",
+							"key": "Date",
+							"value": "Tue, 13 Dec 2016 16:37:29 GMT",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"name": "Server",
+							"key": "Server",
+							"value": "nginx/1.11.1",
+							"description": "A name for the server"
+						},
+						{
+							"name": "Transfer-Encoding",
+							"key": "Transfer-Encoding",
+							"value": "chunked",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						},
+						{
+							"name": "X-Debug-Token",
+							"key": "X-Debug-Token",
+							"value": "612319",
+							"description": "Custom header"
+						},
+						{
+							"name": "X-Debug-Token-Link",
+							"key": "X-Debug-Token-Link",
+							"value": "http://www.literature.dev/_profiler/612319",
+							"description": "Custom header"
+						}
+					],
+					"cookie": [],
+					"responseTime": 244,
+					"body": "{\"success\":true,\"response\":{\"game\":{\"id\":\"g_9f2df7473ba4aeb782c3ce1fe1d6a609\",\"createdAt\":1481646985,\"status\":\"active\",\"prevTurn\":null,\"prevTurnTime\":1481647021,\"nextTurn\":\"4p8a29tg90qm4a5atrebbetpt1\",\"usersCount\":4,\"users\":[\"4p8a29tg90qm4a5atrebbetpt1\",\"76dp78ll61tk1i9j0nqmbdshp6\",\"9k2mr6i1n6kro861amoi5519q6\",\"8rf2vdjbbrfv9luq5u549q0la6\"],\"team0\":[\"4p8a29tg90qm4a5atrebbetpt1\",\"8rf2vdjbbrfv9luq5u549q0la6\"],\"team1\":[\"76dp78ll61tk1i9j0nqmbdshp6\",\"9k2mr6i1n6kro861amoi5519q6\"],\"points\":{\"4p8a29tg90qm4a5atrebbetpt1\":0,\"76dp78ll61tk1i9j0nqmbdshp6\":0,\"9k2mr6i1n6kro861amoi5519q6\":0,\"8rf2vdjbbrfv9luq5u549q0la6\":0}},\"user\":{\"id\":\"8rf2vdjbbrfv9luq5u549q0la6\",\"cards\":[\"c1\",\"c4\",\"c10\",\"d1\",\"d9\",\"h1\",\"h2\",\"h6\",\"h9\",\"s5\",\"s8\",\"s13\"]}}}"
+				},
+				{
+					"id": "52fc7623-bdcb-4c31-8447-a35b8b5d0768",
+					"name": "Failure",
+					"originalRequest": {
+						"url": "http://www.literature.dev/game",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"_postman_previewtype": "text",
+					"header": [
+						{
+							"name": "Cache-Control",
+							"key": "Cache-Control",
+							"value": "no-cache",
+							"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+						},
+						{
+							"name": "Connection",
+							"key": "Connection",
+							"value": "keep-alive",
+							"description": "Options that are desired for the connection"
+						},
+						{
+							"name": "Content-Type",
+							"key": "Content-Type",
+							"value": "application/json",
+							"description": "The mime type of this content"
+						},
+						{
+							"name": "Date",
+							"key": "Date",
+							"value": "Tue, 13 Dec 2016 16:36:08 GMT",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"name": "Server",
+							"key": "Server",
+							"value": "nginx/1.11.1",
+							"description": "A name for the server"
+						},
+						{
+							"name": "Transfer-Encoding",
+							"key": "Transfer-Encoding",
+							"value": "chunked",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						},
+						{
+							"name": "X-Debug-Token",
+							"key": "X-Debug-Token",
+							"value": "998092",
+							"description": "Custom header"
+						},
+						{
+							"name": "X-Debug-Token-Link",
+							"key": "X-Debug-Token-Link",
+							"value": "http://www.literature.dev/_profiler/998092",
+							"description": "Custom header"
+						}
+					],
+					"cookie": [],
+					"responseTime": 59,
+					"body": "{\"success\":false,\"errorCode\":\"BAD_REQUEST\",\"errorMessage\":\"No game exists in session.\",\"extra\":[]}"
+				}
+			]
 		},
 		{
 			"name": "Game start",
@@ -47,7 +174,148 @@
 				},
 				"description": ""
 			},
-			"response": []
+			"response": [
+				{
+					"id": "80c0b000-3f2e-4b29-a5fd-d54c91799e44",
+					"name": "Success",
+					"originalRequest": {
+						"url": "http://www.literature.dev/game/start",
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"_postman_previewtype": "text",
+					"header": [
+						{
+							"name": "Cache-Control",
+							"key": "Cache-Control",
+							"value": "no-cache",
+							"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+						},
+						{
+							"name": "Connection",
+							"key": "Connection",
+							"value": "keep-alive",
+							"description": "Options that are desired for the connection"
+						},
+						{
+							"name": "Content-Type",
+							"key": "Content-Type",
+							"value": "application/json",
+							"description": "The mime type of this content"
+						},
+						{
+							"name": "Date",
+							"key": "Date",
+							"value": "Tue, 13 Dec 2016 16:33:25 GMT",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"name": "Server",
+							"key": "Server",
+							"value": "nginx/1.11.1",
+							"description": "A name for the server"
+						},
+						{
+							"name": "Transfer-Encoding",
+							"key": "Transfer-Encoding",
+							"value": "chunked",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						},
+						{
+							"name": "X-Debug-Token",
+							"key": "X-Debug-Token",
+							"value": "626d7f",
+							"description": "Custom header"
+						},
+						{
+							"name": "X-Debug-Token-Link",
+							"key": "X-Debug-Token-Link",
+							"value": "http://www.literature.dev/_profiler/626d7f",
+							"description": "Custom header"
+						}
+					],
+					"cookie": [],
+					"responseTime": 64,
+					"body": "{\"success\":true,\"response\":{\"game\":{\"id\":\"g_7e0a937356d3d9c615baf4c248dd3eab\",\"createdAt\":1481646805,\"status\":\"initialized\",\"prevTurn\":null,\"prevTurnTime\":0,\"nextTurn\":\"l047n2ilpargesmacelnh3re26\",\"usersCount\":1,\"users\":[\"l047n2ilpargesmacelnh3re26\"],\"team0\":[\"l047n2ilpargesmacelnh3re26\"],\"team1\":[],\"points\":{\"l047n2ilpargesmacelnh3re26\":0}},\"user\":{\"id\":\"l047n2ilpargesmacelnh3re26\",\"cards\":[\"c1\",\"c9\",\"c12\",\"d3\",\"d6\",\"d8\",\"d10\",\"h1\",\"h11\",\"s1\",\"s8\",\"s12\"]}}}"
+				},
+				{
+					"id": "61d99f80-9ddb-4afc-99c3-2163d5c8c4fb",
+					"name": "Failure",
+					"originalRequest": {
+						"url": "http://www.literature.dev/game/start",
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"_postman_previewtype": "text",
+					"header": [
+						{
+							"name": "Cache-Control",
+							"key": "Cache-Control",
+							"value": "no-cache",
+							"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+						},
+						{
+							"name": "Connection",
+							"key": "Connection",
+							"value": "keep-alive",
+							"description": "Options that are desired for the connection"
+						},
+						{
+							"name": "Content-Type",
+							"key": "Content-Type",
+							"value": "application/json",
+							"description": "The mime type of this content"
+						},
+						{
+							"name": "Date",
+							"key": "Date",
+							"value": "Tue, 13 Dec 2016 16:33:39 GMT",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"name": "Server",
+							"key": "Server",
+							"value": "nginx/1.11.1",
+							"description": "A name for the server"
+						},
+						{
+							"name": "Transfer-Encoding",
+							"key": "Transfer-Encoding",
+							"value": "chunked",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						},
+						{
+							"name": "X-Debug-Token",
+							"key": "X-Debug-Token",
+							"value": "7702ea",
+							"description": "Custom header"
+						},
+						{
+							"name": "X-Debug-Token-Link",
+							"key": "X-Debug-Token-Link",
+							"value": "http://www.literature.dev/_profiler/7702ea",
+							"description": "Custom header"
+						}
+					],
+					"cookie": [],
+					"responseTime": 66,
+					"body": "{\"success\":false,\"errorCode\":\"BAD_REQUEST\",\"errorMessage\":\"A game exists in session already.\",\"extra\":{\"gameId\":\"g_7e0a937356d3d9c615baf4c248dd3eab\"}}"
+				}
+			]
 		},
 		{
 			"name": "Game delete",
@@ -61,12 +329,83 @@
 				},
 				"description": ""
 			},
-			"response": []
+			"response": [
+				{
+					"id": "cc3ca482-caee-47f1-908b-38a9e84b22e5",
+					"name": "Success",
+					"originalRequest": {
+						"url": "http://www.literature.dev/game/delete",
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"_postman_previewtype": "text",
+					"header": [
+						{
+							"name": "Cache-Control",
+							"key": "Cache-Control",
+							"value": "no-cache",
+							"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+						},
+						{
+							"name": "Connection",
+							"key": "Connection",
+							"value": "keep-alive",
+							"description": "Options that are desired for the connection"
+						},
+						{
+							"name": "Content-Type",
+							"key": "Content-Type",
+							"value": "application/json",
+							"description": "The mime type of this content"
+						},
+						{
+							"name": "Date",
+							"key": "Date",
+							"value": "Tue, 13 Dec 2016 16:35:56 GMT",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"name": "Server",
+							"key": "Server",
+							"value": "nginx/1.11.1",
+							"description": "A name for the server"
+						},
+						{
+							"name": "Transfer-Encoding",
+							"key": "Transfer-Encoding",
+							"value": "chunked",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						},
+						{
+							"name": "X-Debug-Token",
+							"key": "X-Debug-Token",
+							"value": "1bbb91",
+							"description": "Custom header"
+						},
+						{
+							"name": "X-Debug-Token-Link",
+							"key": "X-Debug-Token-Link",
+							"value": "http://www.literature.dev/_profiler/1bbb91",
+							"description": "Custom header"
+						}
+					],
+					"cookie": [],
+					"responseTime": 77,
+					"body": "{\"success\":true,\"response\":{\"success\":true}}"
+				}
+			]
 		},
 		{
 			"name": "Game Join",
 			"request": {
-				"url": "http://www.literature.dev/game/g_92cb8f18dcbeb7a53c233a85896d834d/join/team0",
+				"url": "http://www.literature.dev/game/g_9f2df7473ba4aeb782c3ce1fe1d6a609/join/team0",
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -75,12 +414,83 @@
 				},
 				"description": ""
 			},
-			"response": []
+			"response": [
+				{
+					"id": "1e725865-0d3b-4c35-af81-da47b62dbeca",
+					"name": "Success",
+					"originalRequest": {
+						"url": "http://www.literature.dev/game/g_9f2df7473ba4aeb782c3ce1fe1d6a609/join/team0",
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"_postman_previewtype": "text",
+					"header": [
+						{
+							"name": "Cache-Control",
+							"key": "Cache-Control",
+							"value": "no-cache",
+							"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+						},
+						{
+							"name": "Connection",
+							"key": "Connection",
+							"value": "keep-alive",
+							"description": "Options that are desired for the connection"
+						},
+						{
+							"name": "Content-Type",
+							"key": "Content-Type",
+							"value": "application/json",
+							"description": "The mime type of this content"
+						},
+						{
+							"name": "Date",
+							"key": "Date",
+							"value": "Tue, 13 Dec 2016 16:37:02 GMT",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"name": "Server",
+							"key": "Server",
+							"value": "nginx/1.11.1",
+							"description": "A name for the server"
+						},
+						{
+							"name": "Transfer-Encoding",
+							"key": "Transfer-Encoding",
+							"value": "chunked",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						},
+						{
+							"name": "X-Debug-Token",
+							"key": "X-Debug-Token",
+							"value": "657cc1",
+							"description": "Custom header"
+						},
+						{
+							"name": "X-Debug-Token-Link",
+							"key": "X-Debug-Token-Link",
+							"value": "http://www.literature.dev/_profiler/657cc1",
+							"description": "Custom header"
+						}
+					],
+					"cookie": [],
+					"responseTime": 59,
+					"body": "{\"success\":true,\"response\":{\"game\":{\"id\":\"g_9f2df7473ba4aeb782c3ce1fe1d6a609\",\"createdAt\":1481646985,\"status\":\"active\",\"prevTurn\":null,\"prevTurnTime\":1481647021,\"nextTurn\":\"4p8a29tg90qm4a5atrebbetpt1\",\"usersCount\":4,\"users\":[\"4p8a29tg90qm4a5atrebbetpt1\",\"76dp78ll61tk1i9j0nqmbdshp6\",\"9k2mr6i1n6kro861amoi5519q6\",\"8rf2vdjbbrfv9luq5u549q0la6\"],\"team0\":[\"4p8a29tg90qm4a5atrebbetpt1\",\"8rf2vdjbbrfv9luq5u549q0la6\"],\"team1\":[\"76dp78ll61tk1i9j0nqmbdshp6\",\"9k2mr6i1n6kro861amoi5519q6\"],\"points\":{\"9k2mr6i1n6kro861amoi5519q6\":0,\"4p8a29tg90qm4a5atrebbetpt1\":0,\"76dp78ll61tk1i9j0nqmbdshp6\":0,\"8rf2vdjbbrfv9luq5u549q0la6\":0}},\"user\":{\"id\":\"8rf2vdjbbrfv9luq5u549q0la6\",\"cards\":[\"c1\",\"c4\",\"c10\",\"d1\",\"d9\",\"h1\",\"h2\",\"h6\",\"h9\",\"s5\",\"s8\",\"s13\"]}}}"
+				}
+			]
 		},
 		{
 			"name": "Game Move",
 			"request": {
-				"url": "http://www.literature.dev/game/move/c1/from/kufma9tfb9jn6kais2d18i7ub0",
+				"url": "http://www.literature.dev/game/move/c10/from/76dp78ll61tk1i9j0nqmbdshp6",
 				"method": "POST",
 				"header": [],
 				"body": {
@@ -89,7 +499,148 @@
 				},
 				"description": ""
 			},
-			"response": []
+			"response": [
+				{
+					"id": "0fe7c903-cc03-4e3d-86d4-a22a138dde89",
+					"name": "Success",
+					"originalRequest": {
+						"url": "http://www.literature.dev/game/move/c9/from/76dp78ll61tk1i9j0nqmbdshp6",
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"_postman_previewtype": "text",
+					"header": [
+						{
+							"name": "Cache-Control",
+							"key": "Cache-Control",
+							"value": "no-cache",
+							"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+						},
+						{
+							"name": "Connection",
+							"key": "Connection",
+							"value": "keep-alive",
+							"description": "Options that are desired for the connection"
+						},
+						{
+							"name": "Content-Type",
+							"key": "Content-Type",
+							"value": "application/json",
+							"description": "The mime type of this content"
+						},
+						{
+							"name": "Date",
+							"key": "Date",
+							"value": "Tue, 13 Dec 2016 16:39:55 GMT",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"name": "Server",
+							"key": "Server",
+							"value": "nginx/1.11.1",
+							"description": "A name for the server"
+						},
+						{
+							"name": "Transfer-Encoding",
+							"key": "Transfer-Encoding",
+							"value": "chunked",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						},
+						{
+							"name": "X-Debug-Token",
+							"key": "X-Debug-Token",
+							"value": "540f43",
+							"description": "Custom header"
+						},
+						{
+							"name": "X-Debug-Token-Link",
+							"key": "X-Debug-Token-Link",
+							"value": "http://www.literature.dev/_profiler/540f43",
+							"description": "Custom header"
+						}
+					],
+					"cookie": [],
+					"responseTime": 248,
+					"body": "{\"success\":true,\"response\":{\"success\":true,\"game\":{\"id\":\"g_9f2df7473ba4aeb782c3ce1fe1d6a609\",\"createdAt\":1481646985,\"status\":\"active\",\"prevTurn\":\"8rf2vdjbbrfv9luq5u549q0la6\",\"prevTurnTime\":1481647195,\"nextTurn\":\"8rf2vdjbbrfv9luq5u549q0la6\",\"usersCount\":4,\"users\":[\"4p8a29tg90qm4a5atrebbetpt1\",\"76dp78ll61tk1i9j0nqmbdshp6\",\"9k2mr6i1n6kro861amoi5519q6\",\"8rf2vdjbbrfv9luq5u549q0la6\"],\"team0\":[\"4p8a29tg90qm4a5atrebbetpt1\",\"8rf2vdjbbrfv9luq5u549q0la6\"],\"team1\":[\"76dp78ll61tk1i9j0nqmbdshp6\",\"9k2mr6i1n6kro861amoi5519q6\"],\"points\":{\"9k2mr6i1n6kro861amoi5519q6\":0,\"8rf2vdjbbrfv9luq5u549q0la6\":0,\"4p8a29tg90qm4a5atrebbetpt1\":0,\"76dp78ll61tk1i9j0nqmbdshp6\":0}},\"user\":{\"id\":\"8rf2vdjbbrfv9luq5u549q0la6\",\"cards\":[\"c1\",\"c4\",\"c9\",\"c10\",\"d1\",\"d9\",\"h1\",\"h2\",\"h6\",\"h9\",\"s5\",\"s8\",\"s13\"]}}}"
+				},
+				{
+					"id": "fb6b85f4-b817-4351-a1c2-daba490607ad",
+					"name": "Failure",
+					"originalRequest": {
+						"url": "http://www.literature.dev/game/move/c10/from/76dp78ll61tk1i9j0nqmbdshp6",
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"_postman_previewtype": "text",
+					"header": [
+						{
+							"name": "Cache-Control",
+							"key": "Cache-Control",
+							"value": "no-cache",
+							"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+						},
+						{
+							"name": "Connection",
+							"key": "Connection",
+							"value": "keep-alive",
+							"description": "Options that are desired for the connection"
+						},
+						{
+							"name": "Content-Type",
+							"key": "Content-Type",
+							"value": "application/json",
+							"description": "The mime type of this content"
+						},
+						{
+							"name": "Date",
+							"key": "Date",
+							"value": "Tue, 13 Dec 2016 16:40:11 GMT",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"name": "Server",
+							"key": "Server",
+							"value": "nginx/1.11.1",
+							"description": "A name for the server"
+						},
+						{
+							"name": "Transfer-Encoding",
+							"key": "Transfer-Encoding",
+							"value": "chunked",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						},
+						{
+							"name": "X-Debug-Token",
+							"key": "X-Debug-Token",
+							"value": "795f15",
+							"description": "Custom header"
+						},
+						{
+							"name": "X-Debug-Token-Link",
+							"key": "X-Debug-Token-Link",
+							"value": "http://www.literature.dev/_profiler/795f15",
+							"description": "Custom header"
+						}
+					],
+					"cookie": [],
+					"responseTime": 67,
+					"body": "{\"success\":false,\"errorCode\":\"BAD_REQUEST\",\"errorMessage\":\"You have the requested card already.\",\"extra\":[]}"
+				}
+			]
 		},
 		{
 			"name": "Game Show",
@@ -103,7 +654,78 @@
 				},
 				"description": ""
 			},
-			"response": []
+			"response": [
+				{
+					"id": "cc0fe281-fab1-4cc2-b755-cfc511dbe2cc",
+					"name": "Success",
+					"originalRequest": {
+						"url": "http://www.literature.dev/game/show/c/lower",
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"_postman_previewtype": "text",
+					"header": [
+						{
+							"name": "Cache-Control",
+							"key": "Cache-Control",
+							"value": "no-cache",
+							"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+						},
+						{
+							"name": "Connection",
+							"key": "Connection",
+							"value": "keep-alive",
+							"description": "Options that are desired for the connection"
+						},
+						{
+							"name": "Content-Type",
+							"key": "Content-Type",
+							"value": "application/json",
+							"description": "The mime type of this content"
+						},
+						{
+							"name": "Date",
+							"key": "Date",
+							"value": "Tue, 13 Dec 2016 16:41:30 GMT",
+							"description": "The date and time that the message was sent"
+						},
+						{
+							"name": "Server",
+							"key": "Server",
+							"value": "nginx/1.11.1",
+							"description": "A name for the server"
+						},
+						{
+							"name": "Transfer-Encoding",
+							"key": "Transfer-Encoding",
+							"value": "chunked",
+							"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+						},
+						{
+							"name": "X-Debug-Token",
+							"key": "X-Debug-Token",
+							"value": "84db2d",
+							"description": "Custom header"
+						},
+						{
+							"name": "X-Debug-Token-Link",
+							"key": "X-Debug-Token-Link",
+							"value": "http://www.literature.dev/_profiler/84db2d",
+							"description": "Custom header"
+						}
+					],
+					"cookie": [],
+					"responseTime": 87,
+					"body": "{\"success\":true,\"response\":{\"success\":true,\"game\":{\"id\":\"g_9f2df7473ba4aeb782c3ce1fe1d6a609\",\"createdAt\":1481646985,\"status\":\"active\",\"prevTurn\":\"8rf2vdjbbrfv9luq5u549q0la6\",\"prevTurnTime\":1481647290,\"nextTurn\":\"8rf2vdjbbrfv9luq5u549q0la6\",\"usersCount\":4,\"users\":[\"4p8a29tg90qm4a5atrebbetpt1\",\"76dp78ll61tk1i9j0nqmbdshp6\",\"9k2mr6i1n6kro861amoi5519q6\",\"8rf2vdjbbrfv9luq5u549q0la6\"],\"team0\":[\"4p8a29tg90qm4a5atrebbetpt1\",\"8rf2vdjbbrfv9luq5u549q0la6\"],\"team1\":[\"76dp78ll61tk1i9j0nqmbdshp6\",\"9k2mr6i1n6kro861amoi5519q6\"],\"points\":{\"9k2mr6i1n6kro861amoi5519q6\":0,\"8rf2vdjbbrfv9luq5u549q0la6\":3,\"4p8a29tg90qm4a5atrebbetpt1\":4,\"76dp78ll61tk1i9j0nqmbdshp6\":0}},\"user\":{\"id\":\"8rf2vdjbbrfv9luq5u549q0la6\",\"cards\":[\"c9\",\"c10\",\"d1\",\"d9\",\"h1\",\"h2\",\"h6\",\"h9\",\"s5\",\"s8\",\"s13\"]},\"showResult\":[{\"id\":\"4p8a29tg90qm4a5atrebbetpt1\",\"cardsShown\":[\"c3\",\"c5\",\"c2\",\"c1\"],\"points\":4},{\"id\":\"8rf2vdjbbrfv9luq5u549q0la6\",\"cardsShown\":[\"c4\",\"c6\",\"c1\"],\"points\":3}]}}"
+				}
+			]
 		},
 		{
 			"name": "Chat Post New Message",
