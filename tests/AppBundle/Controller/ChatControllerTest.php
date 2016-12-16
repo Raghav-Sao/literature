@@ -21,7 +21,7 @@ class ChatControllerTest extends AbstractControllerTest
             'extra'        => [],
         ];
 
-        $resBody = $this->makeFirstAssertions($res, 400, $expected);
+        $content = $this->makeFirstAssertions($res, 400, $expected);
     }
 
     public function testPostActionWithMessage()
@@ -50,7 +50,7 @@ class ChatControllerTest extends AbstractControllerTest
             ],
         ];
 
-        $resBody = $this->makeFirstAssertions($res, 200, $expected);
+        $content = $this->makeFirstAssertions($res, 200, $expected);
     }
 
     public function testPostActionWithoutMessage()
@@ -70,7 +70,7 @@ class ChatControllerTest extends AbstractControllerTest
             'extra'        => [],
         ];
 
-        $resBody = $this->makeFirstAssertions($res, 400, $expected);
+        $content = $this->makeFirstAssertions($res, 400, $expected);
     }
 
     public function testPostActionWithEmptyMessage()
@@ -99,6 +99,6 @@ class ChatControllerTest extends AbstractControllerTest
             'extra'        => [],
         ];
 
-        $resBody = $this->makeFirstAssertions($res, 400, $expected);
+        $content = $this->makeFirstAssertions($res, 400, $expected);
     }
 }

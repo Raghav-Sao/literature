@@ -31,13 +31,14 @@ class AbstractControllerTest extends WebTestCase
         $statusCode = $res->getStatusCode();
         $this->assertEquals($code, $statusCode, 'Response status code mismatch.');
 
-        $resBody = json_decode($res->getContent());
-        $this->doMakeFirstAssertions($resBody, $expected);
+        $content = json_decode($res->getContent(), true);
 
-        return $resBody;
+        $this->doMakeFirstAssertions($content, $expected);
+
+        return $content;
     }
 
-    protected function doMakeFirstAssertions($resBody, array $expected)
+    protected function doMakeFirstAssertions(& $content, array $expected)
     {
         //
         // Helper method to compare http response object & expected response array
@@ -48,11 +49,11 @@ class AbstractControllerTest extends WebTestCase
 
         foreach ($expected as $key => $value)
         {
-            $this->assertTrue(property_exists($resBody, $key), "'$key' key does not exists in response.");
+            $this->assertTrue(array_key_exists($key, $content), "'$key' key does not exists in response.");
 
             if (Utility::isAssocArray($value))
             {
-                $this->doMakeFirstAssertions($resBody->$key, $value);
+                $this->doMakeFirstAssertions($content[$key], $value);
             }
             else
             {
@@ -62,7 +63,7 @@ class AbstractControllerTest extends WebTestCase
                 }
                 else
                 {
-                    $this->assertEquals($value, $resBody->$key, "Value of '$key' key not matching.");
+                    $this->assertEquals($value, $content[$key], "Value of '$key' key not matching.");
                 }
             }
         }

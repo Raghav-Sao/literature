@@ -13,7 +13,7 @@ class GameControllerTest extends AbstractControllerTest
     {
         $client = static::createClient();
 
-        $client->request('GET', '/game/start');
+        $client->request('POST', '/game/start');
 
         $res = $client->getResponse();
 
@@ -40,27 +40,54 @@ class GameControllerTest extends AbstractControllerTest
             ],
         ];
 
-        $resBody = $this->makeFirstAssertions($res, 200, $expected);
+        $content = $this->makeFirstAssertions($res, 200, $expected);
 
-        $game = $resBody->response->game;
-        $user = $resBody->response->user;
+        $game = & $content['response']['game'];
+        $user = & $content['response']['user'];
 
-        $this->assertCount(12, $user->cards);
-        $this->assertEquals($game->nextTurn, $user->id);
+        $this->assertEquals($user['id'], $game['nextTurn']);
+        $this->assertEquals(1, $game['usersCount']);
+        $this->assertCount(1, $game['users']);
+        $this->assertContains($user['id'], $game['users']);
+        $this->assertCount(1, $game['team0']);
+        $this->assertContains($user['id'], $game['team0']);
+        $this->assertCount(0, $game['team1']);
+        $this->assertCount(1, $game['points']);
+        $this->assertCount(1, $game['points']);
+        $this->assertEquals(0, $game['points'][$user['id']]);
 
-        //
-        // TODO:
-        // - Add more asserts
-        //
+        $this->assertCount(12, $user['cards']);
     }
 
     public function testStartActionWhenSessionGameExists()
     {
-    }
+        $client = static::createClient();
 
-    //
-    // TODO:
-    // - Add more tests
-    //   Ensure controller changes are covered.
-    //
+        $client->request('POST', '/game/start');
+
+        $res = $client->getResponse();
+
+        //
+        // Another request for same client should fail
+        //
+
+        $content = $this->makeFirstAssertions($res, 200);
+
+        $gameId = $content['response']['game']['id'];
+
+        $client->request('POST', '/game/start');
+
+        $res = $client->getResponse();
+
+        $expected = [
+            'success'      => false,
+            'errorCode'    => 'BAD_REQUEST',
+            'errorMessage' => 'A game exists in session already.',
+            'extra'        => [
+                'gameId' => $gameId,
+            ],
+        ];
+
+        $this->makeFirstAssertions($res, 400, $expected);
+    }
 }

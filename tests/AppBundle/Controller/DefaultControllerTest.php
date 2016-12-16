@@ -26,7 +26,7 @@ class DefaultControllerTest extends AbstractControllerTest
 
         $res = $client->getResponse();
 
-        $resBody = $this->makeFirstAssertions($res, 200);
+        $content = $this->makeFirstAssertions($res, 200);
 
         // Now, visit index page
 
@@ -43,6 +43,6 @@ class DefaultControllerTest extends AbstractControllerTest
             ],
         ];
 
-        $resBody = $this->makeFirstAssertions($res, 400, $expected);
+        $content = $this->makeFirstAssertions($res, 400, $expected);
     }
 }
