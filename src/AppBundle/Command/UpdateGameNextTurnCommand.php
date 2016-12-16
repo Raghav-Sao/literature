@@ -39,7 +39,13 @@ class UpdateGameNextTurnCommand extends ContainerAwareCommand
 
         $now = time();
 
+        $output->writeln("Now: $now");
+
+        $output->writeln('Quering redis for affected game ids..');
+
         $ids = $redis->zrangebyscore('prevTurnTime', $now - self::T2, $now);
+
+        $output->writeln('Affected game ids: ' . count($ids));
 
         foreach ($ids as $id)
         {
@@ -71,5 +77,7 @@ class UpdateGameNextTurnCommand extends ContainerAwareCommand
                 ]
             );
         }
+
+        $output->writeln('Done.');
     }
 }
