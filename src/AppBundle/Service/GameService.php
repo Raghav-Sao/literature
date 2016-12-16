@@ -235,6 +235,8 @@ class GameService extends BaseService
             implode(',', $game->usersWithNoCards)
         );
 
+        $this->redis->zadd('prevTurnTime', $game->prevTurnTime, $game->id);
+
         // Publish this action
 
         $payload = [

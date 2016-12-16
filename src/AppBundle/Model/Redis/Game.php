@@ -151,14 +151,21 @@ class Game
         }
     }
 
-    public function getValidNextTurn()
+    public function getValidNextTurn(bool $different = false)
     {
-        if ($this->hasCards($this->nextTurn))
+        if ($different === false && $this->hasCards($this->nextTurn))
         {
             return $this->nextTurn;
         }
 
-        $possibleNextTurn = array_diff($this->users, $this->usersWithNoCards);
+        $users = $this->users;
+
+        if ($different)
+        {
+            $users = array_diff($users, [$this->nextTurn]);
+        }
+
+        $possibleNextTurn = array_diff($users, $this->usersWithNoCards);
 
         return current($possibleNextTurn);
     }
