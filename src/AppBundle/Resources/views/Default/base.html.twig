@@ -8,21 +8,15 @@
     </head>
     <body>
         {% block body %}{% endblock %}
-        {% block javascripts %}{% endblock %}
 
-        <!-- Pusher included in all views -->
-        <!-- <script src="https://js.pusher.com/3.2/pusher.min.js"></script> -->
+        {% block javascripts %}
 
-        <script>
-            // Enable this in dev env only
-            // Pusher.logToConsole = true;
-
-            // var pusher = new Pusher(
-            //     '0a4e78670f01ad56c33a',
-            //     {
-            //         encrypted: true
-            //     }
-            // );
+        <script
+            src="https://code.jquery.com/jquery-3.1.1.min.js"
+            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+            crossorigin="anonymous">
         </script>
+
+        {% endblock %}
     </body>
 </html>
