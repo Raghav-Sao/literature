@@ -6,9 +6,8 @@ use AppBundle\Service\BaseService;
 
 class Redis extends BaseService
 {
-    public function __construct(
-        $logger
-    ) {
+    public function __construct($logger)
+    {
         parent::__construct($logger);
     }
 

@@ -23,18 +23,11 @@ class Pusher extends BaseService implements PubSubInterface
     {
         if ($mock)
         {
-            return new PusherMock(
-                $logger
-            );
+            return new PusherMock($logger);
         }
         else
         {
-            return new Pusher(
-                $logger,
-                $appKey,
-                $appSecret,
-                $appId
-            );
+            return new Pusher($logger, $appKey, $appSecret, $appId);
         }
     }
 
@@ -52,19 +45,10 @@ class Pusher extends BaseService implements PubSubInterface
             'encrypted' => true,
         ];
 
-        $this->pusher = new PusherClient(
-            $appKey,
-            $appSecret,
-            $appId,
-            $options
-        );
+        $this->pusher = new PusherClient($appKey, $appSecret, $appId, $options);
     }
 
-    public function trigger(
-        string $channel,
-        string $event,
-        array  $data = []
-    )
+    public function trigger(string $channel, string $event, array $data = [])
     {
 
         $formattedData = [

@@ -2,24 +2,17 @@
 
 namespace AppBundle;
 
-use AppBundle\Constant\Game\Game;
 use AppBundle\Constant\Game\Card;
 
 class Utility
 {
 
-    public static function camelize(
-        string $input,
-        string $separator = '_'
-    )
+    public static function camelize(string $input, string $separator = '_')
     {
         return str_replace($separator, '', ucwords($input, $separator));
     }
 
-    public static function camelizeLcFirst(
-        string $input,
-        string $separator = '_'
-    )
+    public static function camelizeLcFirst(string $input, string $separator = '_')
     {
         return lcfirst(self::camelize($input, $separator));
     }
@@ -31,12 +24,7 @@ class Utility
 
     public static function newGameId()
     {
-        return Game::GAME_ID_PREFIX . self::randomString();
-    }
-
-    public static function currentTimeStamp()
-    {
-        return time();
+        return 'g_' . self::randomString();
     }
 
     public static function isAssocArray($v)
@@ -57,30 +45,22 @@ class Utility
     //
     // Card related Utility methods
 
-    public static function isValidCard(
-        string $card
-    )
+    public static function isValidCard(string $card)
     {
         return in_array($card, Card::$allInGame, true);
     }
 
-    public static function getCardType(
-        string $card
-    )
+    public static function getCardType(string $card)
     {
         return substr($card, 0, 1);
     }
 
-    public static function getCardValue(
-        string $card
-    )
+    public static function getCardValue(string $card)
     {
-        return substr($card, 1);
+        return (int) substr($card, 1);
     }
 
-    public static function getCardRange(
-        string $card
-    )
+    public static function getCardRange(string $card)
     {
         $cardValue = self::getCardValue($card);
 
@@ -107,13 +87,6 @@ class Utility
         return array_chunk($cards, 12);
     }
 
-    // public static function getRandomCard(
-    //     array & $cards
-    // )
-    // {
-    //     return $cards[array_rand($cards, 1)];
-    // }
-
     public static function filterCardsByTypeAndRange(
         array $cards,
         string $cardType,
@@ -121,7 +94,7 @@ class Utility
     )
     {
 
-        return array_filter(
+        $filteredCards = array_filter(
             $cards,
             function ($card) use ($cardType, $cardRange)
             {
@@ -132,5 +105,30 @@ class Utility
                 return ($isCardTypeSame && $isCardRangeSame);
             }
         );
+
+        return array_values($filteredCards);
+    }
+
+    public static function sortCards(array $cards)
+    {
+        usort(
+            $cards,
+            function($x, $y)
+            {
+
+                $bool1 = strcmp(self::getCardType($x), self::getCardType($y));
+
+                if ($bool1 === 0)
+                {
+                    $bool2 = (self::getCardValue($x) < self::getCardValue($y));
+
+                    return $bool2 ? -1 : 1;
+                }
+
+                return $bool1;
+            }
+        );
+
+        return $cards;
     }
 }

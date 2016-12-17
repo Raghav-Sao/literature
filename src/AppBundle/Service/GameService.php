@@ -7,10 +7,10 @@ use AppBundle\Model\Redis\User;
 use AppBundle\Exception\NotFoundException;
 use AppBundle\Exception\BadRequestException;
 use AppBundle\Utility;
-use AppBundle\Constant\Game\Game as GameK;
 use AppBundle\Constant\Game\Status;
 use AppBundle\Constant\Game\Event;
 use AppBundle\Constant\Game\Card;
+use AppBundle\Service\Result\GameServiceResult as Result;
 
 class GameService extends BaseService
 {
@@ -33,77 +33,60 @@ class GameService extends BaseService
         $this->knowledge = $knowledge;
     }
 
-    public function get(
-        string $id
-    )
+    public function get(string $id)
     {
+        //
         // Gets game model by id
+        //
 
         $hash = $this->redis->hgetall($id);
 
         if (empty($hash))
         {
-            throw new NotFoundException('Game not found');
+            throw new NotFoundException('Game not found.');
         }
 
         return new Game($id, $hash);
     }
 
-    public function getUser(
-        string $id
-    )
+    public function getUser(string $id)
     {
+        //
         // Gets user model by id
+        //
 
         $set = $this->redis->smembers($id);
 
         if (empty($set))
         {
-            $error = 'Cards not found for given user';
-            $extra   = ['id' => $id];
-
-            throw new NotFoundException($error, $extra);
+            $hash = [];
         }
 
         return new User($id, $set);
     }
 
-    public function getAndValidate(
-        string $id,
-        string $userId
-    )
+    public function getUsers(Game $game)
     {
-        // Gets game model by given id and validates
-        // if given userId belongs to the game.
+        $users = [];
 
-        $game = $this->get($id);
-
-        if ($game->isExpired())
+        foreach ($game->users as $userId)
         {
-            $this->delete($game);
-
-            $error = 'Game with given id is no longer active';
-
-            throw new BadRequestException($error);
+            $users[] = $this->getUser($userId);
         }
 
-        if ($userId && $game->hasUser($userId) === false)
-        {
-            $error = 'You do not belong to game with given id';
-
-            throw new BadRequestException($error);
-        }
-
-        $user = $this->getUser($userId);
-
-        return [$game, $user];
+        return $users;
     }
 
-    public function init(
-        string $userId
-    )
+    public function index(Game $game, User $user)
     {
+        return Result::create($game, $user);
+    }
+
+    public function init(string $userId)
+    {
+        //
         // Initializes a game with given userId as first member
+        //
 
         // - Creates game hash
 
@@ -123,31 +106,30 @@ class GameService extends BaseService
         $game = $this->get($id);
         $user = $this->getUser($userId);
 
-        return [$game, $user];
+        return Result::create($game, $user);
     }
 
-    public function join(
-        string $gameId,
-        string $atSN,
-        string $userId
-    )
+    public function join(string $gameId, string $team, string $userId)
     {
-        // Given userId joins the game at given position(serial number)
+        //
+        // Given user id joins the game in given team
+        //
 
         $game = $this->get($gameId);
 
-        if ($game->isSNVacant($atSN) === false)
-        {
-            throw new BadRequestException('Invalid position to join as member');
-        }
+        $game->canJoin($team, $userId);
 
-        $game->$atSN = $userId;
+        $game->users[]         = $userId;
+        $game->$team[]         = $userId;
+        $game->points[$userId] = 0;
+
+        $game->usersCount++;
 
         // If all 4 users joined then update game hash with required info
 
-        if ($game->isAnySNVacant() === false)
+        if ($game->usersCount === 4)
         {
-            $game->status            = Status::ACTIVE;
+            $game->status       = Status::ACTIVE;
             $game->prevTurnTime = time();
         }
 
@@ -156,19 +138,28 @@ class GameService extends BaseService
         $this->redis->hmset(
             $game->id,
 
-            $atSN,
-            $userId,
+            'usersCount',
+            $game->usersCount,
 
-            GameK::STATUS,
+            'users',
+            implode(',', $game->users),
+
+            $team,
+            implode(',', $game->$team),
+
+            'points_' . $userId,
+            0,
+
+            'status',
             $game->status,
 
-            GameK::PREV_TURN_TIMESTAMP,
+            'prevTurnTime',
             $game->prevTurnTime
         );
 
         // Creates init cards set for new users who joined
 
-        $cards = $game->getInitCardsBySN($atSN);
+        $cards = $game->getInitCards();
         $arg   = array_merge([$userId], $cards);
 
         call_user_func_array([$this->redis, 'sadd'], $arg);
@@ -176,26 +167,27 @@ class GameService extends BaseService
         // Publish this action
 
         $payload = [
-            'atSN' => $atSN,
-            'game' => $game->toArray(),
+            'team'   => $team,
+            'userId' => $userId,
         ];
         $this->pubSub->trigger($game->id, Event::GAME_JOIN_ACTION, $payload);
 
         $user = $this->getUser($userId);
 
-        return [$game, $user];
+        return Result::create($game, $user);
     }
 
     public function moveCard(
         Game   $game,
+        User   $toUser,
         string $card,
-        string $fromUserId,
-        string $toUserId
+        string $fromUserId
     )
     {
+        //
         // Attempts moving given card between given users of game
+        //
 
-        $toUser   = $this->getUser($toUserId);
         $fromUser = $this->getUser($fromUserId);
 
         $this->validateMove($game, $card, $fromUser, $toUser);
@@ -218,42 +210,46 @@ class GameService extends BaseService
         {
             // Else, update nextTurn
 
-            $fromUserSN     = $game->getSNByUserId($fromUser->id);
-            $game->nextTurn = $fromUserSN;
+            $game->nextTurn = $fromUser->id;
 
             $success = false;
         }
 
         // Update game hash with nextTurn, prevTurn, prevTurnTime
 
-        // TODO:
-        // - Proper assignment of nextTurn
-        //   If the user doesn't have any cards left then do not assign him
-        //   as nextTurn user
-        // - Proper publishing of such action/event
+        $game->refreshNoCardsList([$fromUser]);
 
         $this->redis->hmset(
             $game->id,
 
-            GameK::PREV_TURN,
+            'prevTurn',
             $game->prevTurn,
 
-            GameK::PREV_TURN_TIMESTAMP,
+            'prevTurnTime',
             $game->prevTurnTime,
 
-            GameK::NEXT_TURN,
-            $game->nextTurn
+            'nextTurn',
+            $game->getValidNextTurn(),
+
+            'usersWithNoCards',
+            implode(',', $game->usersWithNoCards)
         );
+
+        $this->redis->zadd('prevTurnTime', $game->prevTurnTime, $game->id);
 
         // Publish this action
 
         $payload = [
-            'success' => $success,
-            'game'    => $game->toArray(),
+            'fromUserId' => $fromUser->id,
+            'toUserId'   => $toUser->id,
+            'card'       => $card,
+            'success'    => $success,
         ];
         $this->pubSub->trigger($game->id, Event::GAME_MOVE_ACTION, $payload);
 
-        return [$success, $game, $toUser];
+        $params = ['success' => $success];
+
+        return Result::create($game, $toUser, $params);
     }
 
     public function show(
@@ -263,107 +259,150 @@ class GameService extends BaseService
         string $cardRange
     )
     {
+        //
         // Consumes cards of given type and range and set points
+        //
 
         // - Attemps consume for team of given user
 
-        list($success, $payload1) = $this->showAndConsumeCardsByTeam(
+        list($success, $result) = $this->showAndConsumeCardsByTeam(
             $game,
             $game->getTeam($user->id),
             $cardType,
             $cardRange
         );
 
-        if ($success)
-        {
-            return [$success, $payload1, []];
-        }
+        $result2 = [];
 
         // - Else, consumes for opposite team of given user
 
-        list($success, $payload2) = $this->showAndConsumeCardsByTeam(
-            $game,
-            $game->getOppTeam($user->id),
-            $cardType,
-            $cardRange,
-            true
+        if ($success === false)
+        {
+
+            list($temp, $result2) = $this->showAndConsumeCardsByTeam(
+                $game,
+                $game->getOppTeam($user->id),
+                $cardType,
+                $cardRange,
+                true
+            );
+        }
+
+        // Appends new result to existing one
+
+        if ($result2)
+        {
+            foreach ($result2 as $value)
+            {
+                $result[] = $value;
+            }
+        }
+
+        // Update game hash
+
+        $game->refreshNoCardsList($this->getUsers($game));
+
+        $this->redis->hmset(
+            $game->id,
+
+            'prevTurn',
+            $game->nextTurn,
+
+            'prevTurnTime',
+            time(),
+
+            'nextTurn',
+            $game->getValidNextTurn(),
+
+            'usersWithNoCards',
+            implode(',', $game->usersWithNoCards)
         );
 
-        // TODO:
-        // - Check game completion: Complete game and publish the action
+        // Refresh models
 
-        return [false, $payload1, $payload2];
+        $game = $this->get($game->id);
+        $user = $this->getUser($user->id);
+
+        $result = ['success' => $success, 'showResult' => $result];
+
+        // Publish event
+
+        $this->pubSub->trigger(
+            $game->id,
+            Event::GAME_SHOW_ACTION,
+            $result
+        );
+
+        // Check if game is complete
+
+        $game = $this->checkAndProcessGameCompletion($game);
+
+        return Result::create($game, $user, $result);
     }
 
-    public function delete(
-        Game $game
-    )
+    public function delete(Game $game)
     {
-        // Deletes all redis keys for given game
+        //
+        // Deletes all redis keys associated with given game
+        //
 
-        $this->redis->del(
-            $game->id,
-            $game->u1,
-            $game->u2,
-            $game->u3,
-            $game->u4
-        );
+        $keys   = $game->users;
+        $keys[] = $game->id;
+
+        call_user_func_array([$this->redis, 'del'], $keys);
 
         return $this;
     }
 
-    // ----------------------------------------------------------------------
+    //
     // Protected methods
 
-    protected function getInitHash(
-        string $id,     // Game id
-        string $userId, // First user in game
-        array  $cards   // 4 Set of cards for all users in game
-    )
+    protected function getInitHash(string $id, string $userId, array $cards)
     {
+        //
         // Returns initial game hash, with userId as firt member
+        //
 
         $hash = [
             $id,
 
-            GameK::CREATED_AT,
-            Utility::currentTimeStamp(),
+            'created_at',
+            time(),
 
-            GameK::STATUS,
+            'status',
             Status::INITIALIZED,
 
             // prevTurn, prevTurnTime null at this point
 
-            GameK::NEXT_TURN,
-            GameK::U1,
-
-            GameK::U1,
+            'nextTurn',
             $userId,
 
-            // u2, u3 & u4 null at this point
+            'usersCount',
+            1,
 
-            GameK::U1_POINTS,
+            'users',
+            $userId,
+
+            'team0',
+            $userId,
+
+            // team1 null at this point
+
+            'points_' . $userId,
             0,
 
-            GameK::U2_POINTS,
-            0,
+            // points_ for other users wont' exist at this point
 
-            GameK::U3_POINTS,
-            0,
-
-            GameK::U4_POINTS,
-            0,
-
-            GameK::U1_CARDS,
+            'cards0',
             implode(',', $cards[0]),
 
-            GameK::U2_CARDS,
+            'cards1',
             implode(',', $cards[1]),
 
-            GameK::U3_CARDS,
+            'cards2',
             implode(',', $cards[2]),
 
-            GameK::U4_CARDS,
+            'cards3',
             implode(',', $cards[3]),
         ];
 
@@ -377,55 +416,43 @@ class GameService extends BaseService
         User   $toUser
     )
     {
+        //
         // Does necessary validations for move action in a game
+        //
 
-        if ($game->isActive() === false)
+        if ($game->hasCards($fromUser->id) === false)
         {
-            $error = 'Game is not active';
-
-            throw new BadRequestException($error);
+            throw new BadRequestException('\'From User\' has no cards.');
         }
 
         if (Utility::isValidCard($card) === false)
         {
-            $error = 'Not a valid card';
-
-            throw new BadRequestException($error);
+            throw new BadRequestException('Not a valid card.');
         }
 
         if ($game->hasUser($fromUser->id) === false)
         {
-            $error = 'Bad value for fromUserId, Does not exists';
-
-            throw new BadRequestException($error);
+            throw new BadRequestException('\'From User\' does not exist.');
         }
 
-        if ($game->getNextTurnUserId() !== $toUser->id)
+        if ($game->nextTurn !== $toUser->id)
         {
-            $error = 'It is not your turn to make a move';
-
-            throw new BadRequestException($error);
+            throw new BadRequestException('It is not your turn to make a move.');
         }
 
         if ($game->areTeam($fromUser->id, $toUser->id))
         {
-            $error = 'Bad value for fromUserId, You are partners';
-
-            throw new BadRequestException($error);
+            throw new BadRequestException('You and \'From User\' are in same team.');
         }
 
         if ($toUser->hasCard($card))
         {
-            $error = 'Bad value for card, You have it already';
-
-            throw new BadRequestException($error);
+            throw new BadRequestException('You have the requested card already.');
         }
 
         if ($toUser->hasAtLeastOneCardOfType($card) === false)
         {
-            $error = 'You do not have at least one card of that type. Invalid move';
-
-            throw new BadRequestException($error);
+            throw new BadRequestException('You do not have at least one card of that type. Invalid move.');
         }
     }
 
@@ -437,104 +464,107 @@ class GameService extends BaseService
         bool   $partial = false
     )
     {
-        // Flow:
+        //
+        // Get both users of the given team
+        // Create default result array with cards shown and points made
+        //
 
-        // - Gets team users
-        // - Gets cards of given type and range for both users
-        // - Assign scores to the users based in ratio
+        $userIds      = $game->$team;
 
-        // - If partial is set to false:
-        //   - If total filtered cards count is not complete, return and dont' give
-        //     any score
-        // - If partial is set to true:
-        //   - Even if total filtered cards count is not complete, assign scores in
-        //     ration (Case: opposite team has the missing cards)
-
-        // - Publishes the action with pre-defined payload
-
-        $userIds      = $game->getTeamUsers($team);
-
-        $user1        = $this->getUser($userIds[0]);
-        $u1Cards      = Utility::filterCardsByTypeAndRange($cardType, $cardRange);
+        $u1           = $this->getUser($userIds[0]);
+        $u1Cards      = Utility::filterCardsByTypeAndRange($u1->cards, $cardType, $cardRange);
         $u1CardsCount = count($u1Cards);
 
-        $u2Cards      = [];
-        $u2CardsCount = 0;
-
-        if ($u1CardsCount < Card::MAX_PER_TYPE_RANGE)
-        {
-            $user2        = $this->getUser($userIds[1]);
-            $u2Cards      = Utility::filterCardsByTypeAndRange($cardType, $cardRange);
-            $u2CardsCount = count($u2Cards);
-        }
-
-        $payload = [
-            'game' => $game->toArray(),
-            'u1'   => [
-                'id'    => $user1->id,
-                'cards' => $u1Cards,
-            ],
-            'u2'   => [
-                'id'    => $user2->id,
-                'cards' => $u2Cards,
-            ],
+        $u1Result  = [
+            'id'         => $u1->id,
+            'cardsShown' => $u1Cards,
+            'points'     => 0,        // Points to be added, if win confirmed
         ];
 
-        if ($u1CardsCount + $u2CardsCount < Card::MAX_PER_TYPE_RANGE &&
-            $partial === false)
-        {
-            return [false, $payload];
-        }
+        $u2           = $this->getUser($userIds[1]);
+        $u2Cards      = Utility::filterCardsByTypeAndRange($u2->cards, $cardType, $cardRange);
+        $u2CardsCount = count($u2Cards);
 
-        $u1Points = 0;
-        $u2Points = 0;
+        $u2Result = [
+            'id'         => $u2->id,
+            'cardsShown' => $u2Cards,
+            'points'     => 0,
+        ];
+
+        //
+        // Remove shown cards from user's redis set
+        //
 
         if ($u1CardsCount > 0)
         {
-            call_user_func_array(
-                [$this->redis, 'srem'],
-                array_merge([$user1->id], $u1Cards)
-            );
-            $user1->removeCards($u1Cards);
-
-            $u1Points = $u1CardsCount / (float) Card::MAX_PER_TYPE_RANGE;
+            call_user_func_array([$this->redis, 'srem'], array_merge([$u1->id], $u1Cards));
         }
 
         if ($u2CardsCount > 0)
         {
-            call_user_func_array(
-                [$this->redis, 'srem'],
-                array_merge([$user2->id], $u1Cards)
-            );
-            $user2->removeCards($u1Cards);
-
-            $u1Points = $u2CardsCount / (float) Card::MAX_PER_TYPE_RANGE;
+            call_user_func_array([$this->redis, 'srem'], array_merge([$u2->id], $u2Cards));
         }
+
+        //
+        // If both user combined couldn't make the full set, then proceed ahead
+        // if 'partial' is set to true (will be the case when this flow gets
+        // called for oposite team)
+        //
+
+        if ($u1CardsCount + $u2CardsCount < Card::MAX_PER_TYPE_RANGE &&
+            $partial === false)
+        {
+            return [false, [$u1Result, $u2Result]];
+        }
+
+        //
+        // Assigns points(equals to filtered cards count) to users and updates
+        // redis keys
+        //
+
+        $u1Result['points'] = $u1CardsCount;
+        $u2Result['points'] = $u2CardsCount;
+
+        $this->redis->hincrby($game->id, 'points_' . $u1->id, $u1CardsCount);
+        $this->redis->hincrby($game->id, 'points_' . $u2->id, $u2CardsCount);
+
+        return [true, [$u1Result, $u2Result]];
+    }
+
+    protected function checkAndProcessGameCompletion(
+        Game $game
+    )
+    {
+        //
+        // If all points in game are made, mark the game's status as OVER.
+        // Publish the same message in proper format.
+        //
+
+        if ($game->allPointsMade() === false)
+        {
+            return $game;
+        }
+
+        //
+        // Sets game status to OVER
+        //
+
+        $game->status = Status::OVER;
 
         $hash = [
             $game->id,
 
-            GameK::U1_POINTS,
-            $u1Points,
-
-            GameK::U2_POINTS,
-            $u2Points,
+            'status',
+            $game->status,
         ];
 
-        $game->incrPoint($user1->id, $u1Points);
-        $game->incrPoint($user2->id, $u2Points);
-
-        call_user_func_array(
-            [$this->redis, 'hincrby'],
-            $hash
-        );
+        call_user_func_array([$this->redis, 'hmset'], $hash);
 
         $this->pubSub->trigger(
             $game->id,
-            Event::GAME_SHOW_ACTION,
-            $payload
+            Event::GAME_OVER_ACTION
         );
 
-        return [true, $payload];
+        return $game;
     }
 }

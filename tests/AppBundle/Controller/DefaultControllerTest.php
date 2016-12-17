@@ -26,7 +26,7 @@ class DefaultControllerTest extends AbstractControllerTest
 
         $res = $client->getResponse();
 
-        $resBody = $this->makeFirstAssertions($res, 200);
+        $content = $this->makeFirstAssertions($res, 200);
 
         // Now, visit index page
 
@@ -37,12 +37,12 @@ class DefaultControllerTest extends AbstractControllerTest
         $expected = [
             'success'      => false,
             'errorCode'    => Exception\Code::BAD_REQUEST,
-            'errorMessage' => 'You appear to be active in a game',
+            'errorMessage' => 'A game exists in session already.',
             'extra'        => [
-                'id'       => $resBody->response->game->id,
+                'gameId' => TestFlag::SOMETHING,
             ],
         ];
 
-        $resBody = $this->makeFirstAssertions($res, 400, $expected);
+        $content = $this->makeFirstAssertions($res, 400, $expected);
     }
 }

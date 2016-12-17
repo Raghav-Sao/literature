@@ -4,7 +4,7 @@ namespace AppBundle\Model\Redis;
 
 use AppBundle\Utility;
 use AppBundle\Constant\Game\Status;
-use AppBundle\Constant\Game\Game as GameK;
+use AppBundle\Constant\Game\Card;
 use AppBundle\Exception\BadRequestException;
 
 class Game
@@ -16,57 +16,59 @@ class Game
     public $prevTurnTime;
     public $nextTurn;
 
-    // @codingStandardsIgnoreStart
-    // User serial numbers
-    public $u1;
-    public $u2;
-    public $u3;
-    public $u4;
+    public $usersCount       = 0;  // Count of users joined
+    public $users            = []; // List of user ids
+    public $usersWithNoCards = []; // List of users who have no cards left
 
-    public $u1Points;
-    public $u2Points;
-    public $u3Points;
-    public $u4Points;
+    public $team0            = []; // List of ids in team0
+    public $team1            = [];
 
-    // Initial cards of all users
-    public $u1Cards;
-    public $u2Cards;
-    public $u3Cards;
-    public $u4Cards;
-    // @codingStandardsIgnoreStart
+    public $points           = []; // Associative list, (user id -> points)
 
-    public $teams;
+    public $cards0           = []; // List of intial cards for first user joined
+    public $cards1           = [];
+    public $cards2           = [];
+    public $cards3           = [];
 
-    public $index;
+    //
+    // Following keys are stored in model and in redis in same way
+    //
 
-    public function __construct(
-        string $id,
-        array  $params
-    )
+    public static $noOpKeys = [
+        'id',
+        'createdAt',
+        'status',
+        'prevTurn',
+        'prevTurnTime',
+        'nextTurn',
+        'usersCount',
+    ];
+
+    //
+    // Following keys are array in model but stored as comma separated
+    // string in redis
+    //
+
+    public static $explodeOpKeys = [
+        'users',
+        'usersWithNoCards',
+        'team0',
+        'team1',
+        'cards0',
+        'cards1',
+        'cards2',
+        'cards3',
+    ];
+
+    public function __construct(string $id, array $params)
     {
 
         $this->id = $id;
 
-        // Sets all attributes of the object
         foreach ($params as $key => $value)
         {
-            $property        = Utility::camelizeLcFirst($key);
-            $this->$property = $value;
+            $this->setAttribute($key, $value);
         }
-
-        // Sets teams
-        $this->teams = [
-            GameK::TEAM_1 => [$this->u1, $this->u3],
-            GameK::TEAM_2 => [$this->u2, $this->u4],
-        ];
-
-        // Sets index
-        $this->index = [
-            $this->u1 => GameK::U1,
-            $this->u2 => GameK::U2,
-            $this->u3 => GameK::U3,
-            $this->u4 => GameK::U4,
-        ];
     }
 
     //
@@ -77,161 +79,165 @@ class Game
         return ($this->status === Status::ACTIVE);
     }
 
-    public function isExpired()
+    public function hasUser(string $userId)
     {
-        return ($this->status === Status::EXPIRED);
+        return in_array($userId, $this->users, true);
     }
 
-    public function isNotExpired()
+    public function hasCards(string $userId)
     {
-        return !($this->isExpired());
+        return (in_array($userId, $this->usersWithNoCards, true) === false);
     }
 
-    public function isSNVacant(
-        string $userSN
-    )
+    public function canJoin(string $team)
     {
-        // Checks if given serial number is vacant for new users
+        //
+        // Checks if a team can be joined by any user.
+        // - Is valid team name?
+        // - Is vacant?
+        //
 
-        if (property_exists($this, $userSN) === false)
+        if (in_array($team, ['team0', 'team1'], true) === false)
         {
-            throw new BadRequestException('Invalid user serial number');
+            throw new BadRequestException('Invalid team name.');
         }
 
-        return ($this->$userSN == null);
+        if (count($this->$team) === 2)
+        {
+            throw new BadRequestException('Team not vacant.');
+        }
     }
 
-    public function isAnySNVacant()
+    public function areTeam(string $userId1, string $userId2)
     {
-        // Checks if any serial number is vacant at all in the game
-
-        return ($this->u1 == null ||
-                $this->u2 == null ||
-                $this->u3 == null ||
-                $this->u4 == null);
-    }
-
-    public function hasUser(
-        string $userId
-    )
-    {
-        return in_array($userId, array_keys($this->index), true);
-    }
-
-    public function areTeam(
-        string $userId1,
-        string $userId2
-    )
-    {
-
-        // Checks if given two users are team
-
-        $x = in_array($userId1, $this->teams[GameK::TEAM_1], true);
-        $y = in_array($userId2, $this->teams[GameK::TEAM_1], true);
+        $x = in_array($userId1, $this->team0, true);
+        $y = in_array($userId2, $this->team0, true);
 
         return ($x === $y);
     }
 
-    public function getSNByUserId(
-        string $userId
-    )
+    public function getInitCards()
     {
-        return $this->index[$userId];
+        //
+        // Returns initial set of cards for new user joining
+        //
+
+        $key = 'cards' . ($this->usersCount - 1);
+
+        return $this->$key;
     }
 
-    public function getNextTurnUserId()
+    public function getTeam(string $userId)
     {
-        $nextTurnSN = $this->nextTurn;
-
-        return $this->$nextTurnSN;
-    }
-
-    public function getInitCardsBySN(
-        string $userSN
-    )
-    {
-
-        $attribute = $userSN . 'Cards';
-
-        if (empty($this->$attribute))
+        if (in_array($userId, $this->team0))
         {
-            return [];
+            return 'team0';
         }
         else
         {
-            return explode(',', $this->$attribute);
+            return 'team1';
         }
     }
 
-    public function getTeamUsers(
-        string $team
-    )
+    public function getOppTeam(string $userId)
     {
-        return $this->teams[$team];
-    }
-
-    public function getTeam(
-        string $userId
-    )
-    {
-        // Returns team of given user id
-
-        if (in_array($userId, $this->teams[GameK::TEAM_1]))
+        if (in_array($userId, $this->team0))
         {
-            return GameK::TEAM_1;
+            return 'team1';
         }
         else
         {
-            return GameK::TEAM_2;
+            return 'team0';
         }
     }
 
-    public function getOppTeam(
-        string $userId
-    )
+    public function getValidNextTurn(bool $different = false)
     {
-        // Returns opposite team for given user id
+        if ($different === false && $this->hasCards($this->nextTurn))
+        {
+            return $this->nextTurn;
+        }
 
-        if (in_array($userId, $this->teams[GameK::TEAM_1]))
+        $users = $this->users;
+
+        if ($different)
         {
-            return GameK::TEAM_2;
+            $users = array_diff($users, [$this->nextTurn]);
         }
-        else
-        {
-            return GameK::TEAM_1;
-        }
+
+        $possibleNextTurn = array_diff($users, $this->usersWithNoCards);
+
+        return current($possibleNextTurn);
+    }
+
+    public function allPointsMade()
+    {
+        return (array_sum($this->points) === Card::MAX_IN_GAME);
     }
 
     public function toArray()
     {
 
         return [
-            'id'        => $this->id,
-            'createdAt' => $this->createdAt,
-            'status'    => $this->status,
+            'id'               => $this->id,
+            'createdAt'        => (int) $this->createdAt,
+            'status'           => $this->status,
+            'prevTurn'         => $this->prevTurn,
+            'prevTurnTime'     => (int) $this->prevTurnTime,
+            'nextTurn'         => $this->nextTurn,
 
-            'u1'        => $this->u1,
-            'u2'        => $this->u2,
-            'u3'        => $this->u3,
-            'u4'        => $this->u4,
+            'usersCount'       => (int) $this->usersCount,
+            'users'            => $this->users,
+            'usersWithNoCards' => $this->usersWithNoCards,
+
+            'team0'            => $this->team0,
+            'team1'            => $this->team1,
+
+            'points'           => $this->points,
         ];
     }
 
     //
     // Setters
 
-    public function incrPoint(
-        string $userId,
-        float  $point
-    )
+    public function refreshNoCardsList(array $users)
     {
-        // Increments points by given amount for given user
+        foreach ($users as $user)
+        {
+            if (count($user->cards) === 0)
+            {
+                $this->usersWithNoCards[] = $user->id;
+            }
+        }
 
-        $property = $this->getSNByUserId($userId) . "Points";
-
-        $this->$property += $point;
+        $this->usersWithNoCards = array_unique($this->usersWithNoCards);
 
         return $this;
     }
 
+    //
+    // Protected methods
+
+    protected function setAttribute(string $key, string $value)
+    {
+        //
+        // Method used to construct this model from redis hash
+        //
+
+        if (in_array($key, self::$noOpKeys, true))
+        {
+            $this->$key = $value;
+        }
+        else if (in_array($key, self::$explodeOpKeys, true))
+        {
+            if (empty($value) === false)
+            {
+                $this->$key = explode(',', $value);
+            }
+        }
+        else if (preg_match('/(points_)(?P<userId>.*)/', $key, $matches))
+        {
+            $this->points[$matches['userId']] = (int) $value;
+        }
+    }
 }

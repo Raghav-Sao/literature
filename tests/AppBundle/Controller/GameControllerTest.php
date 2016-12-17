@@ -13,7 +13,7 @@ class GameControllerTest extends AbstractControllerTest
     {
         $client = static::createClient();
 
-        $client->request('GET', '/game/start');
+        $client->request('POST', '/game/start');
 
         $res = $client->getResponse();
 
@@ -21,12 +21,17 @@ class GameControllerTest extends AbstractControllerTest
             'success'  => true,
             'response' => [
                 'game' => [
-                    'id'     => TestFlag::SOMETHING,
-                    'status' => Status::INITIALIZED,
-                    'u1'     => TestFlag::SOMETHING,
-                    'u2'     => null,
-                    'u3'     => null,
-                    'u4'     => null,
+                    'id'           => TestFlag::SOMETHING,
+                    'createdAt'    => TestFlag::SOMETHING,
+                    'status'       => Status::INITIALIZED,
+                    'prevTurn'     => null,
+                    'prevTurnTime' => TestFlag::SOMETHING,
+                    'nextTurn'     => TestFlag::SOMETHING,
+                    'usersCount'   => 1,
+                    'users'        => TestFlag::SOMETHING,
+                    'team0'        => TestFlag::SOMETHING,
+                    'team1'        => TestFlag::SOMETHING,
+                    'points'       => TestFlag::SOMETHING,
                 ],
                 'user' => [
                     'id'    => TestFlag::SOMETHING,
@@ -35,131 +40,54 @@ class GameControllerTest extends AbstractControllerTest
             ],
         ];
 
-        $resBody = $this->makeFirstAssertions($res, 200, $expected);
+        $content = $this->makeFirstAssertions($res, 200, $expected);
 
-        $this->assertCount(12, $resBody->response->user->cards);
+        $game = & $content['response']['game'];
+        $user = & $content['response']['user'];
 
-        // On reloading the same page,
-        // should throw 400 saying you're already in a game
+        $this->assertEquals($user['id'], $game['nextTurn']);
+        $this->assertEquals(1, $game['usersCount']);
+        $this->assertCount(1, $game['users']);
+        $this->assertContains($user['id'], $game['users']);
+        $this->assertCount(1, $game['team0']);
+        $this->assertContains($user['id'], $game['team0']);
+        $this->assertCount(0, $game['team1']);
+        $this->assertCount(1, $game['points']);
+        $this->assertCount(1, $game['points']);
+        $this->assertEquals(0, $game['points'][$user['id']]);
 
-        $client->reload();
+        $this->assertCount(12, $user['cards']);
+    }
+
+    public function testStartActionWhenSessionGameExists()
+    {
+        $client = static::createClient();
+
+        $client->request('POST', '/game/start');
+
+        $res = $client->getResponse();
+
+        //
+        // Another request for same client should fail
+        //
+
+        $content = $this->makeFirstAssertions($res, 200);
+
+        $gameId = $content['response']['game']['id'];
+
+        $client->request('POST', '/game/start');
+
         $res = $client->getResponse();
 
         $expected = [
             'success'      => false,
-            'errorCode'    => Exception\Code::BAD_REQUEST,
-            'errorMessage' => 'You appear to be active in a game',
+            'errorCode'    => 'BAD_REQUEST',
+            'errorMessage' => 'A game exists in session already.',
             'extra'        => [
-                'id'       => $resBody->response->game->id,
+                'gameId' => $gameId,
             ],
         ];
 
-        $resBody = $this->makeFirstAssertions($res, 400, $expected);
+        $this->makeFirstAssertions($res, 400, $expected);
     }
-
-    public function testIndexAction()
-    {
-        $client = static::createClient();
-
-        // Without a game already created, should throw 404
-        $client->request('GET', '/game');
-
-        $res = $client->getResponse();
-
-        $expected = [
-            'success'      => false,
-            'errorCode'    => Exception\Code::NOT_FOUND,
-            'errorMessage' => 'Game not found',
-            'extra'        => [],
-        ];
-
-        $resBody = $this->makeFirstAssertions($res, 404, $expected);
-
-        // Now after creating a game
-
-        $client->request('GET', '/game/start');
-
-        $res = $client->getResponse();
-
-        $resBody = $this->makeFirstAssertions($res, 200, []);
-
-        $gameId  = $resBody->response->game->id;
-        $userId  = $resBody->response->user->id;
-
-        $client->request('GET', '/game');
-
-        $res = $client->getResponse();
-
-        $expected = [
-            'success'  => true,
-            'response' => [
-                'game' => [
-                    'id'     => $gameId,
-                    'status' => Status::INITIALIZED,
-                    'u1'     => $userId,
-                    'u2'     => null,
-                    'u3'     => null,
-                    'u4'     => null,
-                ],
-                'user' => [
-                    'id'    => $userId,
-                    'cards' => TestFlag::SOMETHING,
-                ],
-            ],
-        ];
-
-        $resBody = $this->makeFirstAssertions($res, 200, $expected);
-
-        $this->assertCount(12, $resBody->response->user->cards);
-    }
-
-    public function testJoinAction()
-    {
-    }
-
-    public function testMoveAction()
-    {
-    }
-
-    public function testDeleteAction()
-    {
-        $client = static::createClient();
-
-        // Without a game already created, should throw 404
-
-        $client->request('DELETE', '/game/delete');
-
-        $res = $client->getResponse();
-
-        $expected = [
-            'success'      => false,
-            'errorCode'    => Exception\Code::NOT_FOUND,
-            'errorMessage' => 'Game not found',
-            'extra'        => [],
-        ];
-
-        $resBody = $this->makeFirstAssertions($res, 404, $expected);
-
-        // Now after starting a game
-
-        $client->request('GET', '/game/start');
-
-        $client->request('DELETE', '/game/delete');
-
-        $res = $client->getResponse();
-
-        $expected = [
-            'success' => true,
-            'response' => [
-                'success' => true,
-            ],
-        ];
-
-        $resBody = $this->makeFirstAssertions($res, 200, $expected);
-    }
-
-    // ----------------------------------------------------------------------
-    // Protected methods
-
-
 }

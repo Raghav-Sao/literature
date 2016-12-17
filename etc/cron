@@ -1,0 +1,5 @@
+
+# Updates game's next turn, Runs every 30s
+
+* * * * * /home/vagrant/literature/bin/console app:updateGameNextTurn
+* * * * * ( sleep 30; /home/vagrant/literature/bin/console app:updateGameNextTurn )

@@ -13,25 +13,24 @@ class ChatController extends BaseController
     {
         $this->init();
 
-        if ($this->gameId === false)
-        {
-            throw new NotFoundException('Game not found');
-        }
+        $this->ensureGameAndUser(false);
 
-        if (empty($this->input['message']))
+        $message = ($this->input['message']) ?? null;
+
+        if (empty($message))
         {
             throw new BadRequestException('No message provided in input');
         }
 
         $payload = [
-            'user'    => $this->userId,
-            'message' => $this->input['message'],
+            'user'    => $this->user->id,
+            'message' => $message,
         ];
 
         $pusher = $this->container->get('app_bundle.pubsub.pusher');
 
         $pusher->trigger($this->gameId, Game\Event::CHAT_MESSAGE, $payload);
 
-        return new Response\Ok();
+        return new Response\Ok(['message' => $message]);
     }
 }

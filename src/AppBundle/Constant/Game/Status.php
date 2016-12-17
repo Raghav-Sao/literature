@@ -7,5 +7,4 @@ class Status
     const INITIALIZED = 'initialized';
     const ACTIVE      = 'active';
     const OVER        = 'over';
-    const EXPIRED     = 'expired';
 }

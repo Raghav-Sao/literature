@@ -13,6 +13,7 @@ class Card
     const HIGHER_RANGE         = 'higher';
     
     const MAX_PER_TYPE_RANGE   = 6;
+    const MAX_IN_GAME          = 24;
     
     const CLUB_1               = 'c1';
     const CLUB_2               = 'c2';

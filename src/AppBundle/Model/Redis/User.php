@@ -10,10 +10,7 @@ class User
     public $id;
     public $cards;
 
-    public function __construct(
-        string $id,
-        array  $cards
-    )
+    public function __construct(string $id, array $cards)
     {
         $this->id    = $id;
         $this->cards = $cards;
@@ -22,16 +19,12 @@ class User
     //
     // Getters
 
-    public function hasCard(
-        string $card
-    )
+    public function hasCard(string $card)
     {
         return in_array($card, $this->cards, true);
     }
 
-    public function hasAtLeastOneCardOfType(
-        string $card
-    )
+    public function hasAtLeastOneCardOfType(string $card)
     {
         $cardType  = Utility::getCardType($card);
         $cardRange = Utility::getCardRange($card);
@@ -50,28 +43,25 @@ class User
 
     public function toArray()
     {
+        $cards = Utility::sortCards($this->cards);
 
         return [
             'id'    => $this->id,
-            'cards' => $this->cards,
+            'cards' => $cards,
         ];
     }
 
     //
     // Setters
 
-    public function addCard(
-        string $card
-    )
+    public function addCard(string $card)
     {
         $this->cards[] = $card;
 
         return $this;
     }
 
-    public function removeCard(
-        string $card
-    )
+    public function removeCard(string $card)
     {
         $key = array_search($card, $this->cards);
 
@@ -83,9 +73,7 @@ class User
         return $this;
     }
 
-    public function removeCards(
-        array $cards
-    )
+    public function removeCards(array $cards)
     {
         foreach ($cards as $card)
         {

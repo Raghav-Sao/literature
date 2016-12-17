@@ -24,9 +24,7 @@ class UserTestData
         Card::HEART_3,
     ];
 
-    public static function id(
-        string $id = null
-    )
+    public static function id(string $id = null)
     {
         if (empty($id))
         {
@@ -36,16 +34,13 @@ class UserTestData
         return $id;
     }
 
-    public static function set(
-        array $overrideWith = [],
-        bool  $replace      = false
-    )
+    public static function set(array $override = [], bool $replace = false)
     {
         if ($replace)
         {
-            return $overrideWith;
+            return $override;
         }
 
-        return array_merge(self::$set, $overrideWith);
+        return array_merge(self::$set, $override);
     }
 }

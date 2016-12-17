@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Constant\Service;
 use AppBundle\Constant\ContextKey;
+use AppBundle\Constant\SerializeGroup as Group;
 use AppBundle\Utility;
 use AppBundle\Controller\Response;
 
@@ -13,139 +14,89 @@ class GameController extends BaseController
     {
         $this->init();
 
-        $this->throwIfUserActiveInAnotherGame();
+        $this->ensureNoGame();
 
-        list($game, $user) = $this->gameService->init($this->userId);
+        $result = $this->gameService->init($this->userId);
 
-        $this->setContext(ContextKey::GAME_ID, $game->id);
+        $this->setContext(ContextKey::GAME_ID, $result->game->id);
 
-        $res = [
-            'game' => $game->toArray(),
-            'user' => $user->toArray(),            
-        ];
-
-        return new Response\Ok($res);
+        return new Response\Ok($result->serialize());
     }
 
     public function indexAction()
     {
         $this->init();
 
-        list($game, $user) = $this->gameService
-                                  ->getAndValidate(
-                                        $this->gameId,
-                                        $this->userId
-                                    );
+        $this->ensureGameAndUser(false);
 
-        $res = [
-            'game' => $game->toArray(),
-            'user' => $user->toArray(),
-        ];
+        $result = $this->gameService->index($this->game, $this->user);
 
-        return new Response\Ok($res);
+
+        return new Response\Ok($result->serialize());
     }
 
-    public function joinAction(
-        string $gameId,
-        string $atSN
-    )
+    public function joinAction(string $gameId, string $team)
     {
 
         $this->init();
 
-        $this->throwIfUserActiveInAnotherGame();
+        $this->ensureNoGame();
 
-        list($game, $user) = $this->gameService
-                                  ->join(
-                                        $gameId,
-                                        $atSN,
-                                        $this->userId
-                                    );
+        $result = $this->gameService
+                       ->join(
+                            $gameId,
+                            $team,
+                            $this->userId
+                        );
 
-        $this->setContext(ContextKey::GAME_ID, $game->id);
+        $this->setContext(ContextKey::GAME_ID, $result->game->id);
 
-        $res = [
-            'game' => $game->toArray(),
-            'user' => $user->toArray(),
-        ];
-
-        return new Response\Ok($res);
+        return new Response\Ok($result->serialize());
     }
 
-    public function moveFromAction(
-        string $card,
-        string $fromUserId
-    )
+    public function moveFromAction(string $card, string $fromUserId)
     {
 
         $this->init();
 
-        list($game, $user) = $this->gameService
-                                  ->getAndValidate(
-                                        $this->gameId,
-                                        $this->userId
-                                    );
+        $this->ensureGameAndUser();
 
-        list($success, $game, $user) = $this->gameService
-                                            ->moveCard(
-                                                $game,
-                                                $card,
-                                                $fromUserId,
-                                                $this->userId
-                                            );
+        $moveResult = $this->gameService
+                           ->moveCard(
+                                $this->game,
+                                $this->user,
+                                $card,
+                                $fromUserId
+                            );
 
-        $res = [
-            'success' => $success,
-            'game'    => $game->toArray(),
-            'user'    => $user->toArray(),
-        ];
-
-        return new Response\Ok($res);
+        return new Response\Ok($moveResult->serialize(Group::GAME_MOVE));
     }
 
-    public function showAction(
-      string $cardType,
-      string $cardRange
-    )
+    public function showAction(string $cardType, string $cardRange)
     {
         $this->init();
 
-        list($game, $user) = $this->gameService
-                                  ->getAndValidate(
-                                        $this->gameId,
-                                        $this->userId
-                                    );
+        $this->ensureGameAndUser();
 
-        list($success, $payload1, $payload2) = $this->gameService
-                                                    ->show(
-                                                        $game,
-                                                        $user,
-                                                        $cardType,
-                                                        $cardRange
-                                                    );
+        $showResult = $this->gameService
+                            ->show(
+                                $this->game,
+                                $this->user,
+                                $cardType,
+                                $cardRange
+                            );
 
-        $res = [
-            'success'  => $success,
-            'game'     => $game->toArray(),
-            'user'     => $user->toArray(),
-            'payload1' => $payload1,
-            'payload2' => $payload2
-        ];
 
-        return new Response\Ok($res);
+        return new Response\Ok($showResult->serialize(Group::GAME_SHOW));
     }
 
     public function deleteAction()
     {
         $this->init();
 
-        list($game, $user) = $this->gameService
-                                  ->getAndValidate(
-                                        $this->gameId,
-                                        $this->userId
-                                    );
+        $this->ensureGameAndUser(false);
 
-        $this->gameService->delete($game);
+        $this->gameService->delete($this->game);
 
         $this->resetContext();
 
