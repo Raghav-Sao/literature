@@ -1,12 +1,6 @@
 imports:
     - { resource: config.yml }
 
-#doctrine:
-#    orm:
-#        metadata_cache_driver: apc
-#        result_cache_driver: apc
-#        query_cache_driver: apc
-
 monolog:
     handlers:
         main:
@@ -19,3 +13,8 @@ monolog:
             level: debug
         console:
             type:  console
+        loggly:
+            type:  loggly
+            token: f0ff20c7-bbdb-41ba-8f23-ef99f9ddd087
+            level: debug
+            tag:   symfony-app
