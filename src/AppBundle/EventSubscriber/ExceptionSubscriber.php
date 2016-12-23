@@ -45,10 +45,12 @@ class ExceptionSubscriber implements EventSubscriberInterface
         {
             case 'AppBundle\Exception\BadRequestException':
                 $response = new Response\Error($e, Response\Error::HTTP_BAD_REQUEST);
+                $this->logger->debug($e);
                 break;
 
             case 'AppBundle\Exception\NotFoundException':
                 $response = new Response\Error($e, Response\Error::HTTP_NOT_FOUND);
+                $this->logger->debug($e);
                 break;
 
             // @codeCoverageIgnoreStart

@@ -8,9 +8,10 @@ monolog:
             action_level: debug
             handler:      nested
         nested:
-            type:  stream
-            path:  "%kernel.logs_dir%/%kernel.environment%.log"
-            level: debug
+            type:     stream
+            path:    "%kernel.logs_dir%/%kernel.environment%.log"
+            level:    debug
+            channels: [!event]
         console:
             type:  console
         loggly:

@@ -16,6 +16,7 @@ class RequestSubscriber implements EventSubscriberInterface
            KernelEvents::REQUEST => [
                ['ensureSessionStarted', 0],
                ['ensureCidHeader',      1],
+               ['log',                  3],
            ],
         ];
 
@@ -48,5 +49,15 @@ class RequestSubscriber implements EventSubscriberInterface
         }
 
         $headers->set('cid', Utility::generateId('cid'));
+    }
+
+    public function log(GetResponseEvent $event)
+    {
+        //
+        // TODO:
+        // - Do not log everything
+        //
+
+        $this->logger->debug($event->getRequest()->__toString());
     }
 }
