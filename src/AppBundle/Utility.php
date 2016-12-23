@@ -17,14 +17,16 @@ class Utility
         return lcfirst(self::camelize($input, $separator));
     }
 
-    public static function randomString()
+    public static function generateId(string $prefix = '')
     {
-        return md5(uniqid(rand(), true));
-    }
+        $id = bin2hex(random_bytes(3));
 
-    public static function newGameId()
-    {
-        return 'g_' . self::randomString();
+        if (empty($prefix))
+        {
+            return $id;
+        }
+
+        return $prefix . '_' . $id;
     }
 
     public static function isAssocArray($v)

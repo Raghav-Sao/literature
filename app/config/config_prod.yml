@@ -8,9 +8,10 @@ monolog:
             action_level: error
             handler:      nested
         nested:
-            type:  stream
-            path:  "%kernel.logs_dir%/%kernel.environment%.log"
-            level: debug
+            type:      stream
+            path:      "%kernel.logs_dir%/%kernel.environment%.log"
+            level:     debug
+            formatter: monolog.formatter.session_request
         console:
             type:  console
         loggly:
@@ -18,3 +19,4 @@ monolog:
             token: f0ff20c7-bbdb-41ba-8f23-ef99f9ddd087
             level: debug
             tag:   symfony-app
+            formatter: monolog.formatter.session_request
