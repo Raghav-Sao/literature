@@ -90,7 +90,7 @@ class GameService extends BaseService
 
         // - Creates game hash
 
-        $id    = Utility::newGameId();
+        $id    = Utility::generateId('g');
         $cards = Utility::distributeCards();
 
         $hash = $this->getInitHash($id, $userId, $cards);

@@ -30,54 +30,69 @@ class UpdateGameNextTurnCommand extends ContainerAwareCommand
             ->setHelp(self::HELP);
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output)
     {
-        $container   = $this->getContainer();
-        $redis       = $container->get('snc_redis.default');
-        $gameService = $container->get(Service::GAME);
-        $pubSub      = $container->get(Service::PUBSUB);
+        $container         = $this->getContainer();
 
+        $this->logger      = $container->get('logger');
+        $this->redis       = $container->get('snc_redis.default');
+        $this->gameService = $container->get(Service::GAME);
+        $this->pubSub      = $container->get(Service::PUBSUB);
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
         $now = time();
 
-        $output->writeln("Now: $now");
+        $this->logger->debug('Cron starts.', [
+                'cron'   => 'app:updateGameNextTurn',
+                'time'   => $now,
+                'status' => 'start',
+            ]);
 
-        $output->writeln('Quering redis for affected game ids..');
-
-        $ids = $redis->zrangebyscore('prevTurnTime', $now - self::T2, $now);
-
-        $output->writeln('Affected game ids: ' . count($ids));
+        $ids = $this->redis->zrangebyscore('prevTurnTime', $now - self::T2, $now);
 
         foreach ($ids as $id)
         {
-            $game            = $gameService->get($id);
-
-            $nextTurn        = $game->nextTurn;
-            $newNextTurn     = $game->getValidNextTurn(true);
-            $prevTurnTime    = $game->prevTurnTime;
-            $newPrevTurnTime = time();
-
-            $redis->hmset(
-                $id,
-
-                'nextTurn',
-                $newNextTurn,
-
-                'prevTurnTime',
-                $newPrevTurnTime
-            );
-
-            $pubSub->trigger(
-                $game->id,
-                Event::GAME_NEXT_TURN_UPDATE,
-                [
-                    'nextTurn'        => $nextTurn,
-                    'newNextTurn'     => $newNextTurn,
-                    'prevTurnTime'    => $prevTurnTime,
-                    'newPrevTurnTime' => $newPrevTurnTime,
-                ]
-            );
+            $this->do($id);
         }
 
-        $output->writeln('Done.');
+        $this->logger->debug('Cron ends.', [
+                'cron'   => 'app:updateGameNextTurn',
+                'time'   => $now,
+                'status' => 'end',
+                'ids'    => $ids,
+            ]);
+    }
+
+    protected function do(string $id)
+    {
+        $game            = $this->gameService->get($id);
+
+        $nextTurn        = $game->nextTurn;
+        $newNextTurn     = $game->getValidNextTurn(true);
+        $prevTurnTime    = $game->prevTurnTime;
+        $newPrevTurnTime = time();
+
+        $this->redis->hmset(
+            $id,
+
+            'nextTurn',
+            $newNextTurn,
+
+            'prevTurnTime',
+            $newPrevTurnTime
+        );
+
+        $this->pubSub->trigger(
+            $game->id,
+            Event::GAME_NEXT_TURN_UPDATE,
+            [
+                'nextTurn'        => $nextTurn,
+                'newNextTurn'     => $newNextTurn,
+                'prevTurnTime'    => $prevTurnTime,
+                'newPrevTurnTime' => $newPrevTurnTime,
+            ]
+        );
     }
 }

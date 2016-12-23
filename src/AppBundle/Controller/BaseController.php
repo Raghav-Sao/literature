@@ -72,7 +72,14 @@ class BaseController extends Controller
             }
         }
 
-        $this->userId = $this->session->getId();
+        $this->userId = $this->session->get(ContextKey::USER_ID, false);
+
+        if ($this->userId === false)
+        {
+            $this->userId = 'u_' . substr(md5($this->session->getId()), 0, 6);
+
+            $this->setContext(ContextKey::USER_ID, $this->userId);
+        }
 
         if ($this->userId)
         {

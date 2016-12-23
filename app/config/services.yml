@@ -47,3 +47,16 @@ services:
             - "@logger"
         tags:
             - { name: kernel.event_subscriber }
+
+    app.response_subscriber:
+        class: AppBundle\EventSubscriber\ResponseSubscriber
+        arguments:
+            - "@logger"
+        tags:
+            - { name: kernel.event_subscriber }
+
+    monolog.processor.session_request:
+        class: AppBundle\SessionRequestProcessor
+        arguments:  ['@session']
+        tags:
+            - { name: monolog.processor, method: processRecord }
