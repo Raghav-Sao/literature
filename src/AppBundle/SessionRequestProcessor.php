@@ -23,7 +23,7 @@ class SessionRequestProcessor
             '_g_id' => $this->session->get(ContextKey::GAME_ID),
         ];
 
-        $record += $debug;
+        $record['extra'] += $debug;
 
         return $record;
     }

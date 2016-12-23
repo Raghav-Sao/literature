@@ -48,11 +48,6 @@ services:
         tags:
             - { name: kernel.event_subscriber }
 
-    monolog.formatter.session_request:
-        class: Monolog\Formatter\LineFormatter
-        arguments:
-            - "[%%datetime%%] %%channel%%.%%level_name%%: %%message%% %%context%% %%extra%% %%top_debug%%\n"
-
     monolog.processor.session_request:
         class: AppBundle\SessionRequestProcessor
         arguments:  ['@session']
