@@ -1,0 +1,22 @@
+<div class="col-xs-12 bgm-green poz-rel h-600">
+    <div class="poz-abs l-0p t-50p">
+        <div dir-left-demo-card>
+        </div>
+    </div>
+    <div class="poz-abs t-10p l-50p"><div dir-top-demo-card>
+        </div></div>
+    <div class="poz-abs t-50p r-0p"><div dir-right-demo-card>
+        </div></div>
+    <div class="poz-abs b-0p l-50p">
+        <div class="game-dex" ng-repeat="data in showCards track by $index" ng-click="getCardOptions(data.card)">
+            <div type="{[{data.type}]}" no={[{data.no}]} arr="{[{data.arr}]}" cls="{[{data.cls}]}" dir-get-card >
+            </div>
+        </div>
+    </div>
+    <div class="poz-abs b-50p l-50p">
+        <div class="center-card" ng-repeat="data in optionCards track by $index">
+            <div type="{[{data.type}]}" no={[{data.no}]} arr="{[{data.arr}]}" cls="{[{data.cls}]}" dir-center-card>
+            </div>
+        </div>
+    </div>
+</div>

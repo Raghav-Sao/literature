@@ -17,4 +17,13 @@ class DefaultController extends BaseController
 
         return new Response($content);
     }
+
+    public function demoAction()
+    {
+
+        $content = $this->render('AppBundle:Default:demo.html.twig')
+                        ->getContent();
+
+        return new Response($content);
+    }
 }

@@ -1,0 +1,195 @@
+.card {
+  background-image: url("/bundles/app/img/cardback.gif");
+  border-color: #808080 #000000 #000000 #808080;
+  border-width: 1px;
+  border-style: solid;
+  font-size: 20pt;
+  position: absolute;
+  width:  3.75em;
+  height: 5.00em;
+}
+.verical-card {
+  background-image: url("/bundles/app/img/cardback.gif");
+  border-color: #808080 #000000 #000000 #808080;
+  border-width: 1px;
+  border-style: solid;
+  font-size: 20pt;
+  position: absolute;
+  width:  5.00em;
+  height: 3.75em;
+}
+
+.front {
+  background-color: #ffffff;
+  color: #000000;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.red { color: #ff0000; }
+
+.index {
+  font-size: 50%;
+  font-weight: bold;
+  text-align: center;
+  position: absolute;
+  left: 0.25em;
+  top:  0.25em;
+}
+
+.ace {
+  font-size: 300%;
+  position: absolute;
+  left: 0.325em;
+  top:  0.250em;
+}
+
+.face {
+  border: 1px solid #000000;
+  position: absolute;
+  left: 0.50em;
+  top:  0.45em;
+  width:  2.6em;
+  height: 4.0em;
+}
+
+.spotA1 { position: absolute; left: 0.60em; top: 0.5em; }
+.spotA2 { position: absolute; left: 0.60em; top: 1.5em; }
+.spotA3 { position: absolute; left: 0.60em; top: 2.0em; }
+.spotA4 { position: absolute; left: 0.60em; top: 2.5em; }
+.spotA5 { position: absolute; left: 0.60em; top: 3.5em; }
+
+.spotB1 { position: absolute; left: 1.55em; top: 0.5em; }
+.spotB2 { position: absolute; left: 1.55em; top: 1.0em; }
+.spotB3 { position: absolute; left: 1.55em; top: 2.0em; }
+.spotB4 { position: absolute; left: 1.55em; top: 3.0em; }
+.spotB5 { position: absolute; left: 1.55em; top: 3.5em; }
+
+.spotC1 { position: absolute; left: 2.50em; top: 0.5em; }
+.spotC2 { position: absolute; left: 2.50em; top: 1.5em; }
+.spotC3 { position: absolute; left: 2.50em; top: 2.0em; }
+.spotC4 { position: absolute; left: 2.50em; top: 2.5em; }
+.spotC5 { position: absolute; left: 2.50em; top: 3.5em; }
+
+
+
+
+/*///////*/
+.game-dex .card {
+	bottom: 0.5em;
+	-webkit-transition-property: bottom; /* Safari */
+    -webkit-transition-duration: 0.01s; /* Safari */
+    transition-property: bottom;
+    transition-duration: 0.01s;
+}
+.game-dex .card:hover {
+	bottom: 1.5em;
+	cursor: pointer;}
+
+.center-card .card {
+	bottom: -2.5em;
+	-webkit-transition-property: bottom; /* Safari */
+    -webkit-transition-duration: 0.01s; /* Safari */
+    transition-property: bottom;
+    transition-duration: 0.01s;
+}
+.center-card .card:hover {
+	bottom: 1.5em;
+	cursor: pointer;}
+
+/*////////*/
+.rotate-90 {
+ -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    transform: rotate(90deg);
+}
+
+.left--1em {
+	left: -1em;
+}
+.left--2em {
+	left: -2em;
+}
+.left--3em {
+	left: -3em;
+}
+.left--4em {
+	left: -4em;
+}
+.left--5em {
+	left: -5em;
+}
+.left--6em {
+	left: -6em;
+}
+.left--7em {
+	left: -7em;
+}
+.left--8em {
+	left: -8em;
+}
+.left-1em {
+	left: 1em;
+}
+.left-2em {
+	left: 2em;
+}
+.left-3em {
+	left: 3em;
+}
+.left-4em {
+	left: 4em;
+}
+.left-5em {
+	left: 5em;
+}
+.left-6em {
+	left: 6em;
+}
+.left-7em {
+	left: 7em;
+}
+.left-8em {
+	left: 8em;
+}
+
+/**************/
+.h-600 {
+	height: 600px;
+}
+.bgm-green {
+	background: green;
+}
+.poz-abs {
+	position: absolute;
+}
+.poz-rel {
+	position: relative;
+}
+.l-0p {
+	left: 0%;
+}
+.l-50p {
+	left: 50%;
+}
+.r-0p {
+	right: 0%;
+}
+.r-50p {
+	right: 50%;
+}
+.t-0p {
+	top: 0%;
+}
+.t-50p {
+	top: 50%;
+}
+.b-0p {
+	bottom: 0%;
+}
+.b-50p {
+	bottom: 50%;
+}

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html ng-app="cardApp">
+<head>
+	<title>Card Demo</title>
+	<script src="/bundles/app/node_modules/angular/angular.min.js"></script>
+	<script src="/bundles/app/js/app.js"></script>
+	<script src="/bundles/app/js/config.js"></script>
+	
+	<script src="/bundles/app/js/controllers/cards.ctrl.js"></script>
+	<script src="/bundles/app/js/directives/card.dir.js"></script>
+	<link rel="stylesheet" type="text/css" href="/bundles/app/css/cards.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-route.js"></script>
+</head>
+<body  ng-controller="cardCtrl">
+	<data ng-view></data>
+</body>
+</html>

@@ -58,7 +58,7 @@ class Pusher extends BaseService implements PubSubInterface
 
         try
         {
-            $this->pusher->trigger($channel, $event, $formattedData);
+            $res = $this->pusher->trigger($channel, $event, $formattedData);
         }
         catch (\Exception $e)
         {
