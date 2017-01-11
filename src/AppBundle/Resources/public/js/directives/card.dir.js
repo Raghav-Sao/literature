@@ -34,7 +34,7 @@ cardApp
 
 
 .directive('dirGetCard', function($compile) {
-    var template = '<div class="card {[{cls}]}em">' +
+    var template = '<div class="card {[{clr}]}" style="left:{[{cls}]}em">' +
         '<div class="front">' +
         '<div class="index">{[{no}]}<br />{[{type}]}</div>' +
         '<div class="spotA1" ng-show="{[{arr}]}.indexOf(11)>=0"> {[{type}]}</div>' +
@@ -61,7 +61,8 @@ cardApp
             type: "@",
             no: "@",
             cls: "@",
-            arr: "@"
+            arr: "@",
+            clr: "@"
         },
         link: function(scope, element, attr) {
             var content = $compile(template)(scope);
@@ -70,7 +71,7 @@ cardApp
     }
 })
     .directive('dirCenterCard', function($compile) {
-    var template = '<div class="card {[{cls}]}em">' +
+        var template = '<div class="card {[{clr}]}" style="left:{[{cls}]}em">' +
         '<div class="front">' +
         '<div class="index">{[{no}]}<br />{[{type}]}</div>' +
         '<div class="spotA1" ng-show="{[{arr}]}.indexOf(11)>=0"> {[{type}]}</div>' +
@@ -95,9 +96,10 @@ cardApp
         replace: 'true',
         scope: {
             type: "@",
-            no: "@",
-            cls: "@",
-            arr: "@"
+            no  : "@",
+            cls : "@",
+            arr : "@",
+            clr : "@"
         },
         link: function(scope, element, attr) {
             var content = $compile(template)(scope);

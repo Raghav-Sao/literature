@@ -21,7 +21,7 @@
 
 .front {
   background-color: #ffffff;
-  color: #000000;
+  /*color: #000000;*/
   position: absolute;
   width: 100%;
   height: 100%;
@@ -94,9 +94,9 @@
     transition-property: bottom;
     transition-duration: 0.01s;
 }
-.center-card .card:hover {
+/*.center-card .card:hover {
 	bottom: 1.5em;
-	cursor: pointer;}
+	cursor: pointer;}*/
 
 /*////////*/
 .rotate-90 {
