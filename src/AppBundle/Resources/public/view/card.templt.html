@@ -14,8 +14,10 @@
         </div>
     </div>
     <div class="poz-abs b-50p l-50p">
-        <div class="center-card" ng-repeat="data in optionCards track by $index">
+        <div class="center-card" ng-repeat="data in optionCards" ng-click="setectCenterCard(data.card)">
+                <div class="card {[{data.clr}]}" style="left:{[{data.cls}]}em"  ng-class="{'selected-card': selectedCard == data.card}">
             <div type="{[{data.type}]}" no={[{data.no}]} arr="{[{data.arr}]}" cls="{[{data.cls}]}" clr="{[{data.clr}]}" dir-center-card>
+            </div>
             </div>
         </div>
     </div>

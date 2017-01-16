@@ -52,6 +52,11 @@ cardApp
         '<div class="spotC3" ng-show="{[{arr}]}.indexOf(33)>=0"> {[{type}]}</div>' +
         '<div class="spotC4" ng-show="{[{arr}]}.indexOf(34)>=0"> {[{type}]}</div>' +
         '<div class="spotC5" ng-show="{[{arr}]}.indexOf(35)>=0"> {[{type}]}</div>' +
+        '<img class="face" src="/bundles/app/img/king.gif" alt="" width="80" height="130"  ng-show="{[{arr}]}.indexOf(1)>=0"/>'+
+        '<img class="face" src="/bundles/app/img/queen.gif" alt="" width="80" height="130" ng-show="{[{arr}]}.indexOf(2)>=0"/>'+
+        '<img class="face" src="/bundles/app/img/jack.gif" alt="" width="80" height="130"  ng-show="{[{arr}]}.indexOf(3)>=0"/>'+
+        // '<div class="spotA1">&clubs;</div>'+
+        // '<div class="spotC5">&clubs;</div>'+
         '</div>' +
         '</div>'
     return {
@@ -71,7 +76,7 @@ cardApp
     }
 })
     .directive('dirCenterCard', function($compile) {
-        var template = '<div class="card {[{clr}]}" style="left:{[{cls}]}em">' +
+        var template =
         '<div class="front">' +
         '<div class="index">{[{no}]}<br />{[{type}]}</div>' +
         '<div class="spotA1" ng-show="{[{arr}]}.indexOf(11)>=0"> {[{type}]}</div>' +
@@ -89,8 +94,12 @@ cardApp
         '<div class="spotC3" ng-show="{[{arr}]}.indexOf(33)>=0"> {[{type}]}</div>' +
         '<div class="spotC4" ng-show="{[{arr}]}.indexOf(34)>=0"> {[{type}]}</div>' +
         '<div class="spotC5" ng-show="{[{arr}]}.indexOf(35)>=0"> {[{type}]}</div>' +
-        '</div>' +
-        '</div>'
+        '<img class="face" src="/bundles/app/img/king.gif" alt="" width="80" height="130"  ng-show="{[{arr}]}.indexOf(1)>=0"/>'+
+        '<img class="face" src="/bundles/app/img/queen.gif" alt="" width="80" height="130" ng-show="{[{arr}]}.indexOf(2)>=0"/>'+
+        '<img class="face" src="/bundles/app/img/jack.gif" alt="" width="80" height="130"  ng-show="{[{arr}]}.indexOf(3)>=0"/>'+
+        // '<div class="spotA1">&clubs;</div>'+
+        // '<div class="spotC5">&clubs;</div>'+
+        '</div>' 
     return {
         restrict: 'AE',
         replace: 'true',
@@ -106,7 +115,4 @@ cardApp
             element.replaceWith(content);
         }
     }
-
-
-
 });
